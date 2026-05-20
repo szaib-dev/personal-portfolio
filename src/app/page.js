@@ -98,7 +98,7 @@ const featuredProjects = [
   },
 ];
 
-const values = ["Useful", "Scalable", "Beautiful", "Well built"];
+const values = ["Useful", "Considered", "Beautiful", "Well made"];
 
 const referenceCards = [
   {
@@ -313,11 +313,13 @@ export default function Home() {
 
         <div className={styles.valuesBody}>
           <p>
-            These are the standards I bring to every build. I care about
-            interfaces that solve a real problem, systems that stay maintainable
-            as scope grows, visuals that feel intentional, and implementation
-            that holds up under real use. Good work should be clear on the
-            surface, strong underneath, and ready for what comes next.
+            These are the core values behind the way I build. I care about
+            digital work that solves a real problem, feels intentional in every
+            detail, and stays strong as products grow. I like thinking big,
+            building fast but carefully, staying practical, and creating
+            systems that are not only beautiful on the surface, but dependable
+            underneath. My goal is always the same: make something useful, well
+            made, and built to last.
           </p>
         </div>
       </section>
