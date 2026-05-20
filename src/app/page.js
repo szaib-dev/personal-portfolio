@@ -1,6 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { FiArrowUpRight } from "react-icons/fi";
 import { gsap } from "gsap";
 import styles from "./page.module.css";
 
@@ -55,11 +57,76 @@ const audienceProfiles = [
   },
 ];
 
-const sections = ["Intro", "Work", "Values", "References", "About"];
+const navSections = [
+  { id: "intro", label: "Intro" },
+  { id: "work", label: "Work" },
+  { id: "values", label: "Values" },
+  { id: "references", label: "References" },
+  { id: "about", label: "About" },
+];
+
+const featuredProjects = [
+  {
+    id: "trend-bible",
+    kicker: "Trend Bible",
+    title: "Trend Bible",
+    description:
+      "A bold subscription-first editorial platform concept built to package market signals into a high-impact landing page with oversized type, strong hierarchy, and a confident conversion flow.",
+    metaLeft: "Editorial platform",
+    metaRight: "UI / Frontend concept",
+    image: "/trend-bible.png",
+    href: "/trend-bible.png",
+    width: 1086,
+    height: 633,
+    reverse: false,
+    accent: "#ff8f12",
+  },
+  {
+    id: "visual-poetry",
+    kicker: "Visual Poetry",
+    title: "Visual Poetry",
+    description:
+      "A cinematic portfolio concept for a visual storyteller, designed to balance gallery energy, warm contrast, and a brand-led first impression that feels immersive from the opening screen.",
+    metaLeft: "Creative portfolio",
+    metaRight: "Brand-led web concept",
+    image: "/visual-poetry.png",
+    href: "/visual-poetry.png",
+    width: 631,
+    height: 423,
+    reverse: true,
+    accent: "#f2aa38",
+  },
+];
+
+const values = ["Useful", "Scalable", "Beautiful", "Well built"];
+
+const referenceCards = [
+  {
+    label: "For founders",
+    title: "Fast, thoughtful delivery",
+    body:
+      "I can move from rough direction to polished execution without letting the product foundation become messy underneath.",
+  },
+  {
+    label: "For product teams",
+    title: "Clean UI with real structure",
+    body:
+      "The frontend gets attention to detail, while the architecture behind it stays organized, readable, and ready to evolve.",
+  },
+  {
+    label: "For technical collaborators",
+    title: "Scale-minded decisions",
+    body:
+      "I think early about maintainability, multi-tenant patterns, deployment flow, and the kind of codebase that keeps working after launch.",
+  },
+];
+
+const aboutTools = ["Next.js", "Node.js", "TypeScript"];
 
 export default function Home() {
   const [activeAudience, setActiveAudience] = useState(audienceProfiles[0].id);
-  const heroRef = useRef(null);
+  const [activeSection, setActiveSection] = useState(navSections[0].id);
+  const pageRef = useRef(null);
   const headingRef = useRef(null);
 
   const activeProfile =
@@ -81,7 +148,7 @@ export default function Home() {
           ease: "power2.out",
         }
       );
-    }, heroRef);
+    }, pageRef);
 
     return () => ctx.revert();
   }, []);
@@ -112,25 +179,51 @@ export default function Home() {
     );
   }, [activeAudience]);
 
+  useEffect(() => {
+    const sections = Array.from(document.querySelectorAll("[data-section]"));
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntries = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((entryA, entryB) => entryB.intersectionRatio - entryA.intersectionRatio);
+
+        if (visibleEntries[0]?.target.id) {
+          setActiveSection(visibleEntries[0].target.id);
+        }
+      },
+      {
+        rootMargin: "-20% 0px -45% 0px",
+        threshold: [0.2, 0.45, 0.7],
+      }
+    );
+
+    sections.forEach((section) => observer.observe(section));
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <main className={styles.page} ref={heroRef}>
+    <main className={styles.page} ref={pageRef}>
       <div className={styles.brand} data-hero-item>
         SM.
       </div>
 
       <aside className={styles.sidebar} data-hero-item>
-        {sections.map((section, index) => (
+        {navSections.map((section) => (
           <a
-            key={section}
-            href={`#${section.toLowerCase()}`}
-            className={index === 0 ? styles.activeNav : styles.navItem}
+            key={section.id}
+            href={`#${section.id}`}
+            className={
+              activeSection === section.id ? styles.activeNav : styles.navItem
+            }
           >
-            {section}
+            {section.label}
           </a>
         ))}
       </aside>
 
-      <section className={styles.hero} id="intro">
+      <section className={styles.hero} id="intro" data-section>
         <div className={styles.audienceRow}>
           {audienceProfiles.map((profile) => {
             const isActive = profile.id === activeAudience;
@@ -156,6 +249,141 @@ export default function Home() {
           </h1>
 
           <p className={styles.summary}>{activeProfile.summary}</p>
+        </div>
+      </section>
+
+      <section className={`${styles.contentSection} ${styles.workSection}`} id="work" data-section>
+        {featuredProjects.map((project) => (
+          <article
+            key={project.id}
+            className={`${styles.projectCard} ${
+              project.reverse ? styles.projectCardReverse : ""
+            }`}
+          >
+            <div className={styles.projectCopy}>
+              <p className={styles.projectKicker} style={{ color: project.accent }}>
+                {project.kicker}
+              </p>
+              <h2 className={styles.projectTitle}>{project.title}</h2>
+              <p className={styles.projectDescription}>{project.description}</p>
+
+              <div className={styles.projectMeta}>
+                <span>{project.metaLeft}</span>
+                <span>{project.metaRight}</span>
+              </div>
+
+              <a
+                className={styles.projectButton}
+                href={project.href}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View project preview
+                <FiArrowUpRight aria-hidden="true" />
+              </a>
+            </div>
+
+            <a
+              className={styles.projectVisualLink}
+              href={project.href}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Image
+                className={styles.projectVisual}
+                src={project.image}
+                alt={`${project.title} project preview`}
+                width={project.width}
+                height={project.height}
+                priority={project.id === "trend-bible"}
+              />
+            </a>
+          </article>
+        ))}
+      </section>
+
+      <section className={`${styles.contentSection} ${styles.valuesSection}`} id="values" data-section>
+        <div className={styles.valuesStack}>
+          {values.map((value) => (
+            <span key={value} className={styles.valuesWord}>
+              {value}
+            </span>
+          ))}
+        </div>
+
+        <div className={styles.valuesBody}>
+          <p>
+            These are the standards I bring to every build. I care about
+            interfaces that solve a real problem, systems that stay maintainable
+            as scope grows, visuals that feel intentional, and implementation
+            that holds up under real use. Good work should be clear on the
+            surface, strong underneath, and ready for what comes next.
+          </p>
+        </div>
+      </section>
+
+      <section
+        className={`${styles.contentSection} ${styles.referencesSection}`}
+        id="references"
+        data-section
+      >
+        <div className={styles.referencesGrid}>
+          {referenceCards.map((card) => (
+            <article key={card.title} className={styles.referenceCard}>
+              <p className={styles.referenceLabel}>{card.label}</p>
+              <h3 className={styles.referenceTitle}>{card.title}</h3>
+              <p className={styles.referenceBody}>{card.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className={`${styles.contentSection} ${styles.aboutSection}`} id="about" data-section>
+        <div className={styles.aboutTop}>
+          <h2 className={styles.aboutLead}>
+            I&apos;m Shahzaib Mirza, a PK-based full stack developer.
+          </h2>
+
+          <p className={styles.aboutBody}>
+            I build clean, beautiful websites with the same care I put into the
+            systems behind them. I enjoy shaping frontend experiences that feel
+            polished and backend structures that stay reliable as products grow.
+          </p>
+
+          <p className={styles.aboutBody}>
+            I work especially well with founders, startups, and small teams that
+            need strong product thinking, modern execution, and a developer who
+            can move across the stack without losing clarity.
+          </p>
+        </div>
+
+        <div className={styles.aboutLower}>
+          <div className={styles.aboutCardStack}>
+            <div className={`${styles.aboutCardPaper} ${styles.aboutCardPaperOne}`} />
+            <div className={`${styles.aboutCardPaper} ${styles.aboutCardPaperTwo}`} />
+            <div className={`${styles.aboutCardPaper} ${styles.aboutCardFront}`}>
+              <p className={styles.aboutCardLabel}>Shahzaib Mirza</p>
+              <p className={styles.aboutMonogram}>SM</p>
+              <p className={styles.aboutRole}>Full stack web developer</p>
+
+              <div className={styles.aboutTools}>
+                {aboutTools.map((tool) => (
+                  <span key={tool} className={styles.aboutToolChip}>
+                    {tool}
+                  </span>
+                ))}
+              </div>
+
+              <p className={styles.aboutCardNote}>
+                Building polished interfaces and systems that scale with time.
+              </p>
+            </div>
+          </div>
+
+          <p className={styles.aboutClosing}>
+            Let me help build a web presence and product foundation that looks
+            sharp and scales with time.
+          </p>
         </div>
       </section>
     </main>
