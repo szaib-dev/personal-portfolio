@@ -95,20 +95,18 @@ export default function Home() {
       headingRef.current,
       {
         opacity: 0,
-        scaleX: 1.1,
-        scaleY: 0.9,
-        y: 8,
-        transformOrigin: "50% 50%",
-        filter: "blur(6px)",
+        scaleX: 1.035,
+        scaleY: 0.985,
+        y: 6,
+        transformOrigin: "50% 100%",
       },
       {
         opacity: 1,
         scaleX: 1,
         scaleY: 1,
         y: 0,
-        filter: "blur(0px)",
-        duration: 0.58,
-        ease: "power3.out",
+        duration: 0.42,
+        ease: "power2.out",
         overwrite: "auto",
       }
     );
