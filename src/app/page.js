@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import styles from "./page.module.css";
 
@@ -56,87 +56,11 @@ const audienceProfiles = [
 ];
 
 const sections = ["Intro", "Work", "Values", "References", "About"];
-const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
-
-function getCharacterSequence(character) {
-  const lowerCharacter = character.toLowerCase();
-  const characterIndex = alphabet.indexOf(lowerCharacter);
-
-  if (character === " ") {
-    return {
-      targetIndex: 0,
-      values: [" "],
-    };
-  }
-
-  if (characterIndex === -1) {
-    return {
-      targetIndex: 0,
-      values: [character],
-    };
-  }
-
-  const values = alphabet
-    .slice(0, characterIndex + 1)
-    .map((letter) => (character === lowerCharacter ? letter : letter.toUpperCase()));
-
-  return {
-    targetIndex: values.length - 1,
-    values,
-  };
-}
-
-function RollingText({ as: Tag, className, text, duration }) {
-  const letterRefs = useRef([]);
-  const characters = useMemo(
-    () => Array.from(text).map((character) => getCharacterSequence(character)),
-    [text]
-  );
-
-  useEffect(() => {
-    const nodes = letterRefs.current.filter(Boolean);
-
-    gsap.set(nodes, { yPercent: 0 });
-    gsap.to(nodes, {
-      yPercent: (index) => -100 * characters[index].targetIndex,
-      duration,
-      ease: "power2.out",
-      overwrite: true,
-    });
-  }, [characters, duration]);
-
-  return (
-    <Tag className={className} aria-label={text}>
-      {characters.map((character, index) => (
-        <span
-          key={`${text}-${index}`}
-          className={
-            character.values[0] === " "
-              ? styles.rollSpace
-              : styles.rollCharacter
-          }
-        >
-          <span
-            ref={(node) => {
-              letterRefs.current[index] = node;
-            }}
-            className={styles.rollInner}
-          >
-            {character.values.map((value, valueIndex) => (
-              <span key={`${index}-${valueIndex}`} className={styles.rollGlyph}>
-                {value}
-              </span>
-            ))}
-          </span>
-        </span>
-      ))}
-    </Tag>
-  );
-}
 
 export default function Home() {
   const [activeAudience, setActiveAudience] = useState(audienceProfiles[0].id);
   const heroRef = useRef(null);
+  const headingRef = useRef(null);
 
   const activeProfile =
     audienceProfiles.find((profile) => profile.id === activeAudience) ??
@@ -148,12 +72,12 @@ export default function Home() {
         "[data-hero-item]",
         {
           opacity: 0,
-          y: 18,
+          y: 12,
         },
         {
           opacity: 1,
           y: 0,
-          duration: 0.32,
+          duration: 0.28,
           ease: "power2.out",
         }
       );
@@ -161,6 +85,34 @@ export default function Home() {
 
     return () => ctx.revert();
   }, []);
+
+  useEffect(() => {
+    if (!headingRef.current) {
+      return;
+    }
+
+    gsap.fromTo(
+      headingRef.current,
+      {
+        opacity: 0,
+        scaleX: 1.1,
+        scaleY: 0.9,
+        y: 8,
+        transformOrigin: "50% 50%",
+        filter: "blur(6px)",
+      },
+      {
+        opacity: 1,
+        scaleX: 1,
+        scaleY: 1,
+        y: 0,
+        filter: "blur(0px)",
+        duration: 0.58,
+        ease: "power3.out",
+        overwrite: "auto",
+      }
+    );
+  }, [activeAudience]);
 
   return (
     <main className={styles.page} ref={heroRef}>
@@ -181,7 +133,7 @@ export default function Home() {
       </aside>
 
       <section className={styles.hero} id="intro">
-        <div className={styles.audienceRow} data-hero-item>
+        <div className={styles.audienceRow}>
           {audienceProfiles.map((profile) => {
             const isActive = profile.id === activeAudience;
 
@@ -201,19 +153,11 @@ export default function Home() {
         </div>
 
         <div className={styles.copyBlock}>
-          <RollingText
-            as="h1"
-            className={styles.headline}
-            text={activeProfile.headline}
-            duration={0.72}
-          />
+          <h1 ref={headingRef} className={styles.headline}>
+            {activeProfile.headline}
+          </h1>
 
-          <RollingText
-            as="p"
-            className={styles.summary}
-            text={activeProfile.summary}
-            duration={0.58}
-          />
+          <p className={styles.summary}>{activeProfile.summary}</p>
         </div>
       </section>
     </main>

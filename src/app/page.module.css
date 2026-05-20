@@ -77,42 +77,13 @@
   max-width: 43rem;
 }
 
-.rollCharacter,
-.rollSpace {
-  display: inline-flex;
-  height: 1em;
-  overflow: hidden;
-  vertical-align: top;
-}
-
-.rollCharacter {
-  width: 0.63em;
-}
-
-.rollSpace {
-  width: 0.31em;
-}
-
-.rollInner {
-  display: flex;
-  width: 100%;
-  flex-direction: column;
-  will-change: transform;
-}
-
-.rollGlyph {
-  display: flex;
-  height: 1em;
-  align-items: center;
-  justify-content: center;
-}
-
 .headline {
   max-width: 42rem;
   font-size: clamp(2.78rem, 4.18vw, 4rem);
   font-weight: 500;
   line-height: 1;
   letter-spacing: -0.07em;
+  will-change: transform, filter, opacity;
 }
 
 .summary {
