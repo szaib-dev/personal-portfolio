@@ -28,7 +28,7 @@
 }
 
 .pageContent {
-  will-change: transform, opacity;
+  position: relative;
 }
 
 .brand {
@@ -205,32 +205,32 @@
 .valuesSection {
   position: relative;
   min-height: 100vh;
-  padding-top: 1.6rem;
-  padding-bottom: 0;
+  padding-top: 0.9rem;
+  padding-bottom: 1.5rem;
 }
 
 .valuesStack {
   position: absolute;
-  left: clamp(8rem, 9vw, 11.5rem);
-  top: 1.2rem;
-  max-width: 33rem;
+  left: clamp(6.6rem, 8.2vw, 8.85rem);
+  top: 0;
+  max-width: 29rem;
 }
 
 .valuesWord {
   display: block;
-  font-size: clamp(5.4rem, 7.9vw, 7.5rem);
+  font-size: clamp(4.65rem, 6.35vw, 6.65rem);
   font-weight: 500;
-  line-height: 0.88;
+  line-height: 0.9;
   letter-spacing: -0.08em;
 }
 
 .valuesBody {
   position: absolute;
-  right: 0;
-  bottom: 2rem;
-  width: min(100%, 41rem);
-  font-size: 0.98rem;
-  line-height: 1.55;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  width: min(100%, 42rem);
+  font-size: 0.95rem;
+  line-height: 1.58;
   color: #1f1f1f;
 }
 
@@ -406,7 +406,7 @@
   }
 
   .projectCardReverse .projectCopy,
-  .projectCardReverse .projectVisualLink {
+  .projectCardReverse .projectVisualWrap {
     order: initial;
   }
 
@@ -493,9 +493,6 @@
     padding-top: 5rem;
   }
 
-  .projectVisualLink {
-    padding: 0;
-  }
 }
 
 @media (max-width: 560px) {

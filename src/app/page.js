@@ -137,7 +137,12 @@ export default function Home() {
 
   useEffect(() => {
     const timeline = gsap.timeline({
-      onComplete: () => setShowIntro(false),
+      onComplete: () => {
+        gsap.set(contentRef.current, {
+          clearProps: "transform,opacity",
+        });
+        setShowIntro(false);
+      },
     });
 
     gsap.set(contentRef.current, {
