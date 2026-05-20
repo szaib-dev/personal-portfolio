@@ -316,7 +316,7 @@ export default function Home() {
           {projectEntries.map((project) => (
             <article
               key={project.slug}
-              data-reveal
+              data-stagger-group
               className={`grid items-center gap-12 border-t border-black/10 py-[3.25rem] ${
                 project.reverse
                   ? "grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)] max-[1220px]:grid-cols-1"
@@ -406,14 +406,13 @@ export default function Home() {
               <div
                 className="flex transition-transform duration-[550ms] ease-[cubic-bezier(0.23,1,0.32,1)]"
                 style={{
-                  width: `${referencePages.length * 100}%`,
-                  transform: `translateX(-${activeReferencePage * (100 / referencePages.length)}%)`,
+                  transform: `translateX(-${activeReferencePage * 100}%)`,
                 }}
               >
                 {referencePages.map((page, pageIndex) => (
                   <div
                     key={pageIndex}
-                    className="box-border grid flex-[0_0_100%] grid-cols-3 gap-[3.25rem] pr-[9.5rem] max-[1220px]:grid-cols-2 max-[1220px]:gap-9 max-[1220px]:pr-24 max-[900px]:grid-cols-1 max-[900px]:gap-8 max-[900px]:pr-0"
+                    className="box-border grid min-w-full grid-cols-3 gap-[3.25rem] pr-[9.5rem] max-[1220px]:grid-cols-2 max-[1220px]:gap-9 max-[1220px]:pr-24 max-[900px]:grid-cols-1 max-[900px]:gap-8 max-[900px]:pr-0"
                   >
                     {page.map((card, cardIndex) => (
                       <article key={card.name} className="relative min-h-[13.75rem]">
@@ -486,7 +485,7 @@ export default function Home() {
                 {aboutContent.heading[1]}
               </h2>
 
-              <div className="relative ml-[0.1rem] mt-9 h-[28rem] w-[19.1rem] group max-[900px]:ml-0 max-[900px]:h-[28.5rem] max-[900px]:w-[16rem]">
+              <div className="group relative ml-[0.05rem] mt-8 h-[31.25rem] w-[17.5rem] max-[900px]:ml-0 max-[900px]:h-[28.5rem] max-[900px]:w-[16rem]">
                 <div className="absolute inset-0 box-border overflow-hidden bg-white p-[14px] opacity-0 shadow-[0_10px_24px_rgba(0,0,0,0.085)] transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:rotate-[-2deg] group-hover:opacity-100">
                   <Image
                     src={aboutContent.secondaryImage}
