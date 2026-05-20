@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
+import { FiArrowRight, FiPlus } from "react-icons/fi";
+import { RiDoubleQuotesL } from "react-icons/ri";
 import styles from "./page.module.css";
 
 const audienceProfiles = [
@@ -101,30 +103,58 @@ const values = ["Useful", "Considered", "Beautiful", "Well made"];
 
 const referenceCards = [
   {
-    label: "For founders",
-    title: "Fast, thoughtful delivery",
+    name: "Areeba Khan",
+    role: "Founder at Northlane Studio",
     body:
-      "I can move from rough direction to polished execution without letting the product foundation become messy underneath.",
+      "Shahzaib took our rough vision and turned it into a polished site that felt premium, clear, and ready for clients from day one.",
   },
   {
-    label: "For product teams",
-    title: "Clean UI with real structure",
+    name: "Usman Tariq",
+    role: "Product Manager at FinSolve",
     body:
-      "The frontend gets attention to detail, while the architecture behind it stays organized, readable, and ready to evolve.",
+      "Working with Shahzaib was incredibly smooth. He made smart frontend decisions, kept the backend clean, and shipped features without drama.",
   },
   {
-    label: "For technical collaborators",
-    title: "Scale-minded decisions",
+    name: "Zara Hameed",
+    role: "Operations Lead at Meditech",
     body:
-      "I think early about maintainability, multi-tenant patterns, deployment flow, and the kind of codebase that keeps working after launch.",
+      "He understood the product quickly, simplified the experience, and built a system that stayed dependable as more users came in.",
+  },
+  {
+    name: "Bilal Saeed",
+    role: "Co-founder at LaunchGrid",
+    body:
+      "Shahzaib blends design sensitivity with engineering discipline. The product looked better, loaded faster, and became easier for our team to maintain.",
+  },
+  {
+    name: "Mariam Ali",
+    role: "Marketing Lead at Novacrest",
+    body:
+      "He did not just make the site look good. He gave us a smoother structure, stronger responsiveness, and a web presence that finally matched our brand.",
+  },
+  {
+    name: "Hassan Raza",
+    role: "CTO at Taskmint",
+    body:
+      "He was comfortable across the stack, thoughtful about architecture, and reliable about turning ambiguous requirements into shippable product work.",
   },
 ];
 
 const aboutTools = ["Next.js", "Node.js", "TypeScript"];
+const TESTIMONIALS_PER_PAGE = 3;
+const referencePages = Array.from(
+  { length: Math.ceil(referenceCards.length / TESTIMONIALS_PER_PAGE) },
+  (_, index) =>
+    referenceCards.slice(
+      index * TESTIMONIALS_PER_PAGE,
+      index * TESTIMONIALS_PER_PAGE + TESTIMONIALS_PER_PAGE
+    )
+);
 
 export default function Home() {
   const [activeAudience, setActiveAudience] = useState(audienceProfiles[0].id);
   const [activeSection, setActiveSection] = useState(navSections[0].id);
+  const [activeReferencePage, setActiveReferencePage] = useState(0);
   const [showIntro, setShowIntro] = useState(true);
   const introRef = useRef(null);
   const introNameRef = useRef(null);
@@ -134,6 +164,14 @@ export default function Home() {
   const activeProfile =
     audienceProfiles.find((profile) => profile.id === activeAudience) ??
     audienceProfiles[0];
+  const referenceTrackOffset =
+    activeReferencePage * (100 / referencePages.length);
+
+  const showNextReferencePage = () => {
+    setActiveReferencePage((currentPage) => {
+      return (currentPage + 1) % referencePages.length;
+    });
+  };
 
   useEffect(() => {
     const timeline = gsap.timeline({
@@ -373,14 +411,51 @@ export default function Home() {
           id="references"
           data-section
         >
-          <div className={styles.referencesGrid}>
-            {referenceCards.map((card) => (
-              <article key={card.title} className={styles.referenceCard}>
-                <p className={styles.referenceLabel}>{card.label}</p>
-                <h3 className={styles.referenceTitle}>{card.title}</h3>
-                <p className={styles.referenceBody}>{card.body}</p>
-              </article>
-            ))}
+          <div className={styles.referencesShell}>
+            <div className={styles.referencesViewport}>
+              <div
+                className={styles.referencesTrack}
+                style={{
+                  transform: `translateX(-${referenceTrackOffset}%)`,
+                }}
+              >
+                {referencePages.map((page, pageIndex) => (
+                  <div key={pageIndex} className={styles.referencesPage}>
+                    {page.map((card, cardIndex) => (
+                      <article key={card.name} className={styles.referenceCard}>
+                        {cardIndex > 0 && (
+                          <FiPlus
+                            aria-hidden="true"
+                            className={styles.referencePlus}
+                          />
+                        )}
+
+                        <div className={styles.referenceMeta}>
+                          <p className={styles.referenceName}>{card.name}</p>
+                          <p className={styles.referenceRole}>{card.role}</p>
+                        </div>
+
+                        <RiDoubleQuotesL
+                          aria-hidden="true"
+                          className={styles.referenceQuote}
+                        />
+                        <p className={styles.referenceBody}>{card.body}</p>
+                      </article>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div aria-hidden="true" className={styles.referencesFade} />
+            <button
+              type="button"
+              className={styles.referencesNext}
+              onClick={showNextReferencePage}
+              aria-label="Show next testimonials"
+            >
+              <FiArrowRight aria-hidden="true" />
+            </button>
           </div>
         </section>
 
