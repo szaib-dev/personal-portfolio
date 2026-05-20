@@ -86,7 +86,7 @@ function getCharacterSequence(character) {
   };
 }
 
-function RollingText({ as: Tag, className, text, duration, stagger }) {
+function RollingText({ as: Tag, className, text, duration }) {
   const letterRefs = useRef([]);
   const characters = useMemo(
     () => Array.from(text).map((character) => getCharacterSequence(character)),
@@ -100,14 +100,10 @@ function RollingText({ as: Tag, className, text, duration, stagger }) {
     gsap.to(nodes, {
       yPercent: (index) => -100 * characters[index].targetIndex,
       duration,
-      ease: "power3.out",
-      stagger: {
-        each: stagger,
-        from: "start",
-      },
+      ease: "power2.out",
       overwrite: true,
     });
-  }, [characters, duration, stagger]);
+  }, [characters, duration]);
 
   return (
     <Tag className={className} aria-label={text}>
@@ -157,9 +153,8 @@ export default function Home() {
         {
           opacity: 1,
           y: 0,
-          duration: 0.45,
-          ease: "power3.out",
-          stagger: 0.07,
+          duration: 0.32,
+          ease: "power2.out",
         }
       );
     }, heroRef);
@@ -210,16 +205,14 @@ export default function Home() {
             as="h1"
             className={styles.headline}
             text={activeProfile.headline}
-            duration={1.15}
-            stagger={0.012}
+            duration={0.72}
           />
 
           <RollingText
             as="p"
             className={styles.summary}
             text={activeProfile.summary}
-            duration={0.95}
-            stagger={0.006}
+            duration={0.58}
           />
         </div>
       </section>
