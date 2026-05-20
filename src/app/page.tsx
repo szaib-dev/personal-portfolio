@@ -269,12 +269,17 @@ export default function Home() {
           ref={introRef}
           className="fixed inset-0 z-[100] flex items-center justify-center bg-white"
         >
-          <p
-            ref={introNameRef}
-            className="text-[clamp(2.75rem,6vw,5rem)] font-medium leading-[0.95] tracking-[-0.07em]"
-          >
-            Shahzaib Mirza
-          </p>
+          <div className="flex flex-col items-center gap-3 text-center">
+            <p
+              ref={introNameRef}
+              className="text-[clamp(2.75rem,6vw,5rem)] font-medium leading-[0.95] tracking-[-0.07em]"
+            >
+              Shahzaib Mirza
+            </p>
+            <p className="text-[clamp(0.95rem,1.5vw,1.15rem)] font-normal tracking-[-0.03em] text-[#5f5f5f]">
+              5+ years of experience
+            </p>
+          </div>
         </div>
       )}
 
