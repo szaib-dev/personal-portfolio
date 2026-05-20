@@ -35,6 +35,7 @@
 }
 
 .hero {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -45,11 +46,15 @@
 }
 
 .audienceRow {
+  position: absolute;
+  top: 3.5rem;
+  left: 0;
+  right: 0;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem 1.15rem;
-  margin-bottom: 1.6rem;
+  min-height: 1.5rem;
 }
 
 .audienceButton,
@@ -75,6 +80,7 @@
 
 .copyBlock {
   max-width: 43rem;
+  padding-top: 3.1rem;
 }
 
 .headline {
@@ -130,6 +136,16 @@
     padding-top: 2.5rem;
   }
 
+  .audienceRow {
+    position: static;
+    min-height: 0;
+    margin-bottom: 1.25rem;
+  }
+
+  .copyBlock {
+    padding-top: 0;
+  }
+
   .headline {
     max-width: 100%;
     font-size: clamp(2.8rem, 9vw, 4.1rem);
@@ -149,10 +165,6 @@
   .navItem,
   .activeNav {
     font-size: 0.98rem;
-  }
-
-  .audienceRow {
-    margin-bottom: 1.25rem;
   }
 
   .audienceButton,
