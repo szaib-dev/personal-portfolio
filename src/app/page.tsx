@@ -520,7 +520,7 @@ export default function Home() {
                   />
                 </div>
 
-                <div className="absolute inset-0 box-border overflow-hidden bg-white p-[14px] shadow-[0_10px_24px_rgba(0,0,0,0.085)] transition-all duration-300 ease-out group-hover:translate-x-[0.35rem] group-hover:translate-y-[0.22rem] group-hover:rotate-[-0.6deg] group-hover:opacity-0 max-[560px]:z-[2] max-[560px]:translate-x-[-0.35rem] max-[560px]:translate-y-0 max-[560px]:rotate-0 max-[560px]:opacity-100">
+                <div className="absolute inset-0 box-border overflow-hidden bg-white p-[14px] shadow-[0_10px_24px_rgba(0,0,0,0.085)] transition-all duration-300 ease-out group-hover:translate-x-[0.35rem] group-hover:translate-y-[0.22rem] group-hover:rotate-[-0.6deg] group-hover:opacity-0 max-[560px]:z-[2] max-[560px]:translate-x-[-0.6rem] max-[560px]:translate-y-0 max-[560px]:rotate-0 max-[560px]:opacity-100">
                   <Image
                     src={aboutContent.primaryImage}
                     alt="Portrait of Shahzaib Mirza"
