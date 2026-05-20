@@ -141,6 +141,7 @@ const referenceCards = [
 ];
 
 const TESTIMONIALS_PER_PAGE = 3;
+
 const referencePages = Array.from(
   { length: Math.ceil(referenceCards.length / TESTIMONIALS_PER_PAGE) },
   (_, index) =>
@@ -156,6 +157,7 @@ export default function Home() {
   const [activeReferencePage, setActiveReferencePage] = useState(0);
   const [isReferenceTransitioning, setIsReferenceTransitioning] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
+
   const introRef = useRef(null);
   const introNameRef = useRef(null);
   const contentRef = useRef(null);
@@ -165,9 +167,9 @@ export default function Home() {
   const activeProfile =
     audienceProfiles.find((profile) => profile.id === activeAudience) ??
     audienceProfiles[0];
+
   const referencePageWidth = 100 / referencePages.length;
-  const referenceTrackOffset =
-    activeReferencePage * referencePageWidth;
+  const referenceTrackOffset = activeReferencePage * referencePageWidth;
 
   const showNextReferencePage = () => {
     if (referenceTransitionTimerRef.current) {
@@ -175,9 +177,11 @@ export default function Home() {
     }
 
     setIsReferenceTransitioning(true);
+
     setActiveReferencePage((currentPage) => {
       return (currentPage + 1) % referencePages.length;
     });
+
     referenceTransitionTimerRef.current = setTimeout(() => {
       setIsReferenceTransitioning(false);
     }, 560);
@@ -243,9 +247,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (!headingRef.current) {
-      return;
-    }
+    if (!headingRef.current) return;
 
     gsap.fromTo(
       headingRef.current,
@@ -269,42 +271,33 @@ export default function Home() {
   }, [activeAudience]);
 
   useEffect(() => {
-    const syncHashSection = () => {
-      const hashSection = window.location.hash.replace("#", "");
+    const syncActiveSection = () => {
+      const sections = navSections
+        .map((section) => document.getElementById(section.id))
+        .filter(Boolean);
 
-      if (navSections.some((section) => section.id === hashSection)) {
-        setActiveSection(hashSection);
-      }
+      const scrollPoint = window.scrollY + window.innerHeight * 0.38;
+
+      let currentSection = sections[0]?.id || "intro";
+
+      sections.forEach((section) => {
+        if (section.offsetTop <= scrollPoint) {
+          currentSection = section.id;
+        }
+      });
+
+      setActiveSection(currentSection);
     };
 
-    syncHashSection();
-    window.addEventListener("hashchange", syncHashSection);
+    syncActiveSection();
 
-    return () => window.removeEventListener("hashchange", syncHashSection);
-  }, []);
+    window.addEventListener("scroll", syncActiveSection, { passive: true });
+    window.addEventListener("resize", syncActiveSection);
 
-  useEffect(() => {
-    const sections = Array.from(document.querySelectorAll("[data-section]"));
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleEntries = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((entryA, entryB) => entryB.intersectionRatio - entryA.intersectionRatio);
-
-        if (visibleEntries[0]?.target.id) {
-          setActiveSection(visibleEntries[0].target.id);
-        }
-      },
-      {
-        rootMargin: "-20% 0px -45% 0px",
-        threshold: [0.2, 0.45, 0.7],
-      }
-    );
-
-    sections.forEach((section) => observer.observe(section));
-
-    return () => observer.disconnect();
+    return () => {
+      window.removeEventListener("scroll", syncActiveSection);
+      window.removeEventListener("resize", syncActiveSection);
+    };
   }, []);
 
   useEffect(() => {
@@ -388,7 +381,9 @@ export default function Home() {
                 >
                   {project.kicker}
                 </p>
+
                 <h2 className={styles.projectTitle}>{project.title}</h2>
+
                 <p className={styles.projectDescription}>{project.description}</p>
 
                 <div className={styles.projectMeta}>
@@ -475,6 +470,7 @@ export default function Home() {
                           aria-hidden="true"
                           className={styles.referenceQuote}
                         />
+
                         <p className={styles.referenceBody}>{card.body}</p>
                       </article>
                     ))}
@@ -489,6 +485,7 @@ export default function Home() {
                 isReferenceTransitioning ? styles.referencesFadeActive : ""
               }`}
             />
+
             <button
               type="button"
               className={styles.referencesNext}
@@ -500,11 +497,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section
-          className={`${styles.contentSection} ${styles.aboutSection}`}
-          id="about"
-          data-section
-        >
+        <section className={styles.aboutSection} id="about" data-section>
           <div className={styles.aboutColumns}>
             <div className={styles.aboutColumnPrimary}>
               <h2 className={styles.aboutLead}>
@@ -514,7 +507,9 @@ export default function Home() {
               </h2>
 
               <div className={styles.aboutPhotoDeck}>
-                <div className={`${styles.aboutPhotoCard} ${styles.aboutPhotoCardBack}`}>
+                <div
+                  className={`${styles.aboutPhotoCard} ${styles.aboutPhotoCardBack}`}
+                >
                   <Image
                     className={styles.aboutPortrait}
                     src="/my-perosnal.png"
@@ -524,7 +519,9 @@ export default function Home() {
                   />
                 </div>
 
-                <div className={`${styles.aboutPhotoCard} ${styles.aboutPhotoCardFront}`}>
+                <div
+                  className={`${styles.aboutPhotoCard} ${styles.aboutPhotoCardFront}`}
+                >
                   <Image
                     className={styles.aboutPortrait}
                     src="/my-personal-2.jpg"
@@ -556,8 +553,15 @@ export default function Home() {
               </p>
             </div>
           </div>
+
+          <p className={styles.aboutBottomText}>
+    Let me help with a great visual
+    <br />
+    solution for your business.
+  </p>
         </section>
 
+        
       </div>
     </main>
   );

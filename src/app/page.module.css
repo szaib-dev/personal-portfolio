@@ -30,31 +30,30 @@
 .pageContent {
   position: relative;
 }
-
 .sidebar {
   position: fixed;
   left: 1.75rem;
-  top: 15rem;
+  top: 12rem;
   z-index: 20;
   display: flex;
   flex-direction: column;
-  gap: 0.12rem;
+  gap: 0.08rem;
 }
 
 .navItem,
 .activeNav {
-  font-size: 1.5rem;
-  font-weight: 500;
-  line-height: 2rem;
-  letter-spacing: -0.04em;
+  font-size: 1.32rem;
+  font-weight: 400;
+  line-height: 1.6rem;
+  letter-spacing: -0.055em;
   color: #b8b8b8;
+  text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .activeNav {
   color: #111111;
 }
-
 .hero,
 .contentSection {
   margin-left: var(--content-start);
@@ -79,6 +78,7 @@
 .audienceButtonActive {
   border: 0;
   background: transparent;
+  margin-top: 80px;
   padding: 0;
   font: inherit;
   font-size: 0.88rem;
@@ -103,9 +103,10 @@
 
 .headline {
   max-width: 42rem;
-  font-size: clamp(2.78rem, 4.18vw, 4rem);
+  font-size: clamp(1.78rem, 3.6vw, 4rem);
   font-weight: 500;
   line-height: 1;
+  margin-top: 20px;
   letter-spacing: -0.07em;
   will-change: transform, opacity;
 }
@@ -140,7 +141,7 @@
   order: 2;
 }
 
-.projectCardReverse .projectVisualLink {
+.projectCardReverse .projectVisualWrap {
   order: 1;
 }
 
@@ -341,73 +342,113 @@
   transition: transform 0.2s ease, color 0.2s ease;
 }
 
+/* ABOUT SECTION — desktop exact layout */
 .aboutSection {
-  min-height: 56rem;
-  padding-top: 6.35rem;
-  padding-bottom: 8rem;
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  padding: 0;
+  background: #ffffff;
+  overflow: hidden;
+  scroll-margin-top: 0;
 }
 
+/* Main layout container */
 .aboutColumns {
-  display: grid;
-  grid-template-columns: 21.875rem 20.625rem 20.625rem;
-  column-gap: 5.625rem;
-  padding-left: clamp(9.1rem, 11.2vw, 9.85rem);
-  align-items: start;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: block;
+  margin: 0;
 }
 
+/* First column */
 .aboutColumnPrimary {
-  width: 21.875rem;
+  position: absolute;
+  left: 34.2%;
+  top: 8.6rem;
+  width: 22rem;
 }
 
-.aboutColumn {
-  width: 20.625rem;
+/* Second text column */
+.aboutColumn:nth-child(2) {
+  position: absolute;
+  left: 56.9%;
+  top: 8.6rem;
+  width: 19rem;
 }
 
+/* Third text column */
+.aboutColumn:nth-child(3) {
+  position: absolute;
+  left: 78.2%;
+  top: 8.6rem;
+  width: 19rem;
+}
+
+/* Main heading */
 .aboutLead {
   width: 100%;
   margin: 0;
   color: #111111;
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 2.625rem;
-  letter-spacing: -0.06em;
+  font-size: 1.62rem;
+  font-weight: 500;
+  line-height: 2.08rem;
+  letter-spacing: -0.065em;
 }
 
+/* Right side text */
 .aboutBody {
   width: 100%;
   margin: 0;
   color: #111111;
-  font-size: 1.4375rem;
+  font-size: 1.08rem;
   font-weight: 400;
-  line-height: 2.125rem;
-  letter-spacing: -0.03em;
+  line-height: 1.55rem;
+  letter-spacing: -0.045em;
 }
 
+/* Photo deck */
 .aboutPhotoDeck {
   position: relative;
-  width: 17.5rem;
-  height: 31.25rem;
-  margin-top: 2rem;
+  width: 19.1rem;
+  height: 28rem;
+  margin-top: 2.25rem;
+  margin-left: 0.1rem;
 }
 
+/* Background stacked papers */
+
+
+.aboutPhotoDeck::before {
+  transform: translate(0.7rem, 0.45rem) rotate(0.7deg);
+}
+
+.aboutPhotoDeck::after {
+  transform: translate(-0.4rem, 0.35rem) rotate(-0.8deg);
+}
+
+/* Photo card */
 .aboutPhotoCard {
   position: absolute;
   inset: 0;
+  width: 15.1rem;
+  height: 20rem;
   box-sizing: border-box;
   overflow: hidden;
-  padding: 0.875rem;
+  padding: 0.9rem 0.9rem 1.25rem;
   background: #ffffff;
   border-radius: 0;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.085);
   transition:
     opacity 0.28s ease,
     transform 0.28s ease;
 }
 
 .aboutPhotoCardBack {
-  transform: translate(-0.5rem, -0.3rem) rotate(-2deg);
+  transform: translate(0.62rem, 0.38rem) rotate(0.7deg);
   z-index: 1;
-  opacity: 0;
+  opacity: 0.48;
 }
 
 .aboutPhotoCardFront {
@@ -426,234 +467,48 @@
 
 @media (hover: hover) and (pointer: fine) {
   .aboutPhotoDeck:hover .aboutPhotoCardFront {
-    opacity: 0;
-    transform: translate(0.55rem, 0.3rem) rotate(-0.4deg);
-  }
-
-  .aboutPhotoDeck:hover .aboutPhotoCardBack {
     opacity: 1;
     transform: translate(0, 0) rotate(-2deg);
   }
-}
 
-@media (hover: hover) and (pointer: fine) {
-  .navItem:hover,
-  .audienceButton:hover {
-    color: #525252;
-  }
-
-  .referencesNext:hover {
-    color: #dd1f56;
-    transform: translateX(2px);
+  .aboutPhotoDeck:hover .aboutPhotoCardBack {
+    opacity: 0.48;
+    transform: translate(0.62rem, 0.38rem) rotate(0.7deg);
   }
 }
 
-@media (max-width: 1220px) {
-  .projectCard,
-  .projectCardReverse {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
+/* footer  */
 
-  .projectCardReverse .projectCopy,
-  .projectCardReverse .projectVisualWrap {
-    order: initial;
-  }
-
-  .referencesPage {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2.35rem;
-    padding-right: 6rem;
-  }
-
-  .referencePlus {
-    display: none;
-  }
-
-  .valuesSection {
-    min-height: auto;
-    padding-top: 5rem;
-    padding-bottom: 0;
-  }
-
-  .aboutSection {
-    min-height: auto;
-    padding-bottom: 6rem;
-    padding-top: 5.5rem;
-  }
-
-  .aboutColumns {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    padding-left: 0;
-  }
-
-  .aboutColumnPrimary,
-  .aboutColumn {
-    width: 100%;
-    max-width: 28rem;
-  }
-
-  .valuesStack,
-  .valuesBody {
-    position: static;
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .valuesBody {
-    margin-top: 2rem;
-  }
+.aboutBottomText {
+  position: absolute;
+  left: 2.25rem;
+  bottom: 0rem;
+  max-width: 44rem;
+  margin: 0;
+  color: #2b2b2b;
+  font-size: clamp(2.35rem, 3.05vw, 3.35rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.075em;
 }
 
-@media (max-width: 1100px) {
-  .page {
-    --content-start: 13.5rem;
-    --hero-width: 44rem;
-  }
-
-  .audienceRow,
-  .copyBlock {
-    width: min(100%, 39rem);
-  }
-
-  .headline {
-    font-size: clamp(2.55rem, 4.6vw, 3.7rem);
-  }
-}
-
+/* Tablet / smaller screens */
 @media (max-width: 900px) {
-  .page {
-    --content-start: 0rem;
-    padding: 1.5rem 1.25rem 4rem;
-  }
-
-  .sidebar {
+  .aboutBottomText {
     position: static;
-    top: auto;
     margin-top: 4rem;
-    margin-bottom: 2.5rem;
-  }
-
-  .hero,
-  .contentSection {
-    width: 100%;
-    margin-left: 0;
-  }
-
-  .hero {
-    min-height: auto;
-    padding-top: 0;
-  }
-
-  .audienceRow,
-  .copyBlock {
-    width: 100%;
-  }
-
-  .contentSection {
-    padding-top: 5rem;
-  }
-
-  .aboutSection {
-    padding-top: 5rem;
-    padding-bottom: 3rem;
-  }
-
-  .aboutColumns {
-    gap: 1.75rem;
-  }
-
-  .aboutLead {
-    font-size: 2.1rem;
-    line-height: 2.6rem;
-  }
-
-  .aboutBody {
-    font-size: 1.15rem;
-    line-height: 1.8rem;
-  }
-
-  .aboutPhotoDeck {
-    width: min(100%, 17.5rem);
-    height: 31.25rem;
-    margin-left: 0;
-  }
-  
-  .referencesShell {
-    padding-top: 3.5rem;
-  }
-
-  .referencesPage {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    padding-right: 0;
-  }
-
-  .referencesFade {
-    display: none;
-  }
-
-  .referencesNext {
-    position: static;
-    width: auto;
-    height: auto;
-    margin-top: 2rem;
-    padding: 0;
+    max-width: 100%;
+    font-size: clamp(2rem, 8vw, 3rem);
+    line-height: 1.12;
   }
 }
 
+/* Mobile */
 @media (max-width: 560px) {
-  .page {
-    padding: 1.25rem 1rem 3.5rem;
-  }
-
-  .sidebar {
-    position: static;
-    top: auto;
-    gap: 0.25rem;
+  .aboutBottomText {
     margin-top: 3rem;
-    margin-bottom: 2rem;
-  }
-
-  .navItem,
-  .activeNav {
-    font-size: 1.05rem;
-    line-height: 1.35rem;
-  }
-
-  .audienceButton,
-  .audienceButtonActive {
-    font-size: 0.84rem;
-  }
-
-  .headline {
-    font-size: clamp(2.7rem, 10vw, 4rem);
-  }
-
-  .summary,
-  .projectDescription,
-  .valuesBody,
-  .referenceBody {
-    font-size: 1rem;
-  }
-
-  .valuesWord {
-    font-size: clamp(3.5rem, 16vw, 5.2rem);
-  }
-
-  .aboutLead {
-    font-size: 1.8rem;
-    line-height: 2.25rem;
-  }
-
-  .aboutBody {
-    font-size: 1.02rem;
-    line-height: 1.6rem;
-  }
-
-  .aboutPhotoDeck {
-    width: min(100%, 16rem);
-    height: 28.5rem;
+    font-size: 2.05rem;
+    line-height: 1.15;
+    letter-spacing: -0.065em;
   }
 }
