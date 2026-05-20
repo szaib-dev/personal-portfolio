@@ -263,7 +263,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-white px-8 pb-24 pt-7 text-[#121212] max-[900px]:px-5 max-[900px]:pb-16 max-[560px]:px-4 max-[560px]:pb-14">
+    <main className="relative min-h-screen overflow-x-hidden bg-white px-8 pb-24 pt-7 text-[#121212] max-[1024px]:px-5 max-[1024px]:pb-16 max-[560px]:px-4 max-[560px]:pb-14">
       {showIntro && (
         <div
           ref={introRef}
@@ -279,12 +279,12 @@ export default function Home() {
       )}
 
       <div ref={contentRef} className="relative">
-        <aside className="fixed left-7 top-48 z-20 flex flex-col gap-[0.08rem] max-[900px]:static max-[900px]:mb-10 max-[900px]:mt-16 max-[560px]:mb-8 max-[560px]:mt-12 max-[560px]:gap-1">
+        <aside className="fixed left-7 top-48 z-20 flex flex-col gap-[0.08rem] max-[1024px]:static max-[1024px]:mb-10 max-[1024px]:mt-16 max-[560px]:mb-8 max-[560px]:mt-12 max-[560px]:gap-1">
           {navSections.map((section) => (
             <a
               key={section.id}
               href={`#${section.id}`}
-              className={`text-[1.32rem] font-normal leading-[1.6rem] tracking-[-0.055em] transition-colors max-[560px]:text-[1.05rem] max-[560px]:leading-[1.35rem] ${
+              className={`text-[1.32rem] font-normal leading-[1.6rem] tracking-[-0.055em] transition-colors max-[1024px]:text-[1.15rem] max-[1024px]:leading-[1.45rem] max-[560px]:text-[1.05rem] max-[560px]:leading-[1.35rem] ${
                 activeSection === section.id ? "text-[#111111]" : "text-[#b8b8b8]"
               }`}
             >
@@ -296,9 +296,9 @@ export default function Home() {
         <section
           id="intro"
           data-section
-          className="ml-[clamp(16.125rem,28vw,29.125rem)] min-h-screen w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),49rem)] scroll-mt-8 pt-[5.15rem] max-[900px]:ml-0 max-[900px]:w-full max-[900px]:min-h-0 max-[900px]:pt-0"
+          className="ml-[clamp(16.125rem,28vw,29.125rem)] min-h-screen w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),49rem)] scroll-mt-8 pt-[5.15rem] max-[1024px]:ml-0 max-[1024px]:w-full max-[1024px]:min-h-0 max-[1024px]:pt-0"
         >
-          <div className="flex w-[min(100%,43rem)] flex-wrap items-center gap-x-[1.15rem] gap-y-2 max-[900px]:w-full">
+          <div className="flex w-[min(100%,43rem)] flex-wrap items-center gap-x-[1.15rem] gap-y-2 max-[1024px]:w-full">
             {audienceProfiles.map((profile) => {
               const isActive = profile.id === activeAudience;
 
@@ -317,15 +317,15 @@ export default function Home() {
             })}
           </div>
 
-          <div className="w-[min(100%,43rem)] pt-[1.35rem] max-[900px]:w-full">
+          <div className="w-[min(100%,43rem)] pt-[1.35rem] max-[1024px]:w-full">
             <h1
               ref={headingRef}
-              className="mt-5 max-w-[42rem] text-[clamp(1.78rem,3.6vw,4rem)] font-medium leading-none tracking-[-0.07em]"
+              className="mt-5 max-w-[42rem] text-[clamp(1.78rem,3.6vw,4rem)] font-medium leading-none tracking-[-0.07em] max-[1024px]:text-[clamp(2.1rem,6vw,3.6rem)] max-[560px]:text-[clamp(2rem,9vw,3rem)]"
             >
               {activeProfile.headline}
             </h1>
 
-            <p className="mt-[1.15rem] max-w-[35rem] text-base leading-[1.55] text-[#5f5f5f]">
+            <p className="mt-[1.15rem] max-w-[35rem] text-base leading-[1.55] text-[#5f5f5f] max-[560px]:text-[0.95rem]">
               {activeProfile.summary}
             </p>
           </div>
@@ -334,7 +334,7 @@ export default function Home() {
         <section
           id="work"
           data-section
-          className="ml-[clamp(16.125rem,28vw,29.125rem)] w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),82rem)] scroll-mt-8 pt-12 max-[900px]:ml-0 max-[900px]:w-full max-[900px]:pt-20"
+          className="ml-[clamp(16.125rem,28vw,29.125rem)] w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),82rem)] scroll-mt-8 pt-12 max-[1024px]:ml-0 max-[1024px]:w-full max-[1024px]:pt-20"
         >
           {projectEntries.map((project) => (
             <article
@@ -387,7 +387,7 @@ export default function Home() {
         <section
           id="values"
           data-section
-          className="relative ml-[clamp(16.125rem,28vw,29.125rem)] mt-[60px] min-h-[38rem] w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),82rem)] scroll-mt-8 pb-11 pt-4 max-[1220px]:min-h-0 max-[1220px]:pb-0 max-[1220px]:pt-20 max-[900px]:ml-0 max-[900px]:w-full"
+          className="relative ml-[clamp(16.125rem,28vw,29.125rem)] mt-[60px] min-h-[38rem] w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),82rem)] scroll-mt-8 pb-11 pt-4 max-[1220px]:min-h-0 max-[1220px]:pb-0 max-[1220px]:pt-20 max-[1024px]:ml-0 max-[1024px]:w-full"
         >
           <div
             data-stagger-group
@@ -423,9 +423,9 @@ export default function Home() {
         <section
           id="references"
           data-section
-          className="ml-[clamp(16.125rem,28vw,29.125rem)] w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),82rem)] scroll-mt-8 border-t border-black/10 pt-8 max-[900px]:ml-0 max-[900px]:w-full"
+          className="ml-[clamp(16.125rem,28vw,29.125rem)] w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),82rem)] scroll-mt-8 border-t border-black/10 pt-8 max-[1024px]:ml-0 max-[1024px]:w-full"
         >
-          <div data-reveal className="relative pt-[6.1rem] max-[900px]:pt-14">
+          <div data-reveal className="relative pt-[6.1rem] max-[1024px]:pt-14">
             <div className="overflow-hidden">
               <div
                 className="flex transition-transform duration-[550ms] ease-[cubic-bezier(0.23,1,0.32,1)]"
@@ -436,7 +436,7 @@ export default function Home() {
                 {referencePages.map((page, pageIndex) => (
                   <div
                     key={pageIndex}
-                    className="box-border grid min-w-full grid-cols-3 gap-[3.25rem] pr-[9.5rem] max-[1220px]:grid-cols-2 max-[1220px]:gap-9 max-[1220px]:pr-24 max-[900px]:grid-cols-1 max-[900px]:gap-8 max-[900px]:pr-0"
+                    className="box-border grid min-w-full grid-cols-3 gap-[3.25rem] pr-[9.5rem] max-[1220px]:grid-cols-2 max-[1220px]:gap-9 max-[1220px]:pr-24 max-[768px]:grid-cols-1 max-[768px]:gap-8 max-[768px]:pr-0"
                   >
                     {page.map((card, cardIndex) => (
                       <article key={card.name} className="relative min-h-[13.75rem]">
@@ -473,7 +473,7 @@ export default function Home() {
 
             <div
               aria-hidden="true"
-              className={`pointer-events-none absolute inset-y-0 right-0 w-60 bg-[linear-gradient(90deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.68)_42%,rgba(255,255,255,0.94)_72%,#ffffff_100%)] transition-opacity duration-200 max-[900px]:hidden ${
+              className={`pointer-events-none absolute inset-y-0 right-0 w-60 bg-[linear-gradient(90deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.68)_42%,rgba(255,255,255,0.94)_72%,#ffffff_100%)] transition-opacity duration-200 max-[768px]:hidden ${
                 activeReferencePage > -1 ? "opacity-100" : "opacity-0"
               }`}
             />
@@ -486,7 +486,7 @@ export default function Home() {
                 )
               }
               aria-label="Show next testimonials"
-              className="absolute right-[1.1rem] top-[8.55rem] z-[2] inline-flex h-[1.8rem] w-[1.8rem] items-center justify-center bg-transparent text-[1.35rem] text-[#f12d66] transition hover:translate-x-[2px] hover:text-[#dd1f56] max-[900px]:static max-[900px]:mt-8 max-[900px]:h-auto max-[900px]:w-auto"
+              className="absolute right-[1.1rem] top-[8.55rem] z-[2] inline-flex h-[1.8rem] w-[1.8rem] items-center justify-center bg-transparent text-[1.35rem] text-[#f12d66] transition hover:translate-x-[2px] hover:text-[#dd1f56] max-[768px]:static max-[768px]:mt-8 max-[768px]:h-auto max-[768px]:w-auto"
             >
               <FiArrowRight aria-hidden="true" />
             </button>
@@ -498,10 +498,10 @@ export default function Home() {
           data-section
           className="relative min-h-screen w-full overflow-hidden bg-white px-0 pb-0 pt-0"
         >
-          <div className="relative m-0 block h-screen w-full max-[900px]:grid max-[900px]:h-auto max-[900px]:gap-7 max-[900px]:px-0 max-[900px]:py-20">
+          <div className="relative m-0 block h-screen w-full max-[1280px]:grid max-[1280px]:h-auto max-[1280px]:gap-7 max-[1280px]:px-0 max-[1280px]:py-20">
             <div
               data-reveal
-              className="absolute left-[34.2%] top-[8.6rem] w-[22rem] max-[900px]:static max-[900px]:w-full max-[900px]:max-w-[28rem]"
+              className="absolute left-[34.2%] top-[8.6rem] w-[22rem] max-[1280px]:static max-[1280px]:w-full max-[1280px]:max-w-[28rem]"
             >
               <h2 className="m-0 text-[1.62rem] font-medium leading-[2.08rem] tracking-[-0.065em] text-[#111111]">
                 {aboutContent.heading[0]}
@@ -509,7 +509,7 @@ export default function Home() {
                 {aboutContent.heading[1]}
               </h2>
 
-              <div className="group relative ml-[0.05rem] mt-8 h-[20.75rem] w-[14.5rem] max-[900px]:ml-0 max-[900px]:h-[22.25rem] max-[900px]:w-[16rem]">
+              <div className="group relative ml-[0.05rem] mt-8 h-[20.75rem] w-[14.5rem] max-[1280px]:ml-0 max-[1280px]:h-[22.25rem] max-[1280px]:w-[16rem] max-[560px]:h-[20.5rem] max-[560px]:w-[14.5rem]">
                 <div className="absolute inset-0 box-border overflow-hidden bg-white p-[14px] opacity-0 shadow-[0_10px_24px_rgba(0,0,0,0.085)] transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:rotate-[-2deg] group-hover:opacity-100">
                   <Image
                     src={aboutContent.secondaryImage}
@@ -534,7 +534,7 @@ export default function Home() {
 
             <div
               data-reveal
-              className="absolute left-[56.9%] top-[8.6rem] w-[19rem] max-[900px]:static max-[900px]:w-full max-[900px]:max-w-[28rem]"
+              className="absolute left-[56.9%] top-[8.6rem] w-[19rem] max-[1280px]:static max-[1280px]:w-full max-[1280px]:max-w-[28rem]"
             >
               <p className="m-0 text-[1.08rem] font-normal leading-[1.55rem] tracking-[-0.045em] text-[#111111]">
                 {aboutContent.columnTwo[0]}
@@ -547,7 +547,7 @@ export default function Home() {
 
             <div
               data-reveal
-              className="absolute left-[78.2%] top-[8.6rem] w-[19rem] max-[900px]:static max-[900px]:w-full max-[900px]:max-w-[28rem]"
+              className="absolute left-[78.2%] top-[8.6rem] w-[19rem] max-[1280px]:static max-[1280px]:w-full max-[1280px]:max-w-[28rem]"
             >
               <p className="m-0 text-[1.08rem] font-normal leading-[1.55rem] tracking-[-0.045em] text-[#111111]">
                 {aboutContent.columnThree[0]}
@@ -561,7 +561,7 @@ export default function Home() {
 
           <p
             data-reveal
-            className="absolute bottom-0 left-9 m-0 max-w-[44rem] text-[clamp(2.35rem,3.05vw,3.35rem)] font-normal leading-[1.12] tracking-[-0.075em] text-[#2b2b2b] max-[900px]:static max-[900px]:mt-16 max-[900px]:max-w-full max-[900px]:text-[clamp(2rem,8vw,3rem)] max-[560px]:mt-12 max-[560px]:text-[2.05rem] max-[560px]:leading-[1.15] max-[560px]:tracking-[-0.065em]"
+            className="absolute bottom-0 left-9 m-0 max-w-[44rem] text-[clamp(2.35rem,3.05vw,3.35rem)] font-normal leading-[1.12] tracking-[-0.075em] text-[#2b2b2b] max-[1280px]:static max-[1280px]:mt-16 max-[1280px]:max-w-full max-[1280px]:text-[clamp(2rem,8vw,3rem)] max-[560px]:mt-12 max-[560px]:text-[2.05rem] max-[560px]:leading-[1.15] max-[560px]:tracking-[-0.065em]"
           >
             {aboutContent.bottomText[0]}
             <br />
