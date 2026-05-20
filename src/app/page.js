@@ -505,54 +505,55 @@ export default function Home() {
           id="about"
           data-section
         >
-          <div className={styles.aboutTop}>
-            <h2 className={styles.aboutLead}>
-              I&apos;m Shahzaib Mirza,
-              <br />
-              a PK-based Developer
-            </h2>
+          <div className={styles.aboutColumns}>
+            <div className={styles.aboutColumnPrimary}>
+              <h2 className={styles.aboutLead}>
+                I&apos;m Shahzaib Mirza,
+                <br />
+                a PK-based Developer
+              </h2>
 
-            <p className={styles.aboutBody}>
-              I&apos;m a seasoned developer with a
-              <br />
-              strong passion for creating intuitive
-              <br />
-              &amp; user-friendly digital experiences.
-            </p>
+              <div className={styles.aboutPhotoDeck}>
+                <div className={`${styles.aboutPhotoCard} ${styles.aboutPhotoCardBack}`}>
+                  <Image
+                    className={styles.aboutPortrait}
+                    src="/my-perosnal.png"
+                    alt="Alternate portrait of Shahzaib Mirza"
+                    width={608}
+                    height={658}
+                  />
+                </div>
 
-            <p className={styles.aboutBody}>
-              I love collaborating with founders,
-              <br />
-              helping them solve UX challenges
-              <br />
-              and build solutions.
-            </p>
-          </div>
-
-          <div className={styles.aboutLower}>
-            <div className={styles.aboutPhotoDeck}>
-              <div
-                aria-hidden="true"
-                className={`${styles.aboutPhotoLayer} ${styles.aboutPhotoLayerOne}`}
-              />
-              <div
-                aria-hidden="true"
-                className={`${styles.aboutPhotoLayer} ${styles.aboutPhotoLayerTwo}`}
-              />
-              <div
-                aria-hidden="true"
-                className={`${styles.aboutPhotoLayer} ${styles.aboutPhotoLayerThree}`}
-              />
-
-              <div className={styles.aboutPhotoFrame}>
-                <Image
-                  className={styles.aboutPortrait}
-                  src="/about-portrait.jpg"
-                  alt="Portrait of Shahzaib Mirza"
-                  width={800}
-                  height={1040}
-                />
+                <div className={`${styles.aboutPhotoCard} ${styles.aboutPhotoCardFront}`}>
+                  <Image
+                    className={styles.aboutPortrait}
+                    src="/my-personal-2.jpg"
+                    alt="Portrait of Shahzaib Mirza"
+                    width={1200}
+                    height={1600}
+                  />
+                </div>
               </div>
+            </div>
+
+            <div className={styles.aboutColumn}>
+              <p className={styles.aboutBody}>
+                I&apos;m a seasoned developer with a
+                <br />
+                strong passion for creating intuitive
+                <br />
+                &amp; user-friendly digital experiences.
+              </p>
+            </div>
+
+            <div className={styles.aboutColumn}>
+              <p className={styles.aboutBody}>
+                I love collaborating with founders,
+                <br />
+                helping them solve UX challenges
+                <br />
+                and build solutions.
+              </p>
             </div>
           </div>
         </section>
