@@ -1,22 +1,70 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import styles from "./page.module.css";
 
-const audience = [
-  "Founders",
-  "Startups",
-  "Product Teams",
-  "SaaS Brands",
-  "Agencies",
-  "Growing Businesses",
+const audienceProfiles = [
+  {
+    id: "everyone",
+    label: "For everyone",
+    headline:
+      "Hello there, I'm Shahzaib Mirza. I build beautiful websites and scalable web systems for businesses that want to grow online.",
+    summary:
+      "From clean marketing sites to complex platforms, I create web experiences that look sharp, feel smooth, and keep supporting the business as it grows.",
+  },
+  {
+    id: "founders",
+    label: "Founders",
+    headline:
+      "I help founders turn ideas into polished products with websites that earn trust and systems that stay reliable as traction builds.",
+    summary:
+      "You get a developer who can shape the frontend experience, build the backend foundation, and think beyond launch into long-term scale.",
+  },
+  {
+    id: "startups",
+    label: "Startups",
+    headline:
+      "I build startup-ready products that move fast at the beginning without becoming messy when the product, team, and users expand.",
+    summary:
+      "My focus is shipping quickly, keeping the UX clean, and setting up architecture that can support iterations, deployments, and future complexity.",
+  },
+  {
+    id: "product-teams",
+    label: "Product teams",
+    headline:
+      "I partner with product teams to build fast, clear, and reliable web experiences that connect strong UI with production-ready systems.",
+    summary:
+      "That means thoughtful frontend execution, dependable APIs, and features implemented with performance, maintainability, and scale in mind.",
+  },
+  {
+    id: "developers",
+    label: "Developers",
+    headline:
+      "I build with Next.js, React, Node.js, Express, and TypeScript, creating maintainable applications with clean UI, solid architecture, and smooth deployments.",
+    summary:
+      "My experience includes multi-tenant systems, modular backend design, scalable app structure, and shipping features without letting the codebase drift.",
+  },
+  {
+    id: "ctos",
+    label: "CTOs",
+    headline:
+      "I engineer web platforms with scalable architecture, multi-tenancy patterns, and delivery workflows that support growth without compromising product quality.",
+    summary:
+      "I can contribute across the stack, from frontend craftsmanship to backend services, deployment pipelines, and the decisions that keep systems maintainable.",
+  },
 ];
 
 const sections = ["Intro", "Work", "Values", "References", "About"];
 
 export default function Home() {
+  const [activeAudience, setActiveAudience] = useState(audienceProfiles[0].id);
   const heroRef = useRef(null);
+  const copyRef = useRef(null);
+
+  const activeProfile =
+    audienceProfiles.find((profile) => profile.id === activeAudience) ??
+    audienceProfiles[0];
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -24,20 +72,44 @@ export default function Home() {
         "[data-hero-item]",
         {
           opacity: 0,
-          y: 24,
+          y: 18,
         },
         {
           opacity: 1,
           y: 0,
-          duration: 0.55,
+          duration: 0.45,
           ease: "power3.out",
-          stagger: 0.08,
+          stagger: 0.07,
         }
       );
     }, heroRef);
 
     return () => ctx.revert();
   }, []);
+
+  useEffect(() => {
+    if (!copyRef.current) {
+      return;
+    }
+
+    const elements = copyRef.current.querySelectorAll("[data-copy-item]");
+
+    gsap.fromTo(
+      elements,
+      {
+        opacity: 0,
+        y: 14,
+      },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.32,
+        ease: "power2.out",
+        stagger: 0.04,
+        overwrite: "auto",
+      }
+    );
+  }, [activeAudience]);
 
   return (
     <main className={styles.page} ref={heroRef}>
@@ -59,27 +131,33 @@ export default function Home() {
 
       <section className={styles.hero} id="intro">
         <div className={styles.audienceRow} data-hero-item>
-          <span className={styles.audienceLabel}>Built for</span>
-          <div className={styles.audienceList}>
-            {audience.map((item) => (
-              <span key={item} className={styles.audienceItem}>
-                {item}
-              </span>
-            ))}
-          </div>
+          {audienceProfiles.map((profile) => {
+            const isActive = profile.id === activeAudience;
+
+            return (
+              <button
+                key={profile.id}
+                type="button"
+                className={
+                  isActive ? styles.audienceButtonActive : styles.audienceButton
+                }
+                onClick={() => setActiveAudience(profile.id)}
+              >
+                {profile.label}
+              </button>
+            );
+          })}
         </div>
 
-        <h1 className={styles.headline} data-hero-item>
-          Hello there, I&apos;m Shahzaib Mirza, a full stack developer who
-          builds beautiful websites and the systems behind them that scale with
-          the business.
-        </h1>
+        <div className={styles.copyBlock} ref={copyRef}>
+          <h1 className={styles.headline} data-copy-item>
+            {activeProfile.headline}
+          </h1>
 
-        <p className={styles.summary} data-hero-item>
-          I design and develop polished websites, multi-tenant platforms, and
-          production-ready architectures with React, Next.js, Node.js, Express,
-          and TypeScript.
-        </p>
+          <p className={styles.summary} data-copy-item>
+            {activeProfile.summary}
+          </p>
+        </div>
       </section>
     </main>
   );
