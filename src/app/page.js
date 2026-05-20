@@ -56,64 +56,86 @@ const audienceProfiles = [
 ];
 
 const sections = ["Intro", "Work", "Values", "References", "About"];
-const alphabet = "abcdefghijklmnopqrstuvwxyz";
+const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
 
-function getAnimatedFrames(text) {
-  const characters = Array.from(text);
+function getCharacterSequence(character) {
+  const lowerCharacter = character.toLowerCase();
+  const characterIndex = alphabet.indexOf(lowerCharacter);
 
-  return characters.map((character) => {
-    const lowerCharacter = character.toLowerCase();
-    const targetIndex = alphabet.indexOf(lowerCharacter);
+  if (character === " ") {
+    return {
+      targetIndex: 0,
+      values: [" "],
+    };
+  }
 
-    if (targetIndex === -1) {
-      return [character];
-    }
+  if (characterIndex === -1) {
+    return {
+      targetIndex: 0,
+      values: [character],
+    };
+  }
 
-    const sequence = alphabet.slice(0, targetIndex + 1).split("");
+  const values = alphabet
+    .slice(0, characterIndex + 1)
+    .map((letter) => (character === lowerCharacter ? letter : letter.toUpperCase()));
 
-    if (character === lowerCharacter) {
-      return sequence;
-    }
-
-    return sequence.map((letter) => letter.toUpperCase());
-  });
+  return {
+    targetIndex: values.length - 1,
+    values,
+  };
 }
 
-function useRollingText(text, speed = 20) {
-  const frames = useMemo(() => getAnimatedFrames(text), [text]);
-  const [displayText, setDisplayText] = useState(text);
+function RollingText({ as: Tag, className, text, duration, stagger }) {
+  const letterRefs = useRef([]);
+  const characters = useMemo(
+    () => Array.from(text).map((character) => getCharacterSequence(character)),
+    [text]
+  );
 
   useEffect(() => {
-    let frameIndex = 0;
-    const longestSequence = Math.max(...frames.map((sequence) => sequence.length));
+    const nodes = letterRefs.current.filter(Boolean);
 
-    setDisplayText(
-      frames
-        .map((sequence) => sequence[0] ?? "")
-        .join("")
-    );
+    gsap.set(nodes, { yPercent: 0 });
+    gsap.to(nodes, {
+      yPercent: (index) => -100 * characters[index].targetIndex,
+      duration,
+      ease: "power3.out",
+      stagger: {
+        each: stagger,
+        from: "start",
+      },
+      overwrite: true,
+    });
+  }, [characters, duration, stagger]);
 
-    const interval = window.setInterval(() => {
-      const nextText = frames
-        .map((sequence) => {
-          const characterIndex = Math.min(frameIndex, sequence.length - 1);
-          return sequence[characterIndex];
-        })
-        .join("");
-
-      setDisplayText(nextText);
-
-      if (frameIndex >= longestSequence - 1) {
-        window.clearInterval(interval);
-      }
-
-      frameIndex += 1;
-    }, speed);
-
-    return () => window.clearInterval(interval);
-  }, [frames, speed]);
-
-  return displayText;
+  return (
+    <Tag className={className} aria-label={text}>
+      {characters.map((character, index) => (
+        <span
+          key={`${text}-${index}`}
+          className={
+            character.values[0] === " "
+              ? styles.rollSpace
+              : styles.rollCharacter
+          }
+        >
+          <span
+            ref={(node) => {
+              letterRefs.current[index] = node;
+            }}
+            className={styles.rollInner}
+          >
+            {character.values.map((value, valueIndex) => (
+              <span key={`${index}-${valueIndex}`} className={styles.rollGlyph}>
+                {value}
+              </span>
+            ))}
+          </span>
+        </span>
+      ))}
+    </Tag>
+  );
 }
 
 export default function Home() {
@@ -123,8 +145,6 @@ export default function Home() {
   const activeProfile =
     audienceProfiles.find((profile) => profile.id === activeAudience) ??
     audienceProfiles[0];
-  const animatedHeadline = useRollingText(activeProfile.headline, 12);
-  const animatedSummary = useRollingText(activeProfile.summary, 7);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -186,13 +206,21 @@ export default function Home() {
         </div>
 
         <div className={styles.copyBlock}>
-          <h1 className={styles.headline}>
-            {animatedHeadline}
-          </h1>
+          <RollingText
+            as="h1"
+            className={styles.headline}
+            text={activeProfile.headline}
+            duration={1.15}
+            stagger={0.012}
+          />
 
-          <p className={styles.summary}>
-            {animatedSummary}
-          </p>
+          <RollingText
+            as="p"
+            className={styles.summary}
+            text={activeProfile.summary}
+            duration={0.95}
+            stagger={0.006}
+          />
         </div>
       </section>
     </main>
