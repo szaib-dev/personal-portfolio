@@ -509,7 +509,7 @@ export default function Home() {
                 {aboutContent.heading[1]}
               </h2>
 
-              <div className="group relative ml-[0.05rem] mt-8 h-[29.75rem] w-[17.5rem] max-[900px]:ml-0 max-[900px]:h-[27.25rem] max-[900px]:w-[16rem]">
+              <div className="group relative ml-[0.05rem] mt-8 h-[20.75rem] w-[14.5rem] max-[900px]:ml-0 max-[900px]:h-[22.25rem] max-[900px]:w-[16rem]">
                 <div className="absolute inset-0 box-border overflow-hidden bg-white p-[14px] opacity-0 shadow-[0_10px_24px_rgba(0,0,0,0.085)] transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:rotate-[-2deg] group-hover:opacity-100">
                   <Image
                     src={aboutContent.secondaryImage}
