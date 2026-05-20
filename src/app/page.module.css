@@ -42,12 +42,12 @@
   min-height: calc(100vh - 3.75rem);
   width: min(100%, 49rem);
   margin-left: clamp(16.125rem, 28vw, 29.125rem);
-  padding: 3.5rem 0 0.75rem;
+  padding: 4.6rem 0 0.75rem;
 }
 
 .audienceRow {
   position: absolute;
-  top: 3.5rem;
+  top: 4.55rem;
   left: 0;
   display: flex;
   flex-wrap: wrap;
@@ -80,7 +80,7 @@
 
 .copyBlock {
   width: min(100%, 43rem);
-  padding-top: 3.1rem;
+  padding-top: 1.6rem;
 }
 
 .headline {
@@ -111,6 +111,7 @@
   .hero {
     width: min(100%, 44rem);
     margin-left: 13.5rem;
+    padding-top: 4.25rem;
   }
 
   .audienceRow,
