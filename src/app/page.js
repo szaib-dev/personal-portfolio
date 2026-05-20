@@ -269,6 +269,21 @@ export default function Home() {
   }, [activeAudience]);
 
   useEffect(() => {
+    const syncHashSection = () => {
+      const hashSection = window.location.hash.replace("#", "");
+
+      if (navSections.some((section) => section.id === hashSection)) {
+        setActiveSection(hashSection);
+      }
+    };
+
+    syncHashSection();
+    window.addEventListener("hashchange", syncHashSection);
+
+    return () => window.removeEventListener("hashchange", syncHashSection);
+  }, []);
+
+  useEffect(() => {
     const sections = Array.from(document.querySelectorAll("[data-section]"));
 
     const observer = new IntersectionObserver(
@@ -311,8 +326,6 @@ export default function Home() {
       )}
 
       <div ref={contentRef} className={styles.pageContent}>
-        <div className={styles.brand}>SM.</div>
-
         <aside className={styles.sidebar}>
           {navSections.map((section) => (
             <a
@@ -494,19 +507,25 @@ export default function Home() {
         >
           <div className={styles.aboutTop}>
             <h2 className={styles.aboutLead}>
-              I&apos;m Shahzaib Mirza, a full stack developer from Pakistan.
+              I&apos;m Shahzaib Mirza,
+              <br />
+              a PK-based Developer
             </h2>
 
             <p className={styles.aboutBody}>
-              I build clean, beautiful websites with the same care I put into
-              the systems behind them, shaping polished frontend experiences
-              and backend foundations that stay reliable as products grow.
+              I&apos;m a seasoned developer with a
+              <br />
+              strong passion for creating intuitive
+              <br />
+              &amp; user-friendly digital experiences.
             </p>
 
             <p className={styles.aboutBody}>
-              I work especially well with founders, startups, and small teams
-              that need strong product thinking, modern execution, and a
-              developer who can move across the stack without losing clarity.
+              I love collaborating with founders,
+              <br />
+              helping them solve UX challenges
+              <br />
+              and build solutions.
             </p>
           </div>
 
@@ -514,15 +533,30 @@ export default function Home() {
             <div className={styles.aboutPhotoDeck}>
               <div
                 aria-hidden="true"
-                className={`${styles.aboutPhotoCard} ${styles.aboutPhotoBack}`}
+                className={`${styles.aboutPhotoLayer} ${styles.aboutPhotoLayerOne}`}
               />
               <div
                 aria-hidden="true"
-                className={`${styles.aboutPhotoCard} ${styles.aboutPhotoFront}`}
+                className={`${styles.aboutPhotoLayer} ${styles.aboutPhotoLayerTwo}`}
               />
+              <div
+                aria-hidden="true"
+                className={`${styles.aboutPhotoLayer} ${styles.aboutPhotoLayerThree}`}
+              />
+
+              <div className={styles.aboutPhotoFrame}>
+                <Image
+                  className={styles.aboutPortrait}
+                  src="/about-portrait.jpg"
+                  alt="Portrait of Shahzaib Mirza"
+                  width={800}
+                  height={1040}
+                />
+              </div>
             </div>
           </div>
         </section>
+
       </div>
     </main>
   );
