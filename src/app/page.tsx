@@ -26,6 +26,7 @@ export default function Home() {
   const [activeSection, setActiveSection] = useState(navSections[0].id);
   const [activeReferencePage, setActiveReferencePage] = useState(0);
   const [showIntro, setShowIntro] = useState(true);
+  const [introText, setIntroText] = useState("Shahzaib Mirza");
   const contentRef = useRef<HTMLDivElement | null>(null);
   const introRef = useRef<HTMLDivElement | null>(null);
   const introNameRef = useRef<HTMLParagraphElement | null>(null);
@@ -107,9 +108,32 @@ export default function Home() {
       .to(introNameRef.current, {
         opacity: 0,
         y: -18,
-        duration: 0.28,
+        duration: 0.24,
         ease: "power2.in",
         delay: 0.18,
+        onComplete: () => {
+          setIntroText("5+ years of experience");
+        },
+      })
+      .fromTo(
+        introNameRef.current,
+        {
+          opacity: 0,
+          y: 18,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.36,
+          ease: "power2.out",
+        }
+      )
+      .to(introNameRef.current, {
+        opacity: 0,
+        y: -18,
+        duration: 0.24,
+        ease: "power2.in",
+        delay: 0.16,
       })
       .to(
         introRef.current,
@@ -269,17 +293,12 @@ export default function Home() {
           ref={introRef}
           className="fixed inset-0 z-[100] flex items-center justify-center bg-white"
         >
-          <div className="flex flex-col items-center gap-3 text-center">
-            <p
-              ref={introNameRef}
-              className="text-[clamp(2.75rem,6vw,5rem)] font-medium leading-[0.95] tracking-[-0.07em]"
-            >
-              Shahzaib Mirza
-            </p>
-            <p className="text-[clamp(0.95rem,1.5vw,1.15rem)] font-normal tracking-[-0.03em] text-[#5f5f5f]">
-              5+ years of experience
-            </p>
-          </div>
+          <p
+            ref={introNameRef}
+            className="text-center text-[clamp(2.75rem,6vw,5rem)] font-medium leading-[0.95] tracking-[-0.07em]"
+          >
+            {introText}
+          </p>
         </div>
       )}
 
