@@ -1,10 +1,12 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { FiArrowRight, FiPlus } from "react-icons/fi";
 import { RiDoubleQuotesL } from "react-icons/ri";
+import { projectEntries } from "./projects/projectData";
 import styles from "./page.module.css";
 
 const audienceProfiles = [
@@ -64,39 +66,6 @@ const navSections = [
   { id: "values", label: "Values" },
   { id: "references", label: "References" },
   { id: "about", label: "About" },
-];
-
-const featuredProjects = [
-  {
-    id: "trend-bible",
-    kicker: "Trend Bible",
-    title: "Trend Bible",
-    description:
-      "A bold subscription-first editorial platform concept built to package market signals into a high-impact landing page with oversized type, strong hierarchy, and a confident conversion flow.",
-    metaLeft: "Editorial platform",
-    metaRight: "UI / Frontend concept",
-    image: "/trend-bible.png",
-    href: "/trend-bible.png",
-    width: 1086,
-    height: 633,
-    reverse: false,
-    accent: "#ff8f12",
-  },
-  {
-    id: "visual-poetry",
-    kicker: "Visual Poetry",
-    title: "Visual Poetry",
-    description:
-      "A cinematic portfolio concept for a visual storyteller, designed to balance gallery energy, warm contrast, and a brand-led first impression that feels immersive from the opening screen.",
-    metaLeft: "Creative portfolio",
-    metaRight: "Brand-led web concept",
-    image: "/visual-poetry.png",
-    href: "/visual-poetry.png",
-    width: 631,
-    height: 423,
-    reverse: true,
-    accent: "#f2aa38",
-  },
 ];
 
 const values = ["Useful", "Considered", "Beautiful", "Well made"];
@@ -163,6 +132,7 @@ export default function Home() {
   const contentRef = useRef(null);
   const headingRef = useRef(null);
   const referenceTransitionTimerRef = useRef(null);
+  const revealedElementsRef = useRef(new WeakSet());
 
   const activeProfile =
     audienceProfiles.find((profile) => profile.id === activeAudience) ??
@@ -308,6 +278,49 @@ export default function Home() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!contentRef.current) return;
+
+    const animatedElements = Array.from(
+      contentRef.current.querySelectorAll("[data-reveal]")
+    );
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting || revealedElementsRef.current.has(entry.target)) {
+            return;
+          }
+
+          revealedElementsRef.current.add(entry.target);
+          observer.unobserve(entry.target);
+
+          gsap.fromTo(
+            entry.target,
+            {
+              opacity: 0,
+              y: 26,
+            },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.9,
+              ease: "power3.out",
+            }
+          );
+        });
+      },
+      {
+        threshold: 0.16,
+        rootMargin: "0px 0px -10% 0px",
+      }
+    );
+
+    animatedElements.forEach((element) => observer.observe(element));
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <main className={styles.page}>
       {showIntro && (
@@ -367,12 +380,13 @@ export default function Home() {
           id="work"
           data-section
         >
-          {featuredProjects.map((project) => (
+          {projectEntries.map((project) => (
             <article
-              key={project.id}
+              key={project.slug}
               className={`${styles.projectCard} ${
                 project.reverse ? styles.projectCardReverse : ""
               }`}
+              data-reveal
             >
               <div className={styles.projectCopy}>
                 <p
@@ -384,7 +398,7 @@ export default function Home() {
 
                 <h2 className={styles.projectTitle}>{project.title}</h2>
 
-                <p className={styles.projectDescription}>{project.description}</p>
+                <p className={styles.projectDescription}>{project.summary}</p>
 
                 <div className={styles.projectMeta}>
                   <span>{project.metaLeft}</span>
@@ -392,16 +406,22 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className={styles.projectVisualWrap}>
-                <Image
-                  className={styles.projectVisual}
-                  src={project.image}
-                  alt={`${project.title} project preview`}
-                  width={project.width}
-                  height={project.height}
-                  priority={project.id === "trend-bible"}
-                />
-              </div>
+              <Link
+                className={styles.projectVisualLink}
+                href={`/projects/${project.slug}`}
+                aria-label={`Open ${project.title} case study`}
+              >
+                <div className={styles.projectVisualWrap}>
+                  <Image
+                    className={styles.projectVisual}
+                    src={project.image}
+                    alt={`${project.title} project preview`}
+                    width={project.width}
+                    height={project.height}
+                    priority={project.slug === "trend-bible"}
+                  />
+                </div>
+              </Link>
             </article>
           ))}
         </section>
@@ -413,13 +433,13 @@ export default function Home() {
         >
           <div className={styles.valuesStack}>
             {values.map((value) => (
-              <span key={value} className={styles.valuesWord}>
+              <span key={value} className={styles.valuesWord} data-reveal>
                 {value}
               </span>
             ))}
           </div>
 
-          <div className={styles.valuesBody}>
+          <div className={styles.valuesBody} data-reveal>
             <p>
               These are the core values behind the way I build. I care about
               digital work that solves a real problem, feels intentional in every
@@ -437,7 +457,7 @@ export default function Home() {
           id="references"
           data-section
         >
-          <div className={styles.referencesShell}>
+          <div className={styles.referencesShell} data-reveal>
             <div className={styles.referencesViewport}>
               <div
                 className={styles.referencesTrack}
@@ -499,7 +519,7 @@ export default function Home() {
 
         <section className={styles.aboutSection} id="about" data-section>
           <div className={styles.aboutColumns}>
-            <div className={styles.aboutColumnPrimary}>
+            <div className={styles.aboutColumnPrimary} data-reveal>
               <h2 className={styles.aboutLead}>
                 I&apos;m Shahzaib Mirza,
                 <br />
@@ -507,33 +527,29 @@ export default function Home() {
               </h2>
 
               <div className={styles.aboutPhotoDeck}>
-                <div
-                  className={`${styles.aboutPhotoCard} ${styles.aboutPhotoCardBack}`}
-                >
-                  <Image
-                    className={styles.aboutPortrait}
-                    src="/my-perosnal.png"
-                    alt="Alternate portrait of Shahzaib Mirza"
-                    width={608}
-                    height={658}
-                  />
-                </div>
-
-                <div
-                  className={`${styles.aboutPhotoCard} ${styles.aboutPhotoCardFront}`}
-                >
+                <div className={`${styles.aboutPhotoCard} ${styles.aboutPhotoCardBack}`}>
                   <Image
                     className={styles.aboutPortrait}
                     src="/my-personal-2.jpg"
-                    alt="Portrait of Shahzaib Mirza"
+                    alt="Alternate portrait of Shahzaib Mirza"
                     width={1200}
                     height={1600}
+                  />
+                </div>
+
+                <div className={`${styles.aboutPhotoCard} ${styles.aboutPhotoCardFront}`}>
+                  <Image
+                    className={styles.aboutPortrait}
+                    src="/my-perosnal.png"
+                    alt="Portrait of Shahzaib Mirza"
+                    width={608}
+                    height={658}
                   />
                 </div>
               </div>
             </div>
 
-            <div className={styles.aboutColumn}>
+            <div className={styles.aboutColumn} data-reveal>
               <p className={styles.aboutBody}>
                 I&apos;m a seasoned developer with a
                 <br />
@@ -543,7 +559,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className={styles.aboutColumn}>
+            <div className={styles.aboutColumn} data-reveal>
               <p className={styles.aboutBody}>
                 I love collaborating with founders,
                 <br />

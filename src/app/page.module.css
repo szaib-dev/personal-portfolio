@@ -188,11 +188,17 @@
   display: block;
 }
 
+.projectVisualLink {
+  display: block;
+  cursor: pointer;
+}
+
 .projectVisual {
   width: 100%;
   height: auto;
   border-radius: 0;
   display: block;
+  transition: transform 0.45s ease;
 }
 
 .valuesSection {
@@ -466,14 +472,18 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
+  .projectVisualLink:hover .projectVisual {
+    transform: translateY(-4px);
+  }
+
   .aboutPhotoDeck:hover .aboutPhotoCardFront {
-    opacity: 1;
-    transform: translate(0, 0) rotate(-2deg);
+    opacity: 0;
+    transform: translate(0.35rem, 0.22rem) rotate(-0.6deg);
   }
 
   .aboutPhotoDeck:hover .aboutPhotoCardBack {
-    opacity: 0.48;
-    transform: translate(0.62rem, 0.38rem) rotate(0.7deg);
+    opacity: 1;
+    transform: translate(0, 0) rotate(-2deg);
   }
 }
 
