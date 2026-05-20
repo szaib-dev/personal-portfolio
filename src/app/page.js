@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { FiArrowUpRight } from "react-icons/fi";
 import { gsap } from "gsap";
 import styles from "./page.module.css";
 
@@ -126,7 +125,10 @@ const aboutTools = ["Next.js", "Node.js", "TypeScript"];
 export default function Home() {
   const [activeAudience, setActiveAudience] = useState(audienceProfiles[0].id);
   const [activeSection, setActiveSection] = useState(navSections[0].id);
-  const pageRef = useRef(null);
+  const [showIntro, setShowIntro] = useState(true);
+  const introRef = useRef(null);
+  const introNameRef = useRef(null);
+  const contentRef = useRef(null);
   const headingRef = useRef(null);
 
   const activeProfile =
@@ -134,23 +136,57 @@ export default function Home() {
     audienceProfiles[0];
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        "[data-hero-item]",
+    const timeline = gsap.timeline({
+      onComplete: () => setShowIntro(false),
+    });
+
+    gsap.set(contentRef.current, {
+      opacity: 0,
+      y: -100,
+    });
+
+    timeline
+      .fromTo(
+        introNameRef.current,
         {
           opacity: 0,
-          y: 12,
+          y: 18,
         },
         {
           opacity: 1,
           y: 0,
-          duration: 0.28,
+          duration: 0.42,
           ease: "power2.out",
         }
+      )
+      .to(introNameRef.current, {
+        opacity: 0,
+        y: -18,
+        duration: 0.28,
+        ease: "power2.in",
+        delay: 0.18,
+      })
+      .to(
+        introRef.current,
+        {
+          opacity: 0,
+          duration: 0.16,
+          ease: "power1.out",
+        },
+        "<"
+      )
+      .to(
+        contentRef.current,
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.82,
+          ease: "power3.out",
+        },
+        "-=0.02"
       );
-    }, pageRef);
 
-    return () => ctx.revert();
+    return () => timeline.kill();
   }, []);
 
   useEffect(() => {
@@ -204,190 +240,202 @@ export default function Home() {
   }, []);
 
   return (
-    <main className={styles.page} ref={pageRef}>
-      <div className={styles.brand} data-hero-item>
-        SM.
-      </div>
-
-      <aside className={styles.sidebar} data-hero-item>
-        {navSections.map((section) => (
-          <a
-            key={section.id}
-            href={`#${section.id}`}
-            className={
-              activeSection === section.id ? styles.activeNav : styles.navItem
-            }
-          >
-            {section.label}
-          </a>
-        ))}
-      </aside>
-
-      <section className={styles.hero} id="intro" data-section>
-        <div className={styles.audienceRow}>
-          {audienceProfiles.map((profile) => {
-            const isActive = profile.id === activeAudience;
-
-            return (
-              <button
-                key={profile.id}
-                type="button"
-                className={
-                  isActive ? styles.audienceButtonActive : styles.audienceButton
-                }
-                onClick={() => setActiveAudience(profile.id)}
-              >
-                {profile.label}
-              </button>
-            );
-          })}
+    <main className={styles.page}>
+      {showIntro && (
+        <div ref={introRef} className={styles.introScreen}>
+          <p ref={introNameRef} className={styles.introName}>
+            Shahzaib Mirza
+          </p>
         </div>
+      )}
 
-        <div className={styles.copyBlock}>
-          <h1 ref={headingRef} className={styles.headline}>
-            {activeProfile.headline}
-          </h1>
+      <div ref={contentRef} className={styles.pageContent}>
+        <div className={styles.brand}>SM.</div>
 
-          <p className={styles.summary}>{activeProfile.summary}</p>
-        </div>
-      </section>
-
-      <section className={`${styles.contentSection} ${styles.workSection}`} id="work" data-section>
-        {featuredProjects.map((project) => (
-          <article
-            key={project.id}
-            className={`${styles.projectCard} ${
-              project.reverse ? styles.projectCardReverse : ""
-            }`}
-          >
-            <div className={styles.projectCopy}>
-              <p className={styles.projectKicker} style={{ color: project.accent }}>
-                {project.kicker}
-              </p>
-              <h2 className={styles.projectTitle}>{project.title}</h2>
-              <p className={styles.projectDescription}>{project.description}</p>
-
-              <div className={styles.projectMeta}>
-                <span>{project.metaLeft}</span>
-                <span>{project.metaRight}</span>
-              </div>
-
-              <a
-                className={styles.projectButton}
-                href={project.href}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View project preview
-                <FiArrowUpRight aria-hidden="true" />
-              </a>
-            </div>
-
+        <aside className={styles.sidebar}>
+          {navSections.map((section) => (
             <a
-              className={styles.projectVisualLink}
-              href={project.href}
-              target="_blank"
-              rel="noopener noreferrer"
+              key={section.id}
+              href={`#${section.id}`}
+              className={
+                activeSection === section.id ? styles.activeNav : styles.navItem
+              }
             >
-              <Image
-                className={styles.projectVisual}
-                src={project.image}
-                alt={`${project.title} project preview`}
-                width={project.width}
-                height={project.height}
-                priority={project.id === "trend-bible"}
-              />
+              {section.label}
             </a>
-          </article>
-        ))}
-      </section>
-
-      <section className={`${styles.contentSection} ${styles.valuesSection}`} id="values" data-section>
-        <div className={styles.valuesStack}>
-          {values.map((value) => (
-            <span key={value} className={styles.valuesWord}>
-              {value}
-            </span>
           ))}
-        </div>
+        </aside>
 
-        <div className={styles.valuesBody}>
-          <p>
-            These are the core values behind the way I build. I care about
-            digital work that solves a real problem, feels intentional in every
-            detail, and stays strong as products grow. I like thinking big,
-            building fast but carefully, staying practical, and creating
-            systems that are not only beautiful on the surface, but dependable
-            underneath. My goal is always the same: make something useful, well
-            made, and built to last.
-          </p>
-        </div>
-      </section>
+        <section className={styles.hero} id="intro" data-section>
+          <div className={styles.audienceRow}>
+            {audienceProfiles.map((profile) => {
+              const isActive = profile.id === activeAudience;
 
-      <section
-        className={`${styles.contentSection} ${styles.referencesSection}`}
-        id="references"
-        data-section
-      >
-        <div className={styles.referencesGrid}>
-          {referenceCards.map((card) => (
-            <article key={card.title} className={styles.referenceCard}>
-              <p className={styles.referenceLabel}>{card.label}</p>
-              <h3 className={styles.referenceTitle}>{card.title}</h3>
-              <p className={styles.referenceBody}>{card.body}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className={`${styles.contentSection} ${styles.aboutSection}`} id="about" data-section>
-        <div className={styles.aboutTop}>
-          <h2 className={styles.aboutLead}>
-            I&apos;m Shahzaib Mirza, a PK-based full stack developer.
-          </h2>
-
-          <p className={styles.aboutBody}>
-            I build clean, beautiful websites with the same care I put into the
-            systems behind them. I enjoy shaping frontend experiences that feel
-            polished and backend structures that stay reliable as products grow.
-          </p>
-
-          <p className={styles.aboutBody}>
-            I work especially well with founders, startups, and small teams that
-            need strong product thinking, modern execution, and a developer who
-            can move across the stack without losing clarity.
-          </p>
-        </div>
-
-        <div className={styles.aboutLower}>
-          <div className={styles.aboutCardStack}>
-            <div className={`${styles.aboutCardPaper} ${styles.aboutCardPaperOne}`} />
-            <div className={`${styles.aboutCardPaper} ${styles.aboutCardPaperTwo}`} />
-            <div className={`${styles.aboutCardPaper} ${styles.aboutCardFront}`}>
-              <p className={styles.aboutCardLabel}>Shahzaib Mirza</p>
-              <p className={styles.aboutMonogram}>SM</p>
-              <p className={styles.aboutRole}>Full stack web developer</p>
-
-              <div className={styles.aboutTools}>
-                {aboutTools.map((tool) => (
-                  <span key={tool} className={styles.aboutToolChip}>
-                    {tool}
-                  </span>
-                ))}
-              </div>
-
-              <p className={styles.aboutCardNote}>
-                Building polished interfaces and systems that scale with time.
-              </p>
-            </div>
+              return (
+                <button
+                  key={profile.id}
+                  type="button"
+                  className={
+                    isActive ? styles.audienceButtonActive : styles.audienceButton
+                  }
+                  onClick={() => setActiveAudience(profile.id)}
+                >
+                  {profile.label}
+                </button>
+              );
+            })}
           </div>
 
-          <p className={styles.aboutClosing}>
-            Let me help build a web presence and product foundation that looks
-            sharp and scales with time.
-          </p>
-        </div>
-      </section>
+          <div className={styles.copyBlock}>
+            <h1 ref={headingRef} className={styles.headline}>
+              {activeProfile.headline}
+            </h1>
+
+            <p className={styles.summary}>{activeProfile.summary}</p>
+          </div>
+        </section>
+
+        <section
+          className={`${styles.contentSection} ${styles.workSection}`}
+          id="work"
+          data-section
+        >
+          {featuredProjects.map((project) => (
+            <article
+              key={project.id}
+              className={`${styles.projectCard} ${
+                project.reverse ? styles.projectCardReverse : ""
+              }`}
+            >
+              <div className={styles.projectCopy}>
+                <p
+                  className={styles.projectKicker}
+                  style={{ color: project.accent }}
+                >
+                  {project.kicker}
+                </p>
+                <h2 className={styles.projectTitle}>{project.title}</h2>
+                <p className={styles.projectDescription}>{project.description}</p>
+
+                <div className={styles.projectMeta}>
+                  <span>{project.metaLeft}</span>
+                  <span>{project.metaRight}</span>
+                </div>
+              </div>
+
+              <div className={styles.projectVisualWrap}>
+                <Image
+                  className={styles.projectVisual}
+                  src={project.image}
+                  alt={`${project.title} project preview`}
+                  width={project.width}
+                  height={project.height}
+                  priority={project.id === "trend-bible"}
+                />
+              </div>
+            </article>
+          ))}
+        </section>
+
+        <section
+          className={`${styles.contentSection} ${styles.valuesSection}`}
+          id="values"
+          data-section
+        >
+          <div className={styles.valuesStack}>
+            {values.map((value) => (
+              <span key={value} className={styles.valuesWord}>
+                {value}
+              </span>
+            ))}
+          </div>
+
+          <div className={styles.valuesBody}>
+            <p>
+              These are the core values behind the way I build. I care about
+              digital work that solves a real problem, feels intentional in every
+              detail, and stays strong as products grow. I like thinking big,
+              building fast but carefully, staying practical, and creating
+              systems that are not only beautiful on the surface, but dependable
+              underneath. My goal is always the same: make something useful, well
+              made, and built to last.
+            </p>
+          </div>
+        </section>
+
+        <section
+          className={`${styles.contentSection} ${styles.referencesSection}`}
+          id="references"
+          data-section
+        >
+          <div className={styles.referencesGrid}>
+            {referenceCards.map((card) => (
+              <article key={card.title} className={styles.referenceCard}>
+                <p className={styles.referenceLabel}>{card.label}</p>
+                <h3 className={styles.referenceTitle}>{card.title}</h3>
+                <p className={styles.referenceBody}>{card.body}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section
+          className={`${styles.contentSection} ${styles.aboutSection}`}
+          id="about"
+          data-section
+        >
+          <div className={styles.aboutTop}>
+            <h2 className={styles.aboutLead}>
+              I&apos;m Shahzaib Mirza, a PK-based full stack developer.
+            </h2>
+
+            <p className={styles.aboutBody}>
+              I build clean, beautiful websites with the same care I put into the
+              systems behind them. I enjoy shaping frontend experiences that feel
+              polished and backend structures that stay reliable as products grow.
+            </p>
+
+            <p className={styles.aboutBody}>
+              I work especially well with founders, startups, and small teams that
+              need strong product thinking, modern execution, and a developer who
+              can move across the stack without losing clarity.
+            </p>
+          </div>
+
+          <div className={styles.aboutLower}>
+            <div className={styles.aboutCardStack}>
+              <div
+                className={`${styles.aboutCardPaper} ${styles.aboutCardPaperOne}`}
+              />
+              <div
+                className={`${styles.aboutCardPaper} ${styles.aboutCardPaperTwo}`}
+              />
+              <div className={`${styles.aboutCardPaper} ${styles.aboutCardFront}`}>
+                <p className={styles.aboutCardLabel}>Shahzaib Mirza</p>
+                <p className={styles.aboutMonogram}>SM</p>
+                <p className={styles.aboutRole}>Full stack web developer</p>
+
+                <div className={styles.aboutTools}>
+                  {aboutTools.map((tool) => (
+                    <span key={tool} className={styles.aboutToolChip}>
+                      {tool}
+                    </span>
+                  ))}
+                </div>
+
+                <p className={styles.aboutCardNote}>
+                  Building polished interfaces and systems that scale with time.
+                </p>
+              </div>
+            </div>
+
+            <p className={styles.aboutClosing}>
+              Let me help build a web presence and product foundation that looks
+              sharp and scales with time.
+            </p>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }
