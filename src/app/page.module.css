@@ -283,7 +283,7 @@
 }
 
 .referenceName {
-  font-size: 0.86rem;
+  font-size: 0.8rem;
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.02em;
@@ -291,21 +291,21 @@
 
 .referenceRole {
   margin-top: 0.16rem;
-  font-size: 0.8rem;
+  font-size: 0.74rem;
   line-height: 1.3;
   color: #8f8f8f;
 }
 
 .referenceQuote {
   color: #dddddd;
-  font-size: 2rem;
+  font-size: 1.7rem;
 }
 
 .referenceBody {
   max-width: 18rem;
   margin-top: 0.08rem;
-  font-size: 0.99rem;
-  line-height: 1.52;
+  font-size: 0.92rem;
+  line-height: 1.48;
   letter-spacing: -0.03em;
   color: #242424;
 }
@@ -313,154 +313,115 @@
 .referencesFade {
   position: absolute;
   inset: 0 0 0 auto;
-  width: 12rem;
+  width: 15rem;
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
   background:
     linear-gradient(
       90deg,
-      rgba(246, 243, 238, 0) 0%,
-      rgba(246, 243, 238, 0.65) 44%,
-      #f6f3ee 72%,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.68) 42%,
+      rgba(255, 255, 255, 0.94) 72%,
       #f6f3ee 100%
     );
 }
 
+.referencesFadeActive {
+  opacity: 1;
+}
+
 .referencesNext {
   position: absolute;
-  top: 8.95rem;
-  right: 0.75rem;
+  top: 8.55rem;
+  right: 1.1rem;
   z-index: 2;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.4rem;
-  height: 2.4rem;
+  width: 1.8rem;
+  height: 1.8rem;
   border: 0;
   background: transparent;
   color: #f12d66;
-  font-size: 1.95rem;
+  font-size: 1.35rem;
   cursor: pointer;
   transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .aboutSection {
-  padding-top: 8rem;
+  padding-top: 6.1rem;
 }
 
 .aboutTop {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr);
-  gap: 2.75rem;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr) minmax(0, 0.92fr);
+  gap: 2.9rem;
   align-items: start;
 }
 
 .aboutLead {
-  max-width: 24rem;
-  font-size: clamp(2.75rem, 4.15vw, 4rem);
+  max-width: 21.75rem;
+  font-size: clamp(3.05rem, 4.4vw, 4.2rem);
   font-weight: 500;
-  line-height: 0.95;
+  line-height: 0.92;
   letter-spacing: -0.06em;
 }
 
 .aboutBody {
-  max-width: 24rem;
-  font-size: 1.1rem;
-  line-height: 1.68;
+  max-width: 18.75rem;
+  font-size: 0.98rem;
+  line-height: 1.6;
   color: #303030;
 }
 
 .aboutLower {
-  display: grid;
-  grid-template-columns: minmax(0, 24rem) minmax(0, 1fr);
-  gap: 4rem;
-  align-items: end;
-  margin-top: 3rem;
+  width: min(100%, 23.75rem);
+  margin-top: 1.55rem;
+  margin-left: 0.65rem;
 }
 
-.aboutCardStack {
+.aboutPhotoDeck {
   position: relative;
-  width: min(100%, 23rem);
-  aspect-ratio: 0.76;
-  margin-left: 0.75rem;
+  width: min(100%, 22.6rem);
+  aspect-ratio: 0.77;
+  cursor: pointer;
 }
 
-.aboutCardPaper {
+.aboutPhotoCard {
   position: absolute;
   inset: 0;
-  border-radius: 1rem;
+  overflow: hidden;
+  padding: 0.78rem;
+  border-radius: 0.18rem;
   border: 1px solid rgba(18, 18, 18, 0.08);
   background: #ffffff;
-  box-shadow: 0 18px 38px rgba(18, 18, 18, 0.08);
+  box-shadow: 0 14px 30px rgba(18, 18, 18, 0.08);
+  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.aboutCardPaperOne {
-  transform: rotate(-4deg);
-}
-
-.aboutCardPaperTwo {
-  transform: rotate(3deg);
-}
-
-.aboutCardFront {
-  inset: 1rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 1.45rem;
+.aboutPhotoCard::before {
+  content: "";
+  position: absolute;
+  inset: 0.78rem;
   background:
-    radial-gradient(circle at top right, rgba(255, 182, 102, 0.5), transparent 34%),
-    linear-gradient(145deg, #fff7eb 0%, #f2e5d0 100%);
+    linear-gradient(135deg, rgba(244, 237, 225, 0.95) 0%, rgba(228, 213, 188, 0.96) 100%);
 }
 
-.aboutCardLabel {
-  font-size: 0.86rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #7d6a55;
+.aboutPhotoBack {
+  transform: rotate(-2.8deg) translate(0.2rem, -0.12rem);
 }
 
-.aboutMonogram {
-  font-size: clamp(5.5rem, 9vw, 7.2rem);
-  font-weight: 500;
-  line-height: 0.9;
-  letter-spacing: -0.08em;
-  color: #171717;
+.aboutPhotoFront {
+  transform: rotate(1.9deg) translate(0, 0);
 }
 
-.aboutRole {
-  margin-top: 0.6rem;
-  font-size: 1.05rem;
-  color: #3f3a33;
+.aboutPhotoDeck:hover .aboutPhotoBack {
+  transform: rotate(-5.25deg) translate(-1rem, -0.5rem);
 }
 
-.aboutTools {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.55rem;
-  margin-top: 1.25rem;
-}
-
-.aboutToolChip {
-  padding: 0.45rem 0.78rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
-  font-size: 0.86rem;
-  color: #2d2d2d;
-}
-
-.aboutCardNote {
-  margin-top: auto;
-  font-size: 0.98rem;
-  line-height: 1.55;
-  color: #3f3a33;
-}
-
-.aboutClosing {
-  max-width: 44rem;
-  font-size: clamp(3rem, 5vw, 4.9rem);
-  font-weight: 500;
-  line-height: 0.98;
-  letter-spacing: -0.07em;
+.aboutPhotoDeck:hover .aboutPhotoFront {
+  transform: rotate(3.05deg) translate(0.78rem, 0.22rem);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -487,8 +448,7 @@
     order: initial;
   }
 
-  .aboutTop,
-  .aboutLower {
+  .aboutTop {
     grid-template-columns: 1fr;
   }
 
@@ -503,7 +463,7 @@
   }
 
   .aboutBody,
-  .aboutClosing {
+  .aboutLower {
     justify-self: start;
     max-width: 100%;
   }
@@ -634,8 +594,7 @@
   .projectDescription,
   .valuesBody,
   .referenceBody,
-  .aboutBody,
-  .aboutCardNote {
+  .aboutBody {
     font-size: 1rem;
   }
 

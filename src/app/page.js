@@ -140,7 +140,6 @@ const referenceCards = [
   },
 ];
 
-const aboutTools = ["Next.js", "Node.js", "TypeScript"];
 const TESTIMONIALS_PER_PAGE = 3;
 const referencePages = Array.from(
   { length: Math.ceil(referenceCards.length / TESTIMONIALS_PER_PAGE) },
@@ -155,22 +154,33 @@ export default function Home() {
   const [activeAudience, setActiveAudience] = useState(audienceProfiles[0].id);
   const [activeSection, setActiveSection] = useState(navSections[0].id);
   const [activeReferencePage, setActiveReferencePage] = useState(0);
+  const [isReferenceTransitioning, setIsReferenceTransitioning] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
   const introRef = useRef(null);
   const introNameRef = useRef(null);
   const contentRef = useRef(null);
   const headingRef = useRef(null);
+  const referenceTransitionTimerRef = useRef(null);
 
   const activeProfile =
     audienceProfiles.find((profile) => profile.id === activeAudience) ??
     audienceProfiles[0];
+  const referencePageWidth = 100 / referencePages.length;
   const referenceTrackOffset =
-    activeReferencePage * (100 / referencePages.length);
+    activeReferencePage * referencePageWidth;
 
   const showNextReferencePage = () => {
+    if (referenceTransitionTimerRef.current) {
+      clearTimeout(referenceTransitionTimerRef.current);
+    }
+
+    setIsReferenceTransitioning(true);
     setActiveReferencePage((currentPage) => {
       return (currentPage + 1) % referencePages.length;
     });
+    referenceTransitionTimerRef.current = setTimeout(() => {
+      setIsReferenceTransitioning(false);
+    }, 560);
   };
 
   useEffect(() => {
@@ -280,6 +290,14 @@ export default function Home() {
     sections.forEach((section) => observer.observe(section));
 
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (referenceTransitionTimerRef.current) {
+        clearTimeout(referenceTransitionTimerRef.current);
+      }
+    };
   }, []);
 
   return (
@@ -416,11 +434,16 @@ export default function Home() {
               <div
                 className={styles.referencesTrack}
                 style={{
+                  width: `${referencePages.length * 100}%`,
                   transform: `translateX(-${referenceTrackOffset}%)`,
                 }}
               >
                 {referencePages.map((page, pageIndex) => (
-                  <div key={pageIndex} className={styles.referencesPage}>
+                  <div
+                    key={pageIndex}
+                    className={styles.referencesPage}
+                    style={{ flex: `0 0 ${referencePageWidth}%` }}
+                  >
                     {page.map((card, cardIndex) => (
                       <article key={card.name} className={styles.referenceCard}>
                         {cardIndex > 0 && (
@@ -447,7 +470,12 @@ export default function Home() {
               </div>
             </div>
 
-            <div aria-hidden="true" className={styles.referencesFade} />
+            <div
+              aria-hidden="true"
+              className={`${styles.referencesFade} ${
+                isReferenceTransitioning ? styles.referencesFadeActive : ""
+              }`}
+            />
             <button
               type="button"
               className={styles.referencesNext}
@@ -466,53 +494,33 @@ export default function Home() {
         >
           <div className={styles.aboutTop}>
             <h2 className={styles.aboutLead}>
-              I&apos;m Shahzaib Mirza, a PK-based full stack developer.
+              I&apos;m Shahzaib Mirza, a full stack developer from Pakistan.
             </h2>
 
             <p className={styles.aboutBody}>
-              I build clean, beautiful websites with the same care I put into the
-              systems behind them. I enjoy shaping frontend experiences that feel
-              polished and backend structures that stay reliable as products grow.
+              I build clean, beautiful websites with the same care I put into
+              the systems behind them, shaping polished frontend experiences
+              and backend foundations that stay reliable as products grow.
             </p>
 
             <p className={styles.aboutBody}>
-              I work especially well with founders, startups, and small teams that
-              need strong product thinking, modern execution, and a developer who
-              can move across the stack without losing clarity.
+              I work especially well with founders, startups, and small teams
+              that need strong product thinking, modern execution, and a
+              developer who can move across the stack without losing clarity.
             </p>
           </div>
 
           <div className={styles.aboutLower}>
-            <div className={styles.aboutCardStack}>
+            <div className={styles.aboutPhotoDeck}>
               <div
-                className={`${styles.aboutCardPaper} ${styles.aboutCardPaperOne}`}
+                aria-hidden="true"
+                className={`${styles.aboutPhotoCard} ${styles.aboutPhotoBack}`}
               />
               <div
-                className={`${styles.aboutCardPaper} ${styles.aboutCardPaperTwo}`}
+                aria-hidden="true"
+                className={`${styles.aboutPhotoCard} ${styles.aboutPhotoFront}`}
               />
-              <div className={`${styles.aboutCardPaper} ${styles.aboutCardFront}`}>
-                <p className={styles.aboutCardLabel}>Shahzaib Mirza</p>
-                <p className={styles.aboutMonogram}>SM</p>
-                <p className={styles.aboutRole}>Full stack web developer</p>
-
-                <div className={styles.aboutTools}>
-                  {aboutTools.map((tool) => (
-                    <span key={tool} className={styles.aboutToolChip}>
-                      {tool}
-                    </span>
-                  ))}
-                </div>
-
-                <p className={styles.aboutCardNote}>
-                  Building polished interfaces and systems that scale with time.
-                </p>
-              </div>
             </div>
-
-            <p className={styles.aboutClosing}>
-              Let me help build a web presence and product foundation that looks
-              sharp and scales with time.
-            </p>
           </div>
         </section>
       </div>
