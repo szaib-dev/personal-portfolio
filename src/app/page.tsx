@@ -189,6 +189,7 @@ export default function Home() {
     const ctx = gsap.context(() => {
       const reveals = gsap.utils.toArray<HTMLElement>("[data-reveal]");
       const groups = gsap.utils.toArray<HTMLElement>("[data-stagger-group]");
+      const valueLines = gsap.utils.toArray<HTMLElement>("[data-value-line]");
 
       reveals.forEach((element) => {
         gsap.fromTo(
@@ -234,6 +235,28 @@ export default function Home() {
           }
         );
       });
+
+      if (valueLines.length) {
+        gsap.fromTo(
+          valueLines,
+          {
+            opacity: 0,
+            y: 34,
+          },
+          {
+            opacity: 1,
+            y: 0,
+            stagger: 0.12,
+            duration: 0.82,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: valueLines[0].parentElement,
+              start: "top 80%",
+              once: true,
+            },
+          }
+        );
+      }
     }, contentRef);
 
     return () => ctx.revert();
@@ -373,6 +396,7 @@ export default function Home() {
             {values.map((value) => (
               <span
                 key={value}
+                data-value-line
                 className="block text-[clamp(4.65rem,6.35vw,6.65rem)] font-medium leading-[0.9] tracking-[-0.08em] max-[560px]:text-[clamp(3.5rem,16vw,5.2rem)]"
               >
                 {value}
