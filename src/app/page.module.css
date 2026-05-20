@@ -204,9 +204,9 @@
 
 .valuesSection {
   position: relative;
-  min-height: 100vh;
+  min-height: 38rem;
   padding-top: 0.9rem;
-  padding-bottom: 1.5rem;
+  padding-bottom: 2.75rem;
 }
 
 .valuesStack {
@@ -220,6 +220,7 @@
   display: block;
   font-size: clamp(4.65rem, 6.35vw, 6.65rem);
   font-weight: 500;
+  margin-top: 28px;
   line-height: 0.9;
   letter-spacing: -0.08em;
 }
@@ -227,7 +228,7 @@
 .valuesBody {
   position: absolute;
   right: 0.5rem;
-  bottom: 0.5rem;
+  bottom: 4rem;
   width: min(100%, 42rem);
   font-size: 0.95rem;
   line-height: 1.58;
@@ -426,6 +427,7 @@
   .valuesSection {
     min-height: auto;
     padding-top: 5rem;
+    padding-bottom: 0;
   }
 
   .valuesStack,
