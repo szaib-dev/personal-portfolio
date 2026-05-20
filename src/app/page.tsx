@@ -486,7 +486,7 @@ export default function Home() {
                 )
               }
               aria-label="Show next testimonials"
-              className="absolute right-[1.1rem] top-[8.55rem] z-[2] inline-flex h-[1.8rem] w-[1.8rem] items-center justify-center bg-transparent text-[1.35rem] text-[#f12d66] transition hover:translate-x-[2px] hover:text-[#dd1f56] max-[768px]:static max-[768px]:mt-8 max-[768px]:h-auto max-[768px]:w-auto"
+              className="absolute right-[1.1rem] top-[8.55rem] z-[2] inline-flex h-[1.8rem] w-[1.8rem] items-center justify-center bg-transparent text-[1.35rem] text-[#f12d66] transition hover:translate-x-[2px] hover:text-[#dd1f56] max-[768px]:hidden"
             >
               <FiArrowRight aria-hidden="true" />
             </button>
@@ -509,7 +509,7 @@ export default function Home() {
                 {aboutContent.heading[1]}
               </h2>
 
-              <div className="group relative ml-[0.05rem] mt-8 h-[20.75rem] w-[14.5rem] max-[1280px]:ml-0 max-[1280px]:h-[22.25rem] max-[1280px]:w-[16rem] max-[560px]:ml-1 max-[560px]:h-[23rem] max-[560px]:w-[15rem]">
+              <div className="group relative ml-[0.05rem] mt-8 h-[20.75rem] w-[14.5rem] max-[1280px]:ml-0 max-[1280px]:h-[22.25rem] max-[1280px]:w-[16rem] max-[560px]:mx-auto max-[560px]:h-[23rem] max-[560px]:w-[15rem]">
                 <div className="absolute inset-0 box-border overflow-hidden bg-white p-[14px] opacity-0 shadow-[0_10px_24px_rgba(0,0,0,0.085)] transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:rotate-[-2deg] group-hover:opacity-100 max-[560px]:translate-x-4 max-[560px]:translate-y-2 max-[560px]:rotate-[4deg] max-[560px]:opacity-100">
                   <Image
                     src={aboutContent.secondaryImage}
@@ -561,7 +561,7 @@ export default function Home() {
 
           <p
             data-reveal
-            className="absolute bottom-0 left-9 m-0 max-w-[44rem] text-[clamp(2.35rem,3.05vw,3.35rem)] font-normal leading-[1.12] tracking-[-0.075em] text-[#2b2b2b] max-[1280px]:static max-[1280px]:mt-16 max-[1280px]:max-w-full max-[1280px]:text-[clamp(2rem,8vw,3rem)] max-[560px]:mt-12 max-[560px]:text-center max-[560px]:text-[2.05rem] max-[560px]:leading-[1.15] max-[560px]:tracking-[-0.065em]"
+            className="absolute bottom-0 left-9 m-0 max-w-[44rem] text-[clamp(2.35rem,3.05vw,3.35rem)] font-normal leading-[1.12] tracking-[-0.075em] text-[#2b2b2b] max-[1280px]:static max-[1280px]:mt-16 max-[1280px]:max-w-full max-[1280px]:text-[clamp(2rem,8vw,3rem)] max-[560px]:mt-12 max-[560px]:text-center max-[560px]:text-[1.8rem] max-[560px]:leading-[1.12] max-[560px]:tracking-[-0.06em]"
           >
             {aboutContent.bottomText[0]}
             <br />
