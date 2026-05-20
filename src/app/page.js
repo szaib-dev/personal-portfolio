@@ -1,66 +1,86 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
 import styles from "./page.module.css";
 
+const audience = [
+  "Founders",
+  "Startups",
+  "Product Teams",
+  "SaaS Brands",
+  "Agencies",
+  "Growing Businesses",
+];
+
+const sections = ["Intro", "Work", "Values", "References", "About"];
+
 export default function Home() {
+  const heroRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        "[data-hero-item]",
+        {
+          opacity: 0,
+          y: 24,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.55,
+          ease: "power3.out",
+          stagger: 0.08,
+        }
+      );
+    }, heroRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.js file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
+    <main className={styles.page} ref={heroRef}>
+      <div className={styles.brand} data-hero-item>
+        SM.
+      </div>
+
+      <aside className={styles.sidebar} data-hero-item>
+        {sections.map((section, index) => (
           <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            key={section}
+            href={`#${section.toLowerCase()}`}
+            className={index === 0 ? styles.activeNav : styles.navItem}
           >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
+            {section}
           </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        ))}
+      </aside>
+
+      <section className={styles.hero} id="intro">
+        <div className={styles.audienceRow} data-hero-item>
+          <span className={styles.audienceLabel}>Built for</span>
+          <div className={styles.audienceList}>
+            {audience.map((item) => (
+              <span key={item} className={styles.audienceItem}>
+                {item}
+              </span>
+            ))}
+          </div>
         </div>
-      </main>
-    </div>
+
+        <h1 className={styles.headline} data-hero-item>
+          Hello there, I&apos;m Shahzaib Mirza, a full stack developer who
+          builds beautiful websites and the systems behind them that scale with
+          the business.
+        </h1>
+
+        <p className={styles.summary} data-hero-item>
+          I design and develop polished websites, multi-tenant platforms, and
+          production-ready architectures with React, Next.js, Node.js, Express,
+          and TypeScript.
+        </p>
+      </section>
+    </main>
   );
 }
