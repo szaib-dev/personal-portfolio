@@ -279,7 +279,7 @@ export default function Home() {
       )}
 
       <div ref={contentRef} className="relative">
-        <aside className="fixed left-7 top-48 z-20 flex flex-col gap-[0.08rem] max-[1024px]:static max-[1024px]:mb-10 max-[1024px]:mt-16 max-[560px]:mb-8 max-[560px]:mt-12 max-[560px]:gap-1">
+        <aside className="fixed left-7 top-48 z-20 flex flex-col gap-[0.08rem] max-[1024px]:static max-[1024px]:mb-10 max-[1024px]:mt-16 max-[560px]:hidden">
           {navSections.map((section) => (
             <a
               key={section.id}
@@ -425,7 +425,7 @@ export default function Home() {
           data-section
           className="ml-[clamp(16.125rem,28vw,29.125rem)] w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),82rem)] scroll-mt-8 border-t border-black/10 pt-8 max-[1024px]:ml-0 max-[1024px]:w-full"
         >
-          <div data-reveal className="relative pt-[6.1rem] max-[1024px]:pt-14">
+          <div data-reveal className="relative pt-[6.1rem] max-[1024px]:pt-14 max-[560px]:mx-auto max-[560px]:max-w-[22rem]">
             <div className="overflow-hidden">
               <div
                 className="flex transition-transform duration-[550ms] ease-[cubic-bezier(0.23,1,0.32,1)]"
@@ -439,7 +439,7 @@ export default function Home() {
                     className="box-border grid min-w-full grid-cols-3 gap-[3.25rem] pr-[9.5rem] max-[1220px]:grid-cols-2 max-[1220px]:gap-9 max-[1220px]:pr-24 max-[768px]:grid-cols-1 max-[768px]:gap-8 max-[768px]:pr-0"
                   >
                     {page.map((card, cardIndex) => (
-                      <article key={card.name} className="relative min-h-[13.75rem]">
+                      <article key={card.name} className="relative min-h-[13.75rem] max-[768px]:mx-auto max-[768px]:w-full max-[768px]:max-w-[22rem]">
                         {cardIndex > 0 && (
                           <FiPlus
                             aria-hidden="true"
@@ -498,10 +498,10 @@ export default function Home() {
           data-section
           className="relative min-h-screen w-full overflow-hidden bg-white px-0 pb-0 pt-0"
         >
-          <div className="relative m-0 block h-screen w-full max-[1280px]:grid max-[1280px]:h-auto max-[1280px]:gap-7 max-[1280px]:px-0 max-[1280px]:py-20">
+          <div className="relative m-0 block h-screen w-full max-[1280px]:grid max-[1280px]:h-auto max-[1280px]:gap-7 max-[1280px]:px-0 max-[1280px]:py-20 max-[560px]:justify-items-center">
             <div
               data-reveal
-              className="absolute left-[34.2%] top-[8.6rem] w-[22rem] max-[1280px]:static max-[1280px]:w-full max-[1280px]:max-w-[28rem]"
+              className="absolute left-[34.2%] top-[8.6rem] w-[22rem] max-[1280px]:static max-[1280px]:w-full max-[1280px]:max-w-[28rem] max-[560px]:text-center"
             >
               <h2 className="m-0 text-[1.62rem] font-medium leading-[2.08rem] tracking-[-0.065em] text-[#111111]">
                 {aboutContent.heading[0]}
@@ -534,7 +534,7 @@ export default function Home() {
 
             <div
               data-reveal
-              className="absolute left-[56.9%] top-[8.6rem] w-[19rem] max-[1280px]:static max-[1280px]:w-full max-[1280px]:max-w-[28rem]"
+              className="absolute left-[56.9%] top-[8.6rem] w-[19rem] max-[1280px]:static max-[1280px]:w-full max-[1280px]:max-w-[28rem] max-[560px]:text-center"
             >
               <p className="m-0 text-[1.08rem] font-normal leading-[1.55rem] tracking-[-0.045em] text-[#111111]">
                 {aboutContent.columnTwo[0]}
@@ -547,7 +547,7 @@ export default function Home() {
 
             <div
               data-reveal
-              className="absolute left-[78.2%] top-[8.6rem] w-[19rem] max-[1280px]:static max-[1280px]:w-full max-[1280px]:max-w-[28rem]"
+              className="absolute left-[78.2%] top-[8.6rem] w-[19rem] max-[1280px]:static max-[1280px]:w-full max-[1280px]:max-w-[28rem] max-[560px]:text-center"
             >
               <p className="m-0 text-[1.08rem] font-normal leading-[1.55rem] tracking-[-0.045em] text-[#111111]">
                 {aboutContent.columnThree[0]}
@@ -561,7 +561,7 @@ export default function Home() {
 
           <p
             data-reveal
-            className="absolute bottom-0 left-9 m-0 max-w-[44rem] text-[clamp(2.35rem,3.05vw,3.35rem)] font-normal leading-[1.12] tracking-[-0.075em] text-[#2b2b2b] max-[1280px]:static max-[1280px]:mt-16 max-[1280px]:max-w-full max-[1280px]:text-[clamp(2rem,8vw,3rem)] max-[560px]:mt-12 max-[560px]:text-[2.05rem] max-[560px]:leading-[1.15] max-[560px]:tracking-[-0.065em]"
+            className="absolute bottom-0 left-9 m-0 max-w-[44rem] text-[clamp(2.35rem,3.05vw,3.35rem)] font-normal leading-[1.12] tracking-[-0.075em] text-[#2b2b2b] max-[1280px]:static max-[1280px]:mt-16 max-[1280px]:max-w-full max-[1280px]:text-[clamp(2rem,8vw,3rem)] max-[560px]:mt-12 max-[560px]:text-center max-[560px]:text-[2.05rem] max-[560px]:leading-[1.15] max-[560px]:tracking-[-0.065em]"
           >
             {aboutContent.bottomText[0]}
             <br />
