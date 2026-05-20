@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { gsap } from "gsap";
 import styles from "./page.module.css";
 
@@ -56,15 +56,75 @@ const audienceProfiles = [
 ];
 
 const sections = ["Intro", "Work", "Values", "References", "About"];
+const alphabet = "abcdefghijklmnopqrstuvwxyz";
+
+function getAnimatedFrames(text) {
+  const characters = Array.from(text);
+
+  return characters.map((character) => {
+    const lowerCharacter = character.toLowerCase();
+    const targetIndex = alphabet.indexOf(lowerCharacter);
+
+    if (targetIndex === -1) {
+      return [character];
+    }
+
+    const sequence = alphabet.slice(0, targetIndex + 1).split("");
+
+    if (character === lowerCharacter) {
+      return sequence;
+    }
+
+    return sequence.map((letter) => letter.toUpperCase());
+  });
+}
+
+function useRollingText(text, speed = 20) {
+  const frames = useMemo(() => getAnimatedFrames(text), [text]);
+  const [displayText, setDisplayText] = useState(text);
+
+  useEffect(() => {
+    let frameIndex = 0;
+    const longestSequence = Math.max(...frames.map((sequence) => sequence.length));
+
+    setDisplayText(
+      frames
+        .map((sequence) => sequence[0] ?? "")
+        .join("")
+    );
+
+    const interval = window.setInterval(() => {
+      const nextText = frames
+        .map((sequence) => {
+          const characterIndex = Math.min(frameIndex, sequence.length - 1);
+          return sequence[characterIndex];
+        })
+        .join("");
+
+      setDisplayText(nextText);
+
+      if (frameIndex >= longestSequence - 1) {
+        window.clearInterval(interval);
+      }
+
+      frameIndex += 1;
+    }, speed);
+
+    return () => window.clearInterval(interval);
+  }, [frames, speed]);
+
+  return displayText;
+}
 
 export default function Home() {
   const [activeAudience, setActiveAudience] = useState(audienceProfiles[0].id);
   const heroRef = useRef(null);
-  const copyRef = useRef(null);
 
   const activeProfile =
     audienceProfiles.find((profile) => profile.id === activeAudience) ??
     audienceProfiles[0];
+  const animatedHeadline = useRollingText(activeProfile.headline, 12);
+  const animatedSummary = useRollingText(activeProfile.summary, 7);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -86,30 +146,6 @@ export default function Home() {
 
     return () => ctx.revert();
   }, []);
-
-  useEffect(() => {
-    if (!copyRef.current) {
-      return;
-    }
-
-    const elements = copyRef.current.querySelectorAll("[data-copy-item]");
-
-    gsap.fromTo(
-      elements,
-      {
-        opacity: 0,
-        y: 14,
-      },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.32,
-        ease: "power2.out",
-        stagger: 0.04,
-        overwrite: "auto",
-      }
-    );
-  }, [activeAudience]);
 
   return (
     <main className={styles.page} ref={heroRef}>
@@ -149,13 +185,13 @@ export default function Home() {
           })}
         </div>
 
-        <div className={styles.copyBlock} ref={copyRef}>
-          <h1 className={styles.headline} data-copy-item>
-            {activeProfile.headline}
+        <div className={styles.copyBlock}>
+          <h1 className={styles.headline}>
+            {animatedHeadline}
           </h1>
 
-          <p className={styles.summary} data-copy-item>
-            {activeProfile.summary}
+          <p className={styles.summary}>
+            {animatedSummary}
           </p>
         </div>
       </section>
