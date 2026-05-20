@@ -510,7 +510,7 @@ export default function Home() {
               </h2>
 
               <div className="group relative ml-[0.05rem] mt-8 h-[20.75rem] w-[14.5rem] max-[1280px]:ml-0 max-[1280px]:h-[22.25rem] max-[1280px]:w-[16rem] max-[560px]:mx-auto max-[560px]:h-[23rem] max-[560px]:w-[15rem]">
-                <div className="absolute inset-0 box-border overflow-hidden bg-white p-[14px] opacity-0 shadow-[0_10px_24px_rgba(0,0,0,0.085)] transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:rotate-[-2deg] group-hover:opacity-100 translate-x-5 translate-y-2 rotate-[4deg] opacity-100 max-[560px]:translate-x-8 max-[560px]:translate-y-4 max-[560px]:rotate-[6deg]">
+                <div className="absolute inset-0 z-[1] box-border overflow-hidden bg-white p-[14px] shadow-[0_10px_24px_rgba(0,0,0,0.085)] transition-all duration-500 ease-out translate-x-5 translate-y-2 rotate-[4deg] opacity-100 group-hover:z-[3] group-hover:translate-x-[-0.2rem] group-hover:translate-y-0 group-hover:rotate-[-1.5deg] max-[560px]:translate-x-8 max-[560px]:translate-y-4 max-[560px]:rotate-[6deg] max-[560px]:group-hover:translate-x-[-0.35rem]">
                   <Image
                     src={aboutContent.secondaryImage}
                     alt="Alternate portrait of Shahzaib Mirza"
@@ -520,7 +520,7 @@ export default function Home() {
                   />
                 </div>
 
-                <div className="absolute inset-0 z-[2] box-border overflow-hidden bg-white p-[14px] shadow-[0_10px_24px_rgba(0,0,0,0.085)] transition-all duration-300 ease-out translate-x-[-0.35rem] group-hover:translate-x-[0.35rem] group-hover:translate-y-[0.22rem] group-hover:rotate-[-0.6deg] group-hover:opacity-0 max-[560px]:translate-x-[-0.6rem] max-[560px]:translate-y-0 max-[560px]:rotate-0 max-[560px]:opacity-100">
+                <div className="absolute inset-0 z-[2] box-border overflow-hidden bg-white p-[14px] shadow-[0_10px_24px_rgba(0,0,0,0.085)] transition-all duration-500 ease-out translate-x-[-0.35rem] group-hover:z-[1] group-hover:translate-x-[0.95rem] group-hover:translate-y-[0.35rem] group-hover:rotate-[3.2deg] max-[560px]:translate-x-[-0.6rem] max-[560px]:translate-y-0 max-[560px]:rotate-0 max-[560px]:group-hover:translate-x-[1.15rem] max-[560px]:group-hover:translate-y-[0.45rem] max-[560px]:group-hover:rotate-[5deg]">
                   <Image
                     src={aboutContent.primaryImage}
                     alt="Portrait of Shahzaib Mirza"
