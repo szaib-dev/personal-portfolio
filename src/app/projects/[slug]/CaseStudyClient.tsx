@@ -401,7 +401,7 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
   useEffect(() => {
     let cancelled = false;
 
-    fetch("/api/project-settings")
+    fetch("/api/project-settings", { cache: "no-store" })
       .then((response) => response.json())
       .then((data: { settings?: { key: string; value: string }[] }) => {
         if (!cancelled) {
@@ -597,10 +597,10 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
                 /* 4-square grid icon */
                 icon: (
                   <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
-                    <rect x="1" y="1" width="5.5" height="5.5" rx="1" stroke="#111111" strokeWidth="1.2" />
-                    <rect x="8.5" y="1" width="5.5" height="5.5" rx="1" stroke="#111111" strokeWidth="1.2" />
-                    <rect x="1" y="8.5" width="5.5" height="5.5" rx="1" stroke="#111111" strokeWidth="1.2" />
-                    <rect x="8.5" y="8.5" width="5.5" height="5.5" rx="1" stroke="#111111" strokeWidth="1.2" />
+                    <rect x="1" y="1" width="5.5" height="5.5" rx="1" stroke="currentColor" strokeWidth="1.2" />
+                    <rect x="8.5" y="1" width="5.5" height="5.5" rx="1" stroke="currentColor" strokeWidth="1.2" />
+                    <rect x="1" y="8.5" width="5.5" height="5.5" rx="1" stroke="currentColor" strokeWidth="1.2" />
+                    <rect x="8.5" y="8.5" width="5.5" height="5.5" rx="1" stroke="currentColor" strokeWidth="1.2" />
                   </svg>
                 ),
               },
@@ -609,8 +609,8 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
                 /* Magnifier icon */
                 icon: (
                   <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
-                    <circle cx="6.5" cy="6.5" r="4.5" stroke="#111111" strokeWidth="1.2" />
-                    <path d="M10 10l3.5 3.5" stroke="#111111" strokeWidth="1.2" strokeLinecap="round" />
+                    <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" strokeWidth="1.2" />
+                    <path d="M10 10l3.5 3.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
                   </svg>
                 ),
               },
@@ -619,8 +619,8 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
                 /* Checkmark in circle icon */
                 icon: (
                   <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
-                    <circle cx="7.5" cy="7.5" r="6" stroke="#111111" strokeWidth="1.2" />
-                    <path d="M4.5 7.5l2 2 4-4" stroke="#111111" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                    <circle cx="7.5" cy="7.5" r="6" stroke="currentColor" strokeWidth="1.2" />
+                    <path d="M4.5 7.5l2 2 4-4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 ),
               },
@@ -635,7 +635,7 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
                   {item.label}
                 </span>
                 {/* Icon — rises from below on hover */}
-                <span className="absolute inset-0 flex h-5 items-center justify-center translate-y-5 transition-transform duration-[280ms] ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-y-0">
+                <span className="absolute inset-0 flex h-5 translate-y-5 items-center justify-center transition-transform duration-[280ms] ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-y-0" style={{ color: accent }}>
                   {item.icon}
                 </span>
               </a>

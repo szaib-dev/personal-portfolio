@@ -78,7 +78,7 @@ export default function Home() {
   useEffect(() => {
     let cancelled = false;
 
-    fetch("/api/project-settings")
+    fetch("/api/project-settings", { cache: "no-store" })
       .then((response) => response.json())
       .then((data: { settings?: { key: string; value: string }[] }) => {
         if (!cancelled) {
