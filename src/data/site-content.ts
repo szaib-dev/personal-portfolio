@@ -545,6 +545,19 @@ export const projectEntries: ProjectEntry[] = [
           "The result is a brand-led portfolio concept that feels premium, atmospheric, and polished while still being usable enough for real client presentation. The structure is kept flexible so future work blocks, deeper case studies, or richer image stacks can be added without rebuilding the visual system.",
       },
       {
+        type: "gallery",
+        columns: 3,
+        hideMissing: true,
+        images: [
+          { src: "/visual-poetry.png", alt: "Visual Poetry final design — opening frame", width: 631, height: 423 },
+          { src: "/visual-poetry.png", alt: "Visual Poetry final design — gallery section", width: 631, height: 423 },
+          { src: "/visual-poetry.png", alt: "Visual Poetry final design — about section", width: 631, height: 423 },
+          { src: "/visual-poetry.png", alt: "Visual Poetry final design — project detail", width: 631, height: 423 },
+          { src: "/visual-poetry.png", alt: "Visual Poetry final design — contact section", width: 631, height: 423 },
+          { src: "/visual-poetry.png", alt: "Visual Poetry final design — full page view", width: 631, height: 423 },
+        ],
+      },
+      {
         type: "section",
         label: "Mobile Responsiveness",
         title: "Cinematic on every screen. Immersive at every size.",

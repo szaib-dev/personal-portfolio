@@ -6,6 +6,7 @@ import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import ImageUploader from "./ImageUploader";
 import { AdminImageSkeleton } from "@/components/Skeleton";
+import { projectEntries } from "@/data/site-content";
 import {
   FiHome,
   FiGrid,
@@ -34,6 +35,65 @@ type ProjectGroup = {
   sections: Section[];
 };
 
+const buildProjectSections = (project: (typeof projectEntries)[number]): Section[] => {
+  const hasPersona = project.caseStudyBlocks.some((block) => block.type === "persona");
+  const galleryCount = project.caseStudyBlocks.reduce((count, block) => {
+    if (block.type !== "gallery" || block.columns === 5) return count;
+    return count + block.images.length;
+  }, 0);
+  const mobileCount = project.caseStudyBlocks.reduce((count, block) => {
+    if (block.type !== "gallery" || block.columns !== 5) return count;
+    return count + block.images.length;
+  }, 0);
+  const gallerySlots = Array.from({ length: galleryCount }, (_, index) => ({
+    id: `gallery-${index}`,
+    label: `Image ${index + 1}`,
+  }));
+  const mobileSlots = Array.from({ length: mobileCount }, (_, index) => ({
+    id: `mobile-${index}`,
+    label: `Mobile ${index + 1}`,
+  }));
+
+  return [
+    {
+      id: `${project.slug}-hero`,
+      label: "Hero",
+      icon: FiImage,
+      slots: [{ id: "hero", label: "Hero Image" }],
+    },
+    ...(gallerySlots.length > 0
+      ? [
+          {
+            id: `${project.slug}-gallery`,
+            label: "Final Design Gallery",
+            icon: FiGrid,
+            slots: gallerySlots,
+          },
+        ]
+      : []),
+    ...(mobileSlots.length > 0
+      ? [
+          {
+            id: `${project.slug}-mobile`,
+            label: "Mobile Mockups",
+            icon: FiSmartphone,
+            slots: mobileSlots,
+          },
+        ]
+      : []),
+    ...(hasPersona
+      ? [
+          {
+            id: `${project.slug}-persona`,
+            label: "Persona",
+            icon: FiUser,
+            slots: [{ id: "persona", label: "Persona Photo" }],
+          },
+        ]
+      : []),
+  ];
+};
+
 const GROUPS: ProjectGroup[] = [
   {
     id: "homepage",
@@ -51,81 +111,12 @@ const GROUPS: ProjectGroup[] = [
       },
     ],
   },
-  {
-    id: "trend-bible",
-    name: "Trend Bible",
+  ...projectEntries.map((project) => ({
+    id: project.slug,
+    name: project.title,
     icon: FiLayers,
-    sections: [
-      {
-        id: "trend-bible-hero",
-        label: "Hero",
-        icon: FiImage,
-        slots: [{ id: "hero", label: "Hero Image" }],
-      },
-      {
-        id: "trend-bible-gallery",
-        label: "Gallery",
-        icon: FiGrid,
-        slots: [
-          { id: "gallery-0", label: "Image 1" },
-          { id: "gallery-1", label: "Image 2" },
-          { id: "gallery-2", label: "Image 3" },
-          { id: "gallery-3", label: "Image 4" },
-          { id: "gallery-4", label: "Image 5" },
-          { id: "gallery-5", label: "Image 6" },
-        ],
-      },
-      {
-        id: "trend-bible-mobile",
-        label: "Mobile Mockups",
-        icon: FiSmartphone,
-        slots: [
-          { id: "mobile-0", label: "Mobile 1" },
-          { id: "mobile-1", label: "Mobile 2" },
-          { id: "mobile-2", label: "Mobile 3" },
-          { id: "mobile-3", label: "Mobile 4" },
-          { id: "mobile-4", label: "Mobile 5" },
-        ],
-      },
-      {
-        id: "trend-bible-persona",
-        label: "Persona",
-        icon: FiUser,
-        slots: [{ id: "persona", label: "Persona Photo" }],
-      },
-    ],
-  },
-  {
-    id: "visual-poetry",
-    name: "Visual Poetry",
-    icon: FiLayers,
-    sections: [
-      {
-        id: "visual-poetry-hero",
-        label: "Hero",
-        icon: FiImage,
-        slots: [{ id: "hero", label: "Hero Image" }],
-      },
-      {
-        id: "visual-poetry-mobile",
-        label: "Mobile Mockups",
-        icon: FiSmartphone,
-        slots: [
-          { id: "mobile-0", label: "Mobile 1" },
-          { id: "mobile-1", label: "Mobile 2" },
-          { id: "mobile-2", label: "Mobile 3" },
-          { id: "mobile-3", label: "Mobile 4" },
-          { id: "mobile-4", label: "Mobile 5" },
-        ],
-      },
-      {
-        id: "visual-poetry-persona",
-        label: "Persona",
-        icon: FiUser,
-        slots: [{ id: "persona", label: "Persona Photo" }],
-      },
-    ],
-  },
+    sections: buildProjectSections(project),
+  })),
 ];
 
 export default function AdminDashboard({
