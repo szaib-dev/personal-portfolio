@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
@@ -134,15 +134,36 @@ export default function AdminDashboard({
   );
 
   const [deleteTarget, setDeleteTarget] = useState<Id<"images"> | null>(null);
+  const [settings, setSettings] = useState<{ key: string; value: string }[]>([]);
 
   const allImages = useQuery(api.images.getAll);
-  const allSettings = useQuery(api.settings.getAll);
   const deleteImage = useMutation(api.images.deleteImage);
   const setSetting = useMutation(api.settings.set);
   const logout = useMutation(api.auth.logout);
 
   const currentGroup = GROUPS.find((g) => g.id === activeGroup)!;
   const currentProject = projectEntries.find((project) => project.slug === activeGroup);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch("/api/project-settings", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((data: { settings?: { key: string; value: string }[] }) => {
+        if (!cancelled) {
+          setSettings(data.settings ?? []);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setSettings([]);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const getImageForSlot = (section: string, slot: string) => {
     if (!allImages) return null;
@@ -196,7 +217,17 @@ export default function AdminDashboard({
   };
 
   const handleAccentChange = async (slug: string, value: string) => {
-    await setSetting({ key: projectAccentSettingKey(slug), value });
+    const key = projectAccentSettingKey(slug);
+    setSettings((current) => {
+      const withoutCurrent = current.filter((setting) => setting.key !== key);
+      return [...withoutCurrent, { key, value }];
+    });
+
+    try {
+      await setSetting({ key, value });
+    } catch (error) {
+      console.error("Failed to save project color:", error);
+    }
   };
 
   return (
@@ -280,13 +311,13 @@ export default function AdminDashboard({
                 <input
                   type="color"
                   aria-label={`${currentProject.title} icon color`}
-                  value={getProjectAccent(currentProject.slug, currentProject.accent, allSettings)}
+                  value={getProjectAccent(currentProject.slug, currentProject.accent, settings)}
                   onChange={(event) => handleAccentChange(currentProject.slug, event.target.value)}
                   className="h-9 w-12 cursor-pointer rounded-[5px] border border-[#dddddd] bg-white p-1"
                 />
                 <input
                   type="text"
-                  value={getProjectAccent(currentProject.slug, currentProject.accent, allSettings)}
+                  value={getProjectAccent(currentProject.slug, currentProject.accent, settings)}
                   onChange={(event) => handleAccentChange(currentProject.slug, event.target.value)}
                   className="h-9 w-[7rem] rounded-[5px] border border-[#dddddd] px-3 font-mono text-[0.78rem] text-[#333333] outline-none transition-colors focus:border-[#111111]"
                 />

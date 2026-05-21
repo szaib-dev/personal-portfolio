@@ -398,7 +398,7 @@ export default function Home() {
         </div>
       )}
 
-      <div ref={contentRef} className="relative">
+      <div ref={contentRef} className="relative mx-auto max-w-[1720px]">
         {/* SA monogram — top-left, scrolls with page */}
         <Link
           href="/"
@@ -408,7 +408,7 @@ export default function Home() {
           SA
         </Link>
 
-        <aside className="fixed left-7 top-48 z-20 flex flex-col gap-[0.08rem] max-[1024px]:static max-[1024px]:mb-10 max-[1024px]:mt-16 max-[560px]:hidden">
+        <aside className="fixed left-7 top-48 z-20 flex flex-col gap-[0.08rem] min-[1800px]:left-[max(1.75rem,calc((100vw-1720px)/2+1.75rem))] max-[1024px]:static max-[1024px]:mb-10 max-[1024px]:mt-16 max-[560px]:hidden">
           {navSections.map((section) => (
             <a
               key={section.id}
@@ -425,7 +425,7 @@ export default function Home() {
         <section
           id="intro"
           data-section
-          className="ml-[clamp(16.125rem,28vw,29.125rem)] min-h-screen w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),49rem)] scroll-mt-8 pt-[5.15rem] max-[1024px]:ml-0 max-[1024px]:w-full max-[1024px]:min-h-0 max-[1024px]:pt-0"
+          className="ml-[clamp(16.125rem,28vw,29.125rem)] min-h-screen w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),56rem)] scroll-mt-8 pt-[clamp(5.15rem,9vh,8rem)] max-[1024px]:ml-0 max-[1024px]:w-full max-[1024px]:min-h-0 max-[1024px]:pt-0"
         >
           <div className="flex w-[min(100%,43rem)] flex-wrap items-center gap-x-[1.15rem] gap-y-2 max-[1024px]:w-full">
             {audienceProfiles.map((profile) => {
@@ -449,12 +449,12 @@ export default function Home() {
           <div className="w-[min(100%,43rem)] pt-[1.35rem] max-[1024px]:w-full">
             <h1
               ref={headingRef}
-              className="mt-5 max-w-[42rem] text-[clamp(1.78rem,3.6vw,4rem)] font-medium leading-none tracking-[-0.07em] max-[1024px]:text-[clamp(2.1rem,6vw,3.6rem)] max-[560px]:text-[clamp(2rem,9vw,3rem)]"
+              className="mt-5 max-w-[50rem] text-[clamp(1.78rem,3.6vw,4.55rem)] font-medium leading-none tracking-[-0.07em] max-[1024px]:text-[clamp(2.1rem,6vw,3.6rem)] max-[560px]:text-[clamp(2rem,9vw,3rem)]"
             >
               {activeProfile.headline}
             </h1>
 
-            <p className="mt-[1.15rem] max-w-[35rem] text-base leading-[1.55] text-[#5f5f5f] max-[560px]:text-[0.95rem]">
+            <p className="mt-[1.15rem] max-w-[39rem] text-base leading-[1.55] text-[#5f5f5f] min-[1800px]:text-[1.08rem] max-[560px]:text-[0.95rem]">
               <span data-text-rise className="block">
                 {activeProfile.summary}
               </span>
@@ -465,7 +465,7 @@ export default function Home() {
         <section
           id="work"
           data-section
-          className="ml-[clamp(16.125rem,28vw,29.125rem)] w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),82rem)] scroll-mt-8 pt-12 max-[1024px]:ml-0 max-[1024px]:w-full max-[1024px]:pt-20"
+          className="ml-[clamp(16.125rem,28vw,29.125rem)] w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),88rem)] scroll-mt-8 pt-12 max-[1024px]:ml-0 max-[1024px]:w-full max-[1024px]:pt-20"
         >
           {projectEntries.map((project) => {
             const accent = getProjectAccent(project.slug, project.accent, settings);
@@ -523,7 +523,7 @@ export default function Home() {
         <section
           id="values"
           data-section
-          className="relative ml-[clamp(16.125rem,28vw,29.125rem)] mt-[60px] min-h-[38rem] w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),82rem)] scroll-mt-8 pb-11 pt-4 max-[1220px]:min-h-0 max-[1220px]:pb-0 max-[1220px]:pt-20 max-[1024px]:ml-0 max-[1024px]:w-full"
+          className="relative ml-[clamp(16.125rem,28vw,29.125rem)] mt-[60px] min-h-[38rem] w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),88rem)] scroll-mt-8 pb-11 pt-4 max-[1220px]:min-h-0 max-[1220px]:pb-0 max-[1220px]:pt-20 max-[1024px]:ml-0 max-[1024px]:w-full"
         >
           <div
             data-stagger-group
@@ -559,7 +559,7 @@ export default function Home() {
         <section
           id="references"
           data-section
-          className="ml-[clamp(16.125rem,28vw,29.125rem)] w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),82rem)] scroll-mt-8 border-t border-black/10 pt-8 max-[1024px]:ml-0 max-[1024px]:w-full"
+          className="ml-[clamp(16.125rem,28vw,29.125rem)] w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),88rem)] scroll-mt-8 border-t border-black/10 pt-8 max-[1024px]:ml-0 max-[1024px]:w-full"
         >
           <div data-reveal className="relative pt-[6.1rem] max-[1024px]:pt-14 max-[560px]:mx-auto max-[560px]:max-w-[22rem]">
             <div className="overflow-hidden">
