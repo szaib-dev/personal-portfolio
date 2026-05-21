@@ -152,7 +152,7 @@ export default function AdminDashboard({
   useEffect(() => {
     let cancelled = false;
 
-    fetch("/api/project-settings", { cache: "no-store" })
+    fetch(`/api/project-settings?ts=${Date.now()}`, { cache: "no-store" })
       .then((response) => response.json())
       .then((data: { settings?: { key: string; value: string }[] }) => {
         if (!cancelled) {

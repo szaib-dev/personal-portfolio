@@ -160,7 +160,7 @@ function Block({
                   </div>
                   <div>
                     <div className="mb-5 flex items-center gap-2.5">
-                      <FiAlertTriangle aria-hidden="true" className="text-[1.1rem] text-[#e03030]" />
+                      <FiAlertTriangle aria-hidden="true" className="text-[1.1rem]" style={{ color: accent }} />
                       <h3 className="text-[1.1rem] font-semibold tracking-[-0.04em] text-[#e03030]">Frustration</h3>
                     </div>
                     <ul className="space-y-4 text-[0.88rem] font-medium leading-[1.55] text-[#343434]">
@@ -401,21 +401,37 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
   useEffect(() => {
     let cancelled = false;
 
-    fetch("/api/project-settings", { cache: "no-store" })
-      .then((response) => response.json())
-      .then((data: { settings?: { key: string; value: string }[] }) => {
-        if (!cancelled) {
-          setSettings(data.settings ?? []);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setSettings([]);
-        }
-      });
+    const loadSettings = () => {
+      fetch(`/api/project-settings?ts=${Date.now()}`, { cache: "no-store" })
+        .then((response) => response.json())
+        .then((data: { settings?: { key: string; value: string }[] }) => {
+          if (!cancelled) {
+            setSettings(data.settings ?? []);
+          }
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setSettings([]);
+          }
+        });
+    };
+
+    loadSettings();
+
+    const handleFocus = () => loadSettings();
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        loadSettings();
+      }
+    };
+
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       cancelled = true;
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 
@@ -559,7 +575,8 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
           {/* Left — Works with grid icon */}
           <Link
             href="/#work"
-            className="group inline-flex items-center gap-2 text-[0.9rem] font-medium text-[#111111] transition-colors hover:text-[#555555]"
+            className="group inline-flex items-center gap-2 text-[0.9rem] font-medium transition-opacity hover:opacity-70"
+            style={{ color: accent }}
           >
             <svg
               width="16"
@@ -567,7 +584,7 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
               viewBox="0 0 16 16"
               fill="none"
               aria-hidden="true"
-              className="text-[#111111] group-hover:text-[#555555] transition-colors"
+              className="transition-colors"
             >
               <rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor" />
               <rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor" />
