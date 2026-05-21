@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 import { FiArrowRight, FiPlus } from "react-icons/fi";
 import { RiDoubleQuotesL } from "react-icons/ri";
 import {
@@ -16,12 +18,27 @@ import {
   values,
 } from "@/data/site-content";
 import DynamicImage from "@/components/DynamicImage";
+import { getConvexUrlFromEnv } from "@/lib/convex-url";
+import { getProjectAccent } from "@/lib/project-settings";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const TESTIMONIALS_PER_PAGE = 3;
 
 export default function Home() {
+  if (!getConvexUrlFromEnv()) {
+    return <HomeContent settings={null} />;
+  }
+
+  return <HomeWithSettings />;
+}
+
+function HomeWithSettings() {
+  const settings = useQuery(api.settings.getAll);
+  return <HomeContent settings={settings} />;
+}
+
+function HomeContent({ settings }: { settings?: { key: string; value: string }[] | null }) {
   const [activeAudience, setActiveAudience] = useState(audienceProfiles[0].id);
   const [activeSection, setActiveSection] = useState(navSections[0].id);
   const [activeReferencePage, setActiveReferencePage] = useState(0);
@@ -31,6 +48,30 @@ export default function Home() {
   const introRef = useRef<HTMLDivElement | null>(null);
   const introNameRef = useRef<HTMLParagraphElement | null>(null);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
+
+  useLayoutEffect(() => {
+    window.history.scrollRestoration = "manual";
+    const navEntry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+    const isReload = navEntry?.type === "reload";
+    const targetHash = isReload ? "" : window.location.hash;
+
+    window.scrollTo(0, 0);
+
+    if (targetHash) {
+      window.setTimeout(() => {
+        document.querySelector(targetHash)?.scrollIntoView({ block: "start" });
+      }, 80);
+    }
+
+    const handleBeforeUnload = () => {
+      window.scrollTo(0, 0);
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
 
   const referencePages = useMemo(
     () =>
@@ -50,9 +91,6 @@ export default function Home() {
     audienceProfiles[0];
 
   useEffect(() => {
-    // Scroll to top on page load/reload
-    window.scrollTo(0, 0);
-    
     const lenis = new Lenis({
       duration: 1.15,
       smoothWheel: true,
@@ -372,20 +410,23 @@ export default function Home() {
           data-section
           className="ml-[clamp(16.125rem,28vw,29.125rem)] w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),82rem)] scroll-mt-8 pt-12 max-[1024px]:ml-0 max-[1024px]:w-full max-[1024px]:pt-20"
         >
-          {projectEntries.map((project) => (
-            <article
-              key={project.slug}
-              data-stagger-group
-              className={`grid items-center gap-12 border-t border-black/10 py-[3.25rem] ${
-                project.reverse
-                  ? "grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)] max-[1220px]:grid-cols-1"
-                  : "grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] max-[1220px]:grid-cols-1"
-              }`}
-            >
-              <div className={`${project.reverse ? "order-2 max-[1220px]:order-none" : ""} max-w-[26rem]`}>
+          {projectEntries.map((project) => {
+            const accent = getProjectAccent(project.slug, project.accent, settings);
+
+            return (
+              <article
+                key={project.slug}
+                data-stagger-group
+                className={`grid items-center gap-12 border-t border-black/10 py-[3.25rem] ${
+                  project.reverse
+                    ? "grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)] max-[1220px]:grid-cols-1"
+                    : "grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] max-[1220px]:grid-cols-1"
+                }`}
+              >
+                <div className={`${project.reverse ? "order-2 max-[1220px]:order-none" : ""} max-w-[26rem]`}>
                 <p
                   className="text-[0.92rem] font-semibold tracking-[-0.02em]"
-                  style={{ color: project.accent }}
+                  style={{ color: accent }}
                 >
                   {project.kicker}
                 </p>
@@ -402,23 +443,24 @@ export default function Home() {
                 </div>
               </div>
 
-              <Link
-                href={`/projects/${project.slug}`}
-                aria-label={`Open ${project.title} case study`}
-                className={`${project.reverse ? "order-1 max-[1220px]:order-none" : ""} block cursor-pointer`}
-              >
-                <DynamicImage
-                  section={`${project.slug}-hero`}
-                  slot="hero"
-                  alt={`${project.title} project preview`}
-                  width={project.width}
-                  height={project.height}
-                  priority={project.slug === "trend-bible"}
-                  className="block h-auto w-full transition-transform duration-500 ease-out hover:-translate-y-1"
-                />
-              </Link>
-            </article>
-          ))}
+                <Link
+                  href={`/projects/${project.slug}`}
+                  aria-label={`Open ${project.title} case study`}
+                  className={`${project.reverse ? "order-1 max-[1220px]:order-none" : ""} block aspect-[16/10] cursor-pointer overflow-hidden rounded-[3px] bg-[#f4f4f4]`}
+                >
+                  <DynamicImage
+                    section={`${project.slug}-hero`}
+                    slot="hero"
+                    alt={`${project.title} project preview`}
+                    width={project.width}
+                    height={project.height}
+                    priority={project.slug === "trend-bible"}
+                    className="block h-full w-full object-cover transition-transform duration-500 ease-out hover:-translate-y-1 hover:scale-[1.015]"
+                  />
+                </Link>
+              </article>
+            );
+          })}
         </section>
 
         <section
@@ -599,7 +641,6 @@ export default function Home() {
           </div>
 
           <p
-            data-reveal
             className="absolute bottom-8 left-9 m-0 max-w-[44rem] text-[clamp(2.35rem,3.05vw,3.35rem)] font-normal leading-[1.12] tracking-[-0.075em] text-[#2b2b2b] max-[1280px]:static max-[1280px]:mt-16 max-[1280px]:max-w-full max-[1280px]:px-8 max-[1280px]:text-[clamp(2rem,8vw,3rem)] max-[560px]:mt-12 max-[560px]:px-4 max-[560px]:text-center max-[560px]:text-[1.65rem] max-[560px]:leading-[1.15] max-[560px]:tracking-[-0.055em]"
            >
             {aboutContent.bottomText[0]}

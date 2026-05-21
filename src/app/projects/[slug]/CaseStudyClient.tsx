@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -27,6 +27,7 @@ import { api } from "../../../../convex/_generated/api";
 import type { ProjectEntry, CaseStudyBlock, OverviewCard } from "@/data/site-content";
 import { getConvexUrlFromEnv } from "@/lib/convex-url";
 import { ImageSkeleton } from "@/components/Skeleton";
+import { getProjectAccent } from "@/lib/project-settings";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -86,7 +87,7 @@ function Block({
                 const Icon = OVERVIEW_ICONS[card.icon];
                 return (
                   <div key={card.label}>
-                    <Icon aria-hidden="true" className="mb-3 text-[1.2rem] text-[#a0a8d0]" strokeWidth={1.3} />
+                    <Icon aria-hidden="true" className="mb-3 text-[1.2rem]" style={{ color: accent }} strokeWidth={1.3} />
                     <p className="mb-2 text-[0.9rem] font-semibold tracking-[-0.01em] text-[#111111]">{card.label}</p>
                     {card.body && <p className="text-[0.86rem] leading-[1.75] text-[#666666]">{card.body}</p>}
                     {card.bullets && card.bullets.length > 0 && (
@@ -335,6 +336,7 @@ type ConvexImages = {
   mobileImages?: { slot: string; url: string }[];
   personaImageUrl?: string | null;
   imagesLoading?: boolean;
+  settings?: { key: string; value: string }[] | null;
 };
 
 export default function CaseStudyClient(props: Props) {
@@ -350,11 +352,13 @@ function CaseStudyWithConvexImages({ project, otherProjects }: Props) {
   const galleryImages = useQuery(api.images.getBySection, { section: `${project.slug}-gallery` });
   const mobileImages = useQuery(api.images.getBySection, { section: `${project.slug}-mobile` });
   const personaImage = useQuery(api.images.getBySlot, { section: `${project.slug}-persona`, slot: "persona" });
+  const settings = useQuery(api.settings.getAll);
   const imagesLoading =
     heroImage === undefined ||
     galleryImages === undefined ||
     mobileImages === undefined ||
-    personaImage === undefined;
+    personaImage === undefined ||
+    settings === undefined;
 
   return (
     <CaseStudyContent
@@ -366,6 +370,7 @@ function CaseStudyWithConvexImages({ project, otherProjects }: Props) {
         mobileImages,
         personaImageUrl: personaImage?.url,
         imagesLoading,
+        settings,
       }}
     />
   );
@@ -380,6 +385,21 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
   const heroImageRef = useRef<HTMLDivElement>(null);
 
   const imagesLoading = convexImages?.imagesLoading ?? false;
+  const accent = getProjectAccent(project.slug, project.accent, convexImages?.settings);
+
+  useLayoutEffect(() => {
+    window.history.scrollRestoration = "manual";
+    window.scrollTo(0, 0);
+
+    const handleBeforeUnload = () => {
+      window.scrollTo(0, 0);
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
 
   const getGalleryUrl = (index: number) => {
     if (!convexImages?.galleryImages) return null;
@@ -395,9 +415,6 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
 
   /* ── Lenis smooth scroll ── */
   useEffect(() => {
-    // Scroll to top on page load/reload
-    window.scrollTo(0, 0);
-    
     const lenis = new Lenis({
       duration: 1.15,
       smoothWheel: true,
@@ -523,7 +540,7 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
 
           {/* Left — Works with grid icon */}
           <Link
-            href="/"
+            href="/#work"
             className="group inline-flex items-center gap-2 text-[0.9rem] font-medium text-[#111111] transition-colors hover:text-[#555555]"
           >
             <svg
@@ -619,7 +636,7 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
             <p
               ref={heroKickerRef}
               className="text-[0.78rem] font-semibold uppercase tracking-[0.16em]"
-              style={{ color: project.accent }}
+              style={{ color: accent }}
             >
               Case Study
             </p>
@@ -651,7 +668,7 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
                       <Icon
                         aria-hidden="true"
                         className="text-[0.78rem]"
-                        style={{ color: project.accent }}
+                        style={{ color: accent }}
                       />
                       <span className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-[#c0c0c0]">
                         {item.label}
@@ -714,7 +731,7 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
                 <Block
                   key={i}
                   block={block}
-                  accent={project.accent}
+                  accent={accent}
                   id={blockId}
                   getImageUrl={imageUrlGetter}
                   personaPhotoUrl={convexImages?.personaImageUrl}
