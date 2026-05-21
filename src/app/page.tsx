@@ -586,7 +586,7 @@ export default function Home() {
           <p
             data-reveal
             className="absolute bottom-0 left-9 m-0 max-w-[44rem] text-[clamp(2.35rem,3.05vw,3.35rem)] font-normal leading-[1.12] tracking-[-0.075em] text-[#2b2b2b] max-[1280px]:static max-[1280px]:mt-16 max-[1280px]:max-w-full max-[1280px]:text-[clamp(2rem,8vw,3rem)] max-[560px]:mt-12 max-[560px]:text-center max-[560px]:text-[1.8rem] max-[560px]:leading-[1.12] max-[560px]:tracking-[-0.06em]"
-          >
+           >
             {aboutContent.bottomText[0]}
             <br />
             {aboutContent.bottomText[1]}
