@@ -605,8 +605,7 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
           {/* Left — Works with grid icon */}
           <Link
             href="/#work"
-            className="group inline-flex items-center gap-2 text-[0.9rem] font-medium transition-opacity hover:opacity-70"
-            style={{ color: accent }}
+            className="group inline-flex items-center gap-2 text-[0.9rem] font-medium text-[#111111] transition-colors hover:text-[#555555]"
           >
             <svg
               width="16"
@@ -629,8 +628,7 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
             type="button"
             aria-label="Scroll to top"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="flex h-7 w-7 items-center justify-center text-[#cccccc] transition-colors max-[560px]:hidden"
-            style={{ color: accent }}
+            className="flex h-7 w-7 items-center justify-center text-[#cccccc] transition-colors hover:text-[#111111] max-[560px]:hidden"
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
               <path d="M7 2 L12 8 M7 2 L2 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -683,7 +681,7 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
                   {item.label}
                 </span>
                 {/* Icon — rises from below on hover */}
-                <span className="absolute inset-0 flex h-5 translate-y-5 items-center justify-center transition-transform duration-[280ms] ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-y-0" style={{ color: accent }}>
+                <span className="absolute inset-0 flex h-5 translate-y-5 items-center justify-center text-[#111111] transition-transform duration-[280ms] ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-y-0">
                   {item.icon}
                 </span>
               </a>
