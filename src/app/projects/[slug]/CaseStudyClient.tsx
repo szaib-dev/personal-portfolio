@@ -277,13 +277,13 @@ function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: Cas
       /* 5+ columns = mobile mockup row — actual screenshots in mobile format */
       if (block.columns === 5) {
         return (
-          <div data-reveal className="flex items-end justify-center gap-4 py-8 max-[900px]:flex-wrap">
+          <div data-reveal className="flex items-end justify-center gap-4 px-20 py-8 max-[900px]:flex-wrap max-[900px]:px-8 max-[560px]:px-4">
             {block.images.map((img, i) => {
               const dynamicUrl = getImageUrl ? getImageUrl(i, img.src, "mobile") : img.src;
               return (
                 <div
                   key={i}
-                  className="w-[12rem] flex-shrink-0 shadow-[0_10px_30px_rgba(0,0,0,0.1)] max-[1100px]:w-[11rem] max-[900px]:w-[10rem] max-[560px]:w-[9rem]"
+                  className="w-[11.5rem] flex-shrink-0 shadow-[0_10px_30px_rgba(0,0,0,0.1)] max-[1100px]:w-[10.5rem] max-[900px]:w-[10rem] max-[560px]:w-[9rem]"
                   style={{ aspectRatio: "9/19.5" }}
                 >
                   {dynamicUrl !== img.src ? (

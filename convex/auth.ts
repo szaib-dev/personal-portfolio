@@ -9,8 +9,12 @@ export const login = mutation({
   },
   handler: async (ctx, args) => {
     // Hardcoded credentials (secure since this runs server-side on Convex)
-    const adminEmail = "szaib.dev@gmail.com";
-    const adminPassword = "anyonefromsanglahill";
+    const adminEmail = process.env.ADMIN_EMAIL!;
+    const adminPassword = process.env.ADMIN_PASSWORD!;
+
+    if (!adminEmail || !adminPassword) {
+      throw new Error("Admin credentials not configured in environment variables");
+    }
 
     if (args.email !== adminEmail || args.password !== adminPassword) {
       throw new Error("Invalid credentials");

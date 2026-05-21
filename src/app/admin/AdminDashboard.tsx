@@ -84,7 +84,6 @@ const GROUPS: ProjectGroup[] = [
           { id: "mobile-2", label: "Mobile 3" },
           { id: "mobile-3", label: "Mobile 4" },
           { id: "mobile-4", label: "Mobile 5" },
-          { id: "mobile-5", label: "Mobile 6" },
         ],
       },
       {
@@ -129,7 +128,6 @@ const GROUPS: ProjectGroup[] = [
           { id: "mobile-2", label: "Mobile 3" },
           { id: "mobile-3", label: "Mobile 4" },
           { id: "mobile-4", label: "Mobile 5" },
-          { id: "mobile-5", label: "Mobile 6" },
         ],
       },
       {
