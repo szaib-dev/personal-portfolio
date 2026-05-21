@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { getConvexUrlFromEnv } from "@/lib/convex-url";
 
 type Props = {
   section: string;
@@ -29,7 +30,7 @@ export default function DynamicImage({
   className,
   priority,
 }: Props) {
-  if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
+  if (!getConvexUrlFromEnv()) {
     return (
       <Image
         src={fallbackSrc}

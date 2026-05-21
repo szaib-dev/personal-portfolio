@@ -56,7 +56,7 @@ export default function AdminPage() {
             Admin unavailable
           </h1>
           <p className="mt-3 text-[0.92rem] leading-[1.6] text-[#666666]">
-            Add NEXT_PUBLIC_CONVEX_URL in your deployment environment to access the image manager.
+            Add NEXT_PUBLIC_CONVEX_URL or NEXT_PUBLIC_CONVEX_SITE_URL in your deployment environment to access the image manager.
           </p>
         </div>
       </div>

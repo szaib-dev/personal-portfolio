@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
+import { getConvexUrlFromEnv } from "@/lib/convex-url";
 
 export const dynamic = "force-dynamic";
 
 export function GET() {
-  const url = process.env.NEXT_PUBLIC_CONVEX_URL ?? process.env.CONVEX_URL ?? "";
+  const url = getConvexUrlFromEnv();
 
   return NextResponse.json(
     { url },

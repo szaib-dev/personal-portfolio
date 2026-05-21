@@ -26,6 +26,7 @@ import {
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import type { ProjectEntry, CaseStudyBlock, OverviewCard } from "@/data/site-content";
+import { getConvexUrlFromEnv } from "@/lib/convex-url";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -438,7 +439,7 @@ type ConvexImages = {
 };
 
 export default function CaseStudyClient(props: Props) {
-  if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
+  if (!getConvexUrlFromEnv()) {
     return <CaseStudyContent {...props} />;
   }
 
