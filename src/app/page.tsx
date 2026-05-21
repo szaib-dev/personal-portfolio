@@ -16,6 +16,7 @@ import {
   referenceCards,
   values,
 } from "@/data/site-content";
+import DynamicImage from "@/components/DynamicImage";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -398,8 +399,10 @@ export default function Home() {
                 aria-label={`Open ${project.title} case study`}
                 className={`${project.reverse ? "order-1 max-[1220px]:order-none" : ""} block cursor-pointer`}
               >
-                <Image
-                  src={project.image}
+                <DynamicImage
+                  section={`${project.slug}-hero`}
+                  slot="hero"
+                  fallbackSrc={project.image}
                   alt={`${project.title} project preview`}
                   width={project.width}
                   height={project.height}
@@ -538,8 +541,10 @@ export default function Home() {
 
               <div className="group relative ml-[0.05rem] mt-8 h-[20.75rem] w-[14.5rem] max-[1280px]:ml-0 max-[1280px]:h-[22.25rem] max-[1280px]:w-[16rem] max-[560px]:mx-auto max-[560px]:h-[23rem] max-[560px]:w-[15rem]">
                 <div className="absolute inset-0 z-[1] box-border overflow-hidden bg-white p-[14px] shadow-[0_10px_24px_rgba(0,0,0,0.085)] transition-all duration-500 ease-out translate-x-5 translate-y-2 rotate-[4deg] opacity-100 group-hover:z-[3] group-hover:translate-x-[-0.2rem] group-hover:translate-y-0 group-hover:rotate-[-1.5deg] max-[560px]:translate-x-8 max-[560px]:translate-y-4 max-[560px]:rotate-[6deg] max-[560px]:group-hover:translate-x-[-0.35rem]">
-                  <Image
-                    src={aboutContent.secondaryImage}
+                  <DynamicImage
+                    section="homepage-about"
+                    slot="secondary"
+                    fallbackSrc={aboutContent.secondaryImage}
                     alt="Alternate portrait of Shahzaib Mirza"
                     width={1200}
                     height={1600}
@@ -548,8 +553,10 @@ export default function Home() {
                 </div>
 
                 <div className="absolute inset-0 z-[2] box-border overflow-hidden bg-white p-[14px] shadow-[0_10px_24px_rgba(0,0,0,0.085)] transition-all duration-500 ease-out translate-x-[-0.35rem] group-hover:z-[1] group-hover:translate-x-[0.95rem] group-hover:translate-y-[0.35rem] group-hover:rotate-[3.2deg] max-[560px]:translate-x-[-0.6rem] max-[560px]:translate-y-0 max-[560px]:rotate-0 max-[560px]:group-hover:translate-x-[1.15rem] max-[560px]:group-hover:translate-y-[0.45rem] max-[560px]:group-hover:rotate-[5deg]">
-                  <Image
-                    src={aboutContent.primaryImage}
+                  <DynamicImage
+                    section="homepage-about"
+                    slot="primary"
+                    fallbackSrc={aboutContent.primaryImage}
                     alt="Portrait of Shahzaib Mirza"
                     width={608}
                     height={658}

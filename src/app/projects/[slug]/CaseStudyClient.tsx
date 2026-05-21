@@ -23,6 +23,8 @@ import {
   FiCheckCircle,
   FiAlertTriangle,
 } from "react-icons/fi";
+import { useQuery } from "convex/react";
+import { api } from "../../../../convex/_generated/api";
 import type { ProjectEntry, CaseStudyBlock, OverviewCard } from "@/data/site-content";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -43,7 +45,7 @@ const OVERVIEW_ICONS: Record<OverviewCard["icon"], React.ElementType> = {
   responsibilities: FiList,
 };
 
-function Block({ block, accent, id }: { block: CaseStudyBlock; accent: string; id?: string }) {
+function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: CaseStudyBlock; accent: string; id?: string; getImageUrl?: (index: number, fallback: string, type: "gallery" | "mobile") => string; personaPhotoUrl?: string }) {
   switch (block.type) {
     case "overview":
       return (
@@ -229,13 +231,22 @@ function Block({ block, accent, id }: { block: CaseStudyBlock; accent: string; i
 
               <aside className="flex flex-col justify-center p-7 max-[820px]:order-1 max-[820px]:items-center max-[820px]:text-center max-[560px]:p-5">
                 <div className="relative mx-auto h-[12rem] w-[12rem] overflow-hidden rounded-full bg-white shadow-[0_4px_16px_rgba(0,0,0,0.08)] max-[820px]:mx-auto max-[560px]:h-[11rem] max-[560px]:w-[11rem]">
-                  <Image
-                    src={block.photo}
-                    alt={`${block.name} persona portrait`}
-                    width={608}
-                    height={658}
-                    className="h-full w-full object-cover object-top"
-                  />
+                  {personaPhotoUrl && personaPhotoUrl !== block.photo ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={personaPhotoUrl}
+                      alt={`${block.name} persona portrait`}
+                      className="h-full w-full object-cover object-top"
+                    />
+                  ) : (
+                    <Image
+                      src={block.photo}
+                      alt={`${block.name} persona portrait`}
+                      width={608}
+                      height={658}
+                      className="h-full w-full object-cover object-top"
+                    />
+                  )}
                 </div>
 
                 <div className="mt-8">
@@ -266,21 +277,23 @@ function Block({ block, accent, id }: { block: CaseStudyBlock; accent: string; i
       if (block.columns === 5) {
         return (
           <div data-reveal className="flex items-end justify-center gap-4 py-8 max-[900px]:flex-wrap">
-            {block.images.map((img, i) => (
-              <div
-                key={i}
-                className="w-[12rem] flex-shrink-0 shadow-[0_10px_30px_rgba(0,0,0,0.1)] max-[1100px]:w-[11rem] max-[900px]:w-[10rem] max-[560px]:w-[9rem]"
-                style={{ aspectRatio: "9/19.5" }}
-              >
-                <Image
-                  src={img.src}
-                  alt={img.alt}
-                  width={img.width}
-                  height={img.height}
-                  className="block h-full w-full object-cover"
-                />
-              </div>
-            ))}
+            {block.images.map((img, i) => {
+              const dynamicUrl = getImageUrl ? getImageUrl(i, img.src, "mobile") : img.src;
+              return (
+                <div
+                  key={i}
+                  className="w-[12rem] flex-shrink-0 shadow-[0_10px_30px_rgba(0,0,0,0.1)] max-[1100px]:w-[11rem] max-[900px]:w-[10rem] max-[560px]:w-[9rem]"
+                  style={{ aspectRatio: "9/19.5" }}
+                >
+                  {dynamicUrl !== img.src ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={dynamicUrl} alt={img.alt} className="block h-full w-full object-cover" />
+                  ) : (
+                    <Image src={img.src} alt={img.alt} width={img.width} height={img.height} className="block h-full w-full object-cover" />
+                  )}
+                </div>
+              );
+            })}
           </div>
         );
       }
@@ -293,22 +306,24 @@ function Block({ block, accent, id }: { block: CaseStudyBlock; accent: string; i
           : "grid-cols-2 max-[560px]:grid-cols-1";
       return (
         <div data-reveal className={`grid gap-4 py-8 ${cols}`}>
-          {block.images.map((img, i) => (
-            <div key={i} className="overflow-hidden rounded-[3px] bg-[#f4f4f4]">
-              <Image
-                src={img.src}
-                alt={img.alt}
-                width={img.width}
-                height={img.height}
-                className="block h-auto w-full"
-              />
-              {img.caption && (
-                <p className="px-3 pb-3 pt-2 text-[0.72rem] leading-[1.4] text-[#b0b0b0]">
-                  {img.caption}
-                </p>
-              )}
-            </div>
-          ))}
+          {block.images.map((img, i) => {
+            const dynamicUrl = getImageUrl ? getImageUrl(i, img.src, "gallery") : img.src;
+            return (
+              <div key={i} className="overflow-hidden rounded-[3px] bg-[#f4f4f4]">
+                {dynamicUrl !== img.src ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={dynamicUrl} alt={img.alt} className="block h-auto w-full" />
+                ) : (
+                  <Image src={img.src} alt={img.alt} width={img.width} height={img.height} className="block h-auto w-full" />
+                )}
+                {img.caption && (
+                  <p className="px-3 pb-3 pt-2 text-[0.72rem] leading-[1.4] text-[#b0b0b0]">
+                    {img.caption}
+                  </p>
+                )}
+              </div>
+            );
+          })}
         </div>
       );
     }
@@ -422,6 +437,25 @@ export default function CaseStudyClient({ project, otherProjects }: Props) {
   const heroSummaryRef = useRef<HTMLParagraphElement>(null);
   const heroMetaRef = useRef<HTMLDivElement>(null);
   const heroImageRef = useRef<HTMLDivElement>(null);
+
+  // Fetch all images for this project from Convex
+  const heroImage = useQuery(api.images.getBySlot, { section: `${project.slug}-hero`, slot: "hero" });
+  const galleryImages = useQuery(api.images.getBySection, { section: `${project.slug}-gallery` });
+  const mobileImages = useQuery(api.images.getBySection, { section: `${project.slug}-mobile` });
+  const personaImage = useQuery(api.images.getBySlot, { section: `${project.slug}-persona`, slot: "persona" });
+
+  // Helper to get dynamic image URL with fallback
+  const getGalleryUrl = (index: number, fallback: string) => {
+    if (!galleryImages) return fallback;
+    const img = galleryImages.find((i) => i.slot === `gallery-${index}`);
+    return img?.url ?? fallback;
+  };
+
+  const getMobileUrl = (index: number, fallback: string) => {
+    if (!mobileImages) return fallback;
+    const img = mobileImages.find((i) => i.slot === `mobile-${index}`);
+    return img?.url ?? fallback;
+  };
 
   /* ── Lenis smooth scroll ── */
   useEffect(() => {
@@ -655,37 +689,68 @@ export default function CaseStudyClient({ project, otherProjects }: Props) {
 
           {/* Right: hero image */}
           <div ref={heroImageRef} className="overflow-hidden rounded-[4px] bg-[#f4f4f4]">
-            <Image
-              src={project.heroImage.src}
-              alt={project.heroImage.alt}
-              width={project.heroImage.width}
-              height={project.heroImage.height}
-              className="block h-auto w-full"
-              priority
-            />
+            {heroImage?.url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={heroImage.url}
+                alt={project.heroImage.alt}
+                className="block h-auto w-full"
+              />
+            ) : (
+              <Image
+                src={project.heroImage.src}
+                alt={project.heroImage.alt}
+                width={project.heroImage.width}
+                height={project.heroImage.height}
+                className="block h-auto w-full"
+                priority
+              />
+            )}
           </div>
         </div>
 
         {/* ── Case study blocks ── */}
         <div className="mt-12">
-          {project.caseStudyBlocks.map((block, i) => {
-            // Assign IDs for nav anchors
-            let blockId: string | undefined;
-            if (block.type === "overview") blockId = "overview";
+          {(() => {
+            let galleryIndex = 0;
+            let mobileIndex = 0;
+            return project.caseStudyBlocks.map((block, i) => {
+              // Assign IDs for nav anchors
+              let blockId: string | undefined;
+              if (block.type === "overview") blockId = "overview";
 
-            // "Research" link → Style System section
-            if (block.type === "section" || block.type === "palette" || block.type === "typography") {
-              const label = "label" in block ? (block.label as string).toLowerCase() : "";
-              if (label.includes("style system") || label.includes("color palette")) {
-                blockId = "research";
+              // "Research" link → Style System section
+              if (block.type === "section" || block.type === "palette" || block.type === "typography") {
+                const label = "label" in block ? (block.label as string).toLowerCase() : "";
+                if (label.includes("style system") || label.includes("color palette")) {
+                  blockId = "research";
+                }
+                if (label.includes("final design")) {
+                  blockId = "outcome";
+                }
               }
-              if (label.includes("final design")) {
-                blockId = "outcome";
-              }
-            }
 
-            return <Block key={i} block={block} accent={project.accent} id={blockId} />;
-          })}
+              // Track which gallery/mobile block this is for image indexing
+              const currentGalleryStart = galleryIndex;
+              const currentMobileStart = mobileIndex;
+              if (block.type === "gallery") {
+                if (block.columns === 5) {
+                  mobileIndex += block.images.length;
+                } else {
+                  galleryIndex += block.images.length;
+                }
+              }
+
+              const imageUrlGetter = (index: number, fallback: string, type: "gallery" | "mobile") => {
+                if (type === "mobile") {
+                  return getMobileUrl(currentMobileStart + index, fallback);
+                }
+                return getGalleryUrl(currentGalleryStart + index, fallback);
+              };
+
+              return <Block key={i} block={block} accent={project.accent} id={blockId} getImageUrl={imageUrlGetter} personaPhotoUrl={personaImage?.url} />;
+            });
+          })()}
         </div>
 
         {/* ── Footer ── */}
