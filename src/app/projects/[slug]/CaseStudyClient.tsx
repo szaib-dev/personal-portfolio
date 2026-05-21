@@ -726,7 +726,7 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
 
         {/* ── Footer ── */}
         <footer className="mt-32 pb-0">
-          <p data-reveal className="max-w-[44rem] text-[clamp(2.35rem,3.05vw,3.35rem)] font-normal leading-[1.12] tracking-[-0.075em] text-[#2b2b2b] max-[560px]:text-[1.8rem]">
+          <p className="max-w-[44rem] text-[clamp(2.35rem,3.05vw,3.35rem)] font-normal leading-[1.12] tracking-[-0.075em] text-[#2b2b2b] max-[560px]:text-[1.8rem]">
             Let me help with a great visual
             <br />
             solution for your business.
