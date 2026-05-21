@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { getProjectBySlug, projectEntries } from "@/data/site-content";
 import CaseStudyClient from "./CaseStudyClient";
 
+export const dynamic = "force-dynamic";
+
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
