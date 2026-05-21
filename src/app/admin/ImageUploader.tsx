@@ -13,6 +13,7 @@ export default function ImageUploader({
   slot: string;
 }) {
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [dragOver, setDragOver] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -26,28 +27,49 @@ export default function ImageUploader({
     }
 
     setUploading(true);
+    setProgress(0);
+
     try {
       const uploadUrl = await generateUploadUrl();
+      setProgress(10);
 
-      const result = await fetch(uploadUrl, {
-        method: "POST",
-        headers: { "Content-Type": file.type },
-        body: file,
+      // Upload with real progress tracking via XMLHttpRequest
+      const storageId = await new Promise<string>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+
+        xhr.upload.addEventListener("progress", (e) => {
+          if (e.lengthComputable) {
+            const pct = Math.round((e.loaded / e.total) * 80) + 10; // 10-90%
+            setProgress(pct);
+          }
+        });
+
+        xhr.addEventListener("load", () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            const response = JSON.parse(xhr.responseText);
+            setProgress(95);
+            resolve(response.storageId);
+          } else {
+            reject(new Error(`Upload failed: ${xhr.status}`));
+          }
+        });
+
+        xhr.addEventListener("error", () => reject(new Error("Upload failed")));
+        xhr.open("POST", uploadUrl);
+        xhr.setRequestHeader("Content-Type", file.type);
+        xhr.send(file);
       });
 
-      const { storageId } = await result.json();
-
-      await saveImage({
-        section,
-        slot,
-        storageId,
-        filename: file.name,
-      });
+      await saveImage({ section, slot, storageId, filename: file.name });
+      setProgress(100);
     } catch (err) {
       console.error("Upload failed:", err);
       alert("Upload failed. Please try again.");
     } finally {
-      setUploading(false);
+      setTimeout(() => {
+        setUploading(false);
+        setProgress(0);
+      }, 400);
       if (fileRef.current) fileRef.current.value = "";
     }
   };
@@ -66,16 +88,11 @@ export default function ImageUploader({
 
   return (
     <div
-      onDragOver={(e) => {
-        e.preventDefault();
-        setDragOver(true);
-      }}
+      onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
       onDragLeave={() => setDragOver(false)}
       onDrop={handleDrop}
       className={`relative cursor-pointer rounded-[5px] border py-2 text-center transition-colors ${
-        dragOver
-          ? "border-[#111111] bg-[#fafafa]"
-          : "border-[#e8e8e8] hover:border-[#cccccc]"
+        dragOver ? "border-[#111111] bg-[#fafafa]" : "border-[#e8e8e8] hover:border-[#cccccc]"
       }`}
     >
       <input
@@ -87,9 +104,17 @@ export default function ImageUploader({
         disabled={uploading}
       />
       {uploading ? (
-        <div className="flex items-center justify-center gap-2">
-          <div className="h-3.5 w-3.5 animate-spin rounded-full border-[1.5px] border-[#e0e0e0] border-t-[#111111]" />
-          <span className="text-[0.78rem] text-[#888888]">Uploading...</span>
+        <div className="space-y-1.5 px-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[0.75rem] text-[#888888]">Uploading</span>
+            <span className="text-[0.75rem] font-medium text-[#555555]">{progress}%</span>
+          </div>
+          <div className="h-1 w-full overflow-hidden rounded-full bg-[#eee]">
+            <div
+              className="h-full rounded-full bg-[#111111] transition-all duration-200"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
         </div>
       ) : (
         <div className="flex items-center justify-center gap-1.5">

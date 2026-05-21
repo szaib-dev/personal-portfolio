@@ -521,30 +521,6 @@ export const projectEntries: ProjectEntry[] = [
           "Instead of a dense gallery, the layout gives each piece more room. That makes the portfolio feel intentional and lets imagery act as the primary storytelling element while the supporting copy stays quiet and structured.",
       },
       {
-        type: "gallery",
-        columns: 3,
-        images: [
-          {
-            src: "/visual-poetry.png",
-            alt: "Visual Poetry frame one",
-            width: 631,
-            height: 423,
-          },
-          {
-            src: "/visual-poetry.png",
-            alt: "Visual Poetry frame two",
-            width: 631,
-            height: 423,
-          },
-          {
-            src: "/visual-poetry.png",
-            alt: "Visual Poetry frame three",
-            width: 631,
-            height: 423,
-          },
-        ],
-      },
-      {
         type: "palette",
         label: "Color Palette",
         title: "Warm, low contrast, and carefully tuned.",

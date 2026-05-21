@@ -5,6 +5,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import ImageUploader from "./ImageUploader";
+import { AdminImageSkeleton } from "@/components/Skeleton";
 import {
   FiHome,
   FiGrid,
@@ -152,6 +153,8 @@ export default function AdminDashboard({
     new Set(GROUPS[0].sections.map((s) => s.id))
   );
 
+  const [deleteTarget, setDeleteTarget] = useState<Id<"images"> | null>(null);
+
   const allImages = useQuery(api.images.getAll);
   const deleteImage = useMutation(api.images.deleteImage);
   const logout = useMutation(api.auth.logout);
@@ -178,9 +181,17 @@ export default function AdminDashboard({
   };
 
   const handleDelete = async (id: Id<"images">) => {
-    if (confirm("Delete this image?")) {
-      await deleteImage({ id });
+    setDeleteTarget(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      await deleteImage({ id: deleteTarget });
+    } catch (err) {
+      console.error("Delete failed:", err);
     }
+    setDeleteTarget(null);
   };
 
   const toggleSection = (sectionId: string) => {
@@ -334,7 +345,13 @@ export default function AdminDashboard({
                 {isExpanded && (
                   <div className="border-t border-[#f0f0f0] px-5 pb-5 pt-4 max-[560px]:px-4">
                     <div className={`grid gap-4 ${section.slots.length === 1 ? "grid-cols-1 max-w-[420px]" : section.slots.length === 2 ? "grid-cols-2 max-[560px]:grid-cols-1" : "grid-cols-3 max-[768px]:grid-cols-2 max-[560px]:grid-cols-1"}`}>
-                      {section.slots.map((slot) => {
+                      {!allImages ? (
+                        // Loading skeleton
+                        section.slots.map((slot) => (
+                          <AdminImageSkeleton key={slot.id} />
+                        ))
+                      ) : (
+                        section.slots.map((slot) => {
                         const image = getImageForSlot(section.id, slot.id);
                         return (
                           <div key={slot.id}>
@@ -375,7 +392,8 @@ export default function AdminDashboard({
                             )}
                           </div>
                         );
-                      })}
+                      })
+                      )}
                     </div>
                   </div>
                 )}
@@ -384,6 +402,32 @@ export default function AdminDashboard({
           })}
         </div>
       </main>
+
+      {/* Delete Confirmation Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-[340px] rounded-[10px] bg-white p-6 shadow-xl">
+            <h3 className="text-[1.05rem] font-semibold text-[#111111]">Delete image?</h3>
+            <p className="mt-2 text-[0.88rem] leading-[1.5] text-[#666666]">
+              This action cannot be undone. The image will be permanently removed.
+            </p>
+            <div className="mt-5 flex gap-3">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="flex-1 rounded-[6px] border border-[#e0e0e0] py-2.5 text-[0.85rem] font-medium text-[#555555] transition-colors hover:border-[#999999]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="flex-1 rounded-[6px] bg-[#111111] py-2.5 text-[0.85rem] font-medium text-white transition-opacity hover:opacity-90"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
