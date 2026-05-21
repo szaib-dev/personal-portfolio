@@ -6,6 +6,25 @@ import { api } from "../../../convex/_generated/api";
 import AdminDashboard from "./AdminDashboard";
 
 export default function AdminPage() {
+  if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#fafafa] px-4">
+        <div className="w-full max-w-[420px] rounded-[8px] border border-[#e5e5e5] bg-white p-6 text-center">
+          <h1 className="text-[1.4rem] font-semibold tracking-[-0.04em] text-[#111111]">
+            Admin unavailable
+          </h1>
+          <p className="mt-3 text-[0.92rem] leading-[1.6] text-[#666666]">
+            Add NEXT_PUBLIC_CONVEX_URL in your deployment environment to access the image manager.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return <AdminLogin />;
+}
+
+function AdminLogin() {
   const [token, setToken] = useState<string | null>(() => {
     if (typeof window === "undefined") return null;
     return localStorage.getItem("admin_token");
