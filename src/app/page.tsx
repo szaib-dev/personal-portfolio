@@ -261,6 +261,8 @@ export default function Home() {
       const reveals = gsap.utils.toArray<HTMLElement>("[data-reveal]");
       const groups = gsap.utils.toArray<HTMLElement>("[data-stagger-group]");
       const valueLines = gsap.utils.toArray<HTMLElement>("[data-value-line]");
+      const textRise = gsap.utils.toArray<HTMLElement>("[data-text-rise]");
+      const footerLines = gsap.utils.toArray<HTMLElement>("[data-footer-cta-line]");
 
       reveals.forEach((element) => {
         gsap.fromTo(
@@ -323,6 +325,53 @@ export default function Home() {
             scrollTrigger: {
               trigger: valueLines[0].parentElement,
               start: "top 85%",
+              toggleActions: "play none none reverse",
+            },
+          }
+        );
+      }
+
+      textRise.forEach((element) => {
+        gsap.fromTo(
+          element,
+          {
+            opacity: 0,
+            y: 16,
+            filter: "blur(6px)",
+          },
+          {
+            opacity: 1,
+            y: 0,
+            filter: "blur(0px)",
+            duration: 0.72,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: element,
+              start: "top 88%",
+              toggleActions: "play none none reverse",
+            },
+          }
+        );
+      });
+
+      if (footerLines.length) {
+        gsap.fromTo(
+          footerLines,
+          {
+            yPercent: 105,
+            rotateX: -28,
+            opacity: 0,
+          },
+          {
+            yPercent: 0,
+            rotateX: 0,
+            opacity: 1,
+            stagger: 0.11,
+            duration: 0.95,
+            ease: "power4.out",
+            scrollTrigger: {
+              trigger: footerLines[0].parentElement,
+              start: "top 90%",
               toggleActions: "play none none reverse",
             },
           }
@@ -406,7 +455,9 @@ export default function Home() {
             </h1>
 
             <p className="mt-[1.15rem] max-w-[35rem] text-base leading-[1.55] text-[#5f5f5f] max-[560px]:text-[0.95rem]">
-              {activeProfile.summary}
+              <span data-text-rise className="block">
+                {activeProfile.summary}
+              </span>
             </p>
           </div>
         </section>
@@ -439,7 +490,7 @@ export default function Home() {
                 <h2 className="mt-[0.55rem] text-[clamp(2.8rem,3.9vw,4rem)] font-medium leading-[0.95] tracking-[-0.06em]">
                   {project.title}
                 </h2>
-                <p className="mt-[1.45rem] text-[1.12rem] leading-[1.68] text-[#454545]">
+                <p data-text-rise className="mt-[1.45rem] text-[1.12rem] leading-[1.68] text-[#454545]">
                   {project.summary}
                 </p>
 
@@ -647,11 +698,18 @@ export default function Home() {
           </div>
 
           <p
-            className="absolute bottom-8 left-9 m-0 max-w-[44rem] text-[clamp(2.35rem,3.05vw,3.35rem)] font-normal leading-[1.12] tracking-[-0.075em] text-[#2b2b2b] max-[1280px]:static max-[1280px]:mt-16 max-[1280px]:max-w-full max-[1280px]:px-8 max-[1280px]:text-[clamp(2rem,8vw,3rem)] max-[560px]:mt-12 max-[560px]:px-4 max-[560px]:text-center max-[560px]:text-[1.65rem] max-[560px]:leading-[1.15] max-[560px]:tracking-[-0.055em]"
+            className="absolute bottom-8 left-9 m-0 max-w-[44rem] overflow-hidden text-[clamp(2.35rem,3.05vw,3.35rem)] font-normal leading-[1.12] tracking-[-0.075em] text-[#2b2b2b] [perspective:800px] max-[1280px]:static max-[1280px]:mt-16 max-[1280px]:max-w-full max-[1280px]:px-8 max-[1280px]:text-[clamp(2rem,8vw,3rem)] max-[560px]:mt-12 max-[560px]:px-4 max-[560px]:text-center max-[560px]:text-[1.65rem] max-[560px]:leading-[1.15] max-[560px]:tracking-[-0.055em]"
            >
-            {aboutContent.bottomText[0]}
-            <br />
-            {aboutContent.bottomText[1]}
+            <span className="block overflow-hidden">
+              <span data-footer-cta-line className="block will-change-transform">
+                {aboutContent.bottomText[0]}
+              </span>
+            </span>
+            <span className="block overflow-hidden">
+              <span data-footer-cta-line className="block will-change-transform">
+                {aboutContent.bottomText[1]}
+              </span>
+            </span>
           </p>
         </section>
       </div>

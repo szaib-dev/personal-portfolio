@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -336,7 +336,6 @@ type ConvexImages = {
   mobileImages?: { slot: string; url: string }[];
   personaImageUrl?: string | null;
   imagesLoading?: boolean;
-  settings?: { key: string; value: string }[] | null;
 };
 
 export default function CaseStudyClient(props: Props) {
@@ -352,13 +351,11 @@ function CaseStudyWithConvexImages({ project, otherProjects }: Props) {
   const galleryImages = useQuery(api.images.getBySection, { section: `${project.slug}-gallery` });
   const mobileImages = useQuery(api.images.getBySection, { section: `${project.slug}-mobile` });
   const personaImage = useQuery(api.images.getBySlot, { section: `${project.slug}-persona`, slot: "persona" });
-  const settings = useQuery(api.settings.getAll);
   const imagesLoading =
     heroImage === undefined ||
     galleryImages === undefined ||
     mobileImages === undefined ||
-    personaImage === undefined ||
-    settings === undefined;
+    personaImage === undefined;
 
   return (
     <CaseStudyContent
@@ -370,7 +367,6 @@ function CaseStudyWithConvexImages({ project, otherProjects }: Props) {
         mobileImages,
         personaImageUrl: personaImage?.url,
         imagesLoading,
-        settings,
       }}
     />
   );
@@ -383,9 +379,10 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
   const heroSummaryRef = useRef<HTMLParagraphElement>(null);
   const heroMetaRef = useRef<HTMLDivElement>(null);
   const heroImageRef = useRef<HTMLDivElement>(null);
+  const [settings, setSettings] = useState<{ key: string; value: string }[] | null>(null);
 
   const imagesLoading = convexImages?.imagesLoading ?? false;
-  const accent = getProjectAccent(project.slug, project.accent, convexImages?.settings);
+  const accent = getProjectAccent(project.slug, project.accent, settings);
 
   useLayoutEffect(() => {
     window.history.scrollRestoration = "manual";
@@ -398,6 +395,27 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch("/api/project-settings")
+      .then((response) => response.json())
+      .then((data: { settings?: { key: string; value: string }[] }) => {
+        if (!cancelled) {
+          setSettings(data.settings ?? []);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setSettings([]);
+        }
+      });
+
+    return () => {
+      cancelled = true;
     };
   }, []);
 
