@@ -27,7 +27,13 @@ import { api } from "../../../../convex/_generated/api";
 import type { ProjectEntry, CaseStudyBlock, OverviewCard } from "@/data/site-content";
 import { getConvexUrlFromEnv } from "@/lib/convex-url";
 import { ImageSkeleton } from "@/components/Skeleton";
-import { getProjectAccent } from "@/lib/project-settings";
+import {
+  getProjectAccent,
+  getStoredProjectAccent,
+  isHexColor,
+  PROJECT_ACCENT_EVENT,
+  projectAccentStorageKey,
+} from "@/lib/project-settings";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -380,9 +386,10 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
   const heroMetaRef = useRef<HTMLDivElement>(null);
   const heroImageRef = useRef<HTMLDivElement>(null);
   const [settings, setSettings] = useState<{ key: string; value: string }[] | null>(null);
+  const [liveAccent, setLiveAccent] = useState<string | null>(null);
 
   const imagesLoading = convexImages?.imagesLoading ?? false;
-  const accent = getProjectAccent(project.slug, project.accent, settings);
+  const accent = liveAccent ?? getProjectAccent(project.slug, project.accent, settings);
 
   useLayoutEffect(() => {
     window.history.scrollRestoration = "manual";
@@ -402,11 +409,19 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
     let cancelled = false;
 
     const loadSettings = () => {
+      const storedAccent = getStoredProjectAccent(project.slug);
+      if (storedAccent) {
+        setLiveAccent(storedAccent);
+      }
+
       fetch(`/api/project-settings?ts=${Date.now()}`, { cache: "no-store" })
         .then((response) => response.json())
         .then((data: { settings?: { key: string; value: string }[] }) => {
           if (!cancelled) {
-            setSettings(data.settings ?? []);
+            const nextSettings = data.settings ?? [];
+            setSettings(nextSettings);
+            const savedAccent = getProjectAccent(project.slug, project.accent, nextSettings);
+            setLiveAccent(savedAccent);
           }
         })
         .catch(() => {
@@ -424,16 +439,31 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
         loadSettings();
       }
     };
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === projectAccentStorageKey(project.slug) && event.newValue && isHexColor(event.newValue)) {
+        setLiveAccent(event.newValue);
+      }
+    };
+    const handleAccentEvent = (event: Event) => {
+      const detail = (event as CustomEvent<{ slug?: string; value?: string }>).detail;
+      if (detail?.slug === project.slug && detail.value && isHexColor(detail.value)) {
+        setLiveAccent(detail.value);
+      }
+    };
 
     window.addEventListener("focus", handleFocus);
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener(PROJECT_ACCENT_EVENT, handleAccentEvent);
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       cancelled = true;
       window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener(PROJECT_ACCENT_EVENT, handleAccentEvent);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, []);
+  }, [project.accent, project.slug]);
 
   const getGalleryUrl = (index: number) => {
     if (!convexImages?.galleryImages) return null;

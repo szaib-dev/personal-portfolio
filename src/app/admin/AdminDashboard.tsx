@@ -8,7 +8,12 @@ import type { Id } from "../../../convex/_generated/dataModel";
 import ImageUploader from "./ImageUploader";
 import { AdminImageSkeleton } from "@/components/Skeleton";
 import { projectEntries } from "@/data/site-content";
-import { getProjectAccent, isHexColor, projectAccentSettingKey } from "@/lib/project-settings";
+import {
+  getProjectAccent,
+  isHexColor,
+  projectAccentSettingKey,
+  publishProjectAccent,
+} from "@/lib/project-settings";
 import {
   FiHome,
   FiGrid,
@@ -229,6 +234,7 @@ export default function AdminDashboard({
       const withoutCurrent = current.filter((setting) => setting.key !== key);
       return [...withoutCurrent, { key, value }];
     });
+    publishProjectAccent(slug, value);
 
     try {
       await setSetting({ key, value });
