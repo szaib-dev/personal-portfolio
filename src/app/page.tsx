@@ -50,6 +50,9 @@ export default function Home() {
     audienceProfiles[0];
 
   useEffect(() => {
+    // Scroll to top on page load/reload
+    window.scrollTo(0, 0);
+    
     const lenis = new Lenis({
       duration: 1.15,
       smoothWheel: true,
@@ -220,17 +223,17 @@ export default function Home() {
           element,
           {
             opacity: 0,
-            y: 28,
+            y: 20,
           },
           {
             opacity: 1,
             y: 0,
-            duration: 0.95,
-            ease: "power3.out",
+            duration: 0.6,
+            ease: "power2.out",
             scrollTrigger: {
               trigger: element,
-              start: "top 82%",
-              once: true,
+              start: "top 85%",
+              toggleActions: "play none none reverse",
             },
           }
         );
@@ -243,18 +246,18 @@ export default function Home() {
           children,
           {
             opacity: 0,
-            y: 22,
+            y: 18,
           },
           {
             opacity: 1,
             y: 0,
             stagger: 0.08,
-            duration: 0.8,
-            ease: "power3.out",
+            duration: 0.65,
+            ease: "power2.out",
             scrollTrigger: {
               trigger: group,
-              start: "top 80%",
-              once: true,
+              start: "top 85%",
+              toggleActions: "play none none reverse",
             },
           }
         );
@@ -265,18 +268,18 @@ export default function Home() {
           valueLines,
           {
             opacity: 0,
-            y: 34,
+            y: 24,
           },
           {
             opacity: 1,
             y: 0,
-            stagger: 0.12,
-            duration: 0.82,
-            ease: "power3.out",
+            stagger: 0.1,
+            duration: 0.7,
+            ease: "power2.out",
             scrollTrigger: {
               trigger: valueLines[0].parentElement,
-              start: "top 80%",
-              once: true,
+              start: "top 85%",
+              toggleActions: "play none none reverse",
             },
           }
         );
@@ -520,7 +523,7 @@ export default function Home() {
         <section
           id="about"
           data-section
-          className="relative min-h-screen w-full overflow-hidden bg-white px-0 pb-0 pt-0"
+          className="relative min-h-screen w-full overflow-hidden bg-white px-0 pb-32 pt-0 max-[1280px]:min-h-0 max-[1280px]:pb-24 max-[560px]:pb-20"
         >
           <div className="relative m-0 block h-screen w-full max-[1280px]:grid max-[1280px]:h-auto max-[1280px]:gap-7 max-[1280px]:px-0 max-[1280px]:py-20 max-[560px]:justify-items-center">
             <div
@@ -585,7 +588,7 @@ export default function Home() {
 
           <p
             data-reveal
-            className="absolute bottom-0 left-9 m-0 max-w-[44rem] text-[clamp(2.35rem,3.05vw,3.35rem)] font-normal leading-[1.12] tracking-[-0.075em] text-[#2b2b2b] max-[1280px]:static max-[1280px]:mt-16 max-[1280px]:max-w-full max-[1280px]:text-[clamp(2rem,8vw,3rem)] max-[560px]:mt-12 max-[560px]:text-center max-[560px]:text-[1.8rem] max-[560px]:leading-[1.12] max-[560px]:tracking-[-0.06em]"
+            className="absolute bottom-8 left-9 m-0 max-w-[44rem] text-[clamp(2.35rem,3.05vw,3.35rem)] font-normal leading-[1.12] tracking-[-0.075em] text-[#2b2b2b] max-[1280px]:static max-[1280px]:mt-16 max-[1280px]:max-w-full max-[1280px]:px-8 max-[1280px]:text-[clamp(2rem,8vw,3rem)] max-[560px]:mt-12 max-[560px]:px-4 max-[560px]:text-center max-[560px]:text-[1.65rem] max-[560px]:leading-[1.15] max-[560px]:tracking-[-0.055em]"
            >
             {aboutContent.bottomText[0]}
             <br />

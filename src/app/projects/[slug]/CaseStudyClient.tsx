@@ -178,7 +178,7 @@ function Block({ block, accent, id }: { block: CaseStudyBlock; accent: string; i
 
           <div className="ml-auto w-[min(100%,70rem)] overflow-hidden rounded-[6px] border border-black/[0.1] bg-[#f3f4f4] shadow-[0_18px_55px_rgba(0,0,0,0.055)] max-[960px]:ml-0">
             <div className="grid grid-cols-[minmax(0,1fr)_minmax(16rem,0.42fr)] max-[820px]:grid-cols-1">
-              <div className="border-r border-black/[0.1] p-7 max-[820px]:border-b max-[820px]:border-r-0 max-[560px]:p-5">
+              <div className="border-r border-black/[0.1] p-7 max-[820px]:order-2 max-[820px]:border-r-0 max-[820px]:border-t max-[560px]:p-5">
                 <p className="max-w-[34rem] text-[clamp(1.35rem,2.1vw,2.05rem)] font-medium leading-[1.22] tracking-[-0.04em] text-[#080808]">
                   <span className="text-[2.2rem] leading-none text-[#d0d0d0]">&ldquo;</span>{block.quote}<span className="text-[2.2rem] leading-none text-[#d0d0d0]">&rdquo;</span>
                 </p>
@@ -227,8 +227,8 @@ function Block({ block, accent, id }: { block: CaseStudyBlock; accent: string; i
                 </div>
               </div>
 
-              <aside className="flex flex-col justify-center p-7 max-[820px]:items-start max-[560px]:p-5">
-                <div className="relative mx-auto h-[12rem] w-[12rem] overflow-hidden rounded-full bg-white shadow-[0_4px_16px_rgba(0,0,0,0.08)] max-[820px]:mx-0 max-[560px]:h-[11rem] max-[560px]:w-[11rem]">
+              <aside className="flex flex-col justify-center p-7 max-[820px]:order-1 max-[820px]:items-center max-[820px]:text-center max-[560px]:p-5">
+                <div className="relative mx-auto h-[12rem] w-[12rem] overflow-hidden rounded-full bg-white shadow-[0_4px_16px_rgba(0,0,0,0.08)] max-[820px]:mx-auto max-[560px]:h-[11rem] max-[560px]:w-[11rem]">
                   <Image
                     src={block.photo}
                     alt={`${block.name} persona portrait`}
@@ -247,7 +247,7 @@ function Block({ block, accent, id }: { block: CaseStudyBlock; accent: string; i
                   </p>
                 </div>
 
-                <dl className="mt-7 grid gap-5 text-[0.9rem] leading-[1.45]">
+                <dl className="mt-7 grid gap-5 text-[0.9rem] leading-[1.45] max-[820px]:justify-items-center">
                   {block.details.map((detail) => (
                     <div key={detail.label} className="grid grid-cols-[7rem_1fr] gap-4 max-[560px]:grid-cols-1 max-[560px]:gap-1">
                       <dt className="text-[#a7a7a7]">{detail.label}:</dt>
