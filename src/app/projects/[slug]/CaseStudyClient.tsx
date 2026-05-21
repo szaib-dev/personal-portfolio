@@ -47,64 +47,44 @@ const OVERVIEW_ICONS: Record<OverviewCard["icon"], React.ElementType> = {
 };
 
 function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: CaseStudyBlock; accent: string; id?: string; getImageUrl?: (index: number, fallback: string, type: "gallery" | "mobile") => string; personaPhotoUrl?: string }) {
+
+  // Unified two-column grid — 260px left label, right content
+  const ROW = "grid grid-cols-[260px_1fr] gap-x-20 border-t border-black/[0.07] py-12 max-[900px]:grid-cols-1 max-[900px]:gap-y-5 max-[900px]:py-8";
+  const LABEL = "pt-0.5 text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#888888]";
+
   switch (block.type) {
     case "overview":
       return (
-        <div id={id} data-reveal className="scroll-mt-16 pt-16 pb-4">
-          <div className="grid grid-cols-[32%_1fr] gap-20 max-[768px]:grid-cols-1 max-[768px]:gap-8">
-
-            {/* Left — label + heading only */}
-            <div>
-              <span className="block text-[0.82rem] leading-[1.4] text-[#aaaaaa]">
-                {block.superLabel}
-              </span>
-              <h2 className="mt-2 text-[clamp(1.85rem,3.4vw,2.6rem)] font-medium leading-[1.05] tracking-[-0.06em] text-[#111111]">
-                {block.title}
-              </h2>
-            </div>
-
-            {/* Right — description + divider + 2×2 grid */}
-            <div>
-              {/* Description */}
-              <p className="text-[0.96rem] font-[450] leading-[1.82] text-[#1a1a1a]">
-                {block.body}
-              </p>
-
-              {/* Subtle divider */}
-              <div className="mt-10 border-t border-black/[0.06]" />
-
-              {/* 2×2 info blocks */}
-              <div className="mt-10 grid grid-cols-2 gap-x-16 gap-y-12 max-[600px]:grid-cols-1 max-[600px]:gap-y-10">
-                {block.cards.map((card) => {
-                  const Icon = OVERVIEW_ICONS[card.icon];
-                  return (
-                    <div key={card.label}>
-                      <Icon
-                        aria-hidden="true"
-                        className="mb-4 text-[1.35rem] text-[#a0a8d0]"
-                        strokeWidth={1.3}
-                      />
-                      <p className="mb-2.5 text-[0.95rem] font-semibold tracking-[-0.01em] text-[#111111]">
-                        {card.label}
-                      </p>
-                      {card.body && (
-                        <p className="max-w-[24rem] text-[0.88rem] leading-[1.75] text-[#666666]">
-                          {card.body}
-                        </p>
-                      )}
-                      {card.bullets && card.bullets.length > 0 && (
-                        <div className="mt-1 grid grid-cols-2 gap-x-6">
-                          {card.bullets.map((b) => (
-                            <p key={b} className="text-[0.86rem] leading-[2.1] text-[#666666]">
-                              · {b}
-                            </p>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+        <div id={id} data-reveal className={`${ROW} scroll-mt-16`}>
+          <div>
+            <span className="block text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-[#888888]">
+              {block.superLabel}
+            </span>
+            <h2 className="mt-3 text-[clamp(1.5rem,2.4vw,2rem)] font-medium leading-[1.1] tracking-[-0.05em] text-[#111111]">
+              {block.title}
+            </h2>
+          </div>
+          <div>
+            <p className="text-[0.96rem] font-[450] leading-[1.82] text-[#1a1a1a]">{block.body}</p>
+            <div className="mt-10 border-t border-black/[0.06]" />
+            <div className="mt-10 grid grid-cols-2 gap-x-12 gap-y-10 max-[600px]:grid-cols-1">
+              {block.cards.map((card) => {
+                const Icon = OVERVIEW_ICONS[card.icon];
+                return (
+                  <div key={card.label}>
+                    <Icon aria-hidden="true" className="mb-3 text-[1.2rem] text-[#a0a8d0]" strokeWidth={1.3} />
+                    <p className="mb-2 text-[0.9rem] font-semibold tracking-[-0.01em] text-[#111111]">{card.label}</p>
+                    {card.body && <p className="text-[0.86rem] leading-[1.75] text-[#666666]">{card.body}</p>}
+                    {card.bullets && card.bullets.length > 0 && (
+                      <div className="mt-1 grid grid-cols-2 gap-x-4">
+                        {card.bullets.map((b) => (
+                          <p key={b} className="text-[0.84rem] leading-[2.1] text-[#666666]">· {b}</p>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -112,18 +92,10 @@ function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: Cas
 
     case "section":
       return (
-        <div
-          id={id}
-          data-reveal
-          className="scroll-mt-16 grid grid-cols-[minmax(0,0.42fr)_minmax(0,1fr)] gap-12 border-t border-black/[0.07] py-12 max-[768px]:grid-cols-1 max-[768px]:gap-5"
-        >
-          <div className="pt-0.5">
-            <span className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#c0c0c0]">
-              {block.label}
-            </span>
-          </div>
-          <div className="max-w-[44rem]">
-            <h2 className="text-[1.4rem] font-medium leading-[1.3] tracking-[-0.04em] text-[#111111] max-[768px]:text-[1.2rem]">
+        <div id={id} data-reveal className={`${ROW} scroll-mt-16`}>
+          <div className={LABEL}>{block.label}</div>
+          <div>
+            <h2 className="text-[1.35rem] font-medium leading-[1.3] tracking-[-0.04em] text-[#111111] max-[768px]:text-[1.2rem]">
               {block.title}
             </h2>
             <p className="mt-5 text-[1rem] leading-[1.82] text-[#444444]">{block.body}</p>
@@ -133,136 +105,78 @@ function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: Cas
 
     case "image":
       return (
-        <div
-          data-reveal
-          className={`py-8 ${block.contained ? "mx-auto max-w-[52rem]" : ""}`}
-        >
-          <div className="overflow-hidden rounded-[3px] bg-[#f4f4f4]">
-            <Image
-              src={block.src}
-              alt={block.alt}
-              width={block.width}
-              height={block.height}
-              className="block h-auto w-full"
-            />
+        <div data-reveal className={ROW}>
+          <div />
+          <div className={`overflow-hidden rounded-[3px] bg-[#f4f4f4] ${block.contained ? "max-w-[44rem]" : ""}`}>
+            <Image src={block.src} alt={block.alt} width={block.width} height={block.height} className="block h-auto w-full" />
+            {block.caption && <p className="px-3 pb-3 pt-2 text-[0.72rem] leading-[1.4] text-[#b0b0b0]">{block.caption}</p>}
           </div>
-          {block.caption && (
-            <p className="mt-3 text-[0.78rem] leading-[1.5] text-[#b0b0b0]">
-              {block.caption}
-            </p>
-          )}
         </div>
       );
 
     case "persona":
       return (
-        <section
-          id={id}
-          data-reveal
-          className="grid grid-cols-[minmax(18rem,0.36fr)_minmax(0,0.9fr)] gap-20 border-t border-black/[0.07] py-14 max-[1100px]:grid-cols-[minmax(16rem,0.35fr)_minmax(0,0.95fr)] max-[1100px]:gap-12 max-[960px]:grid-cols-1 max-[960px]:gap-8"
-        >
-          <div className="max-w-[25rem]">
-            <FiUsers
-              aria-hidden="true"
-              className="mb-7 text-[2rem]"
-              style={{ color: accent }}
-              strokeWidth={1.45}
-            />
-            <span className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#c0c0c0]">
-              {block.label}
-            </span>
-            <h2 className="mt-5 text-[clamp(1.9rem,3.2vw,3rem)] font-medium leading-[0.98] tracking-[-0.07em] text-[#111111]">
-              {block.title}
-            </h2>
-            <p className="mt-6 text-[1rem] leading-[1.72] text-[#6a6a6a]">
-              {block.body}
-            </p>
+        <section id={id} data-reveal className={`${ROW} scroll-mt-16`}>
+          <div>
+            <FiUsers aria-hidden="true" className="mb-5 text-[1.6rem]" style={{ color: accent }} strokeWidth={1.45} />
+            <span className={LABEL}>{block.label}</span>
+            <h2 className="mt-3 text-[clamp(1.5rem,2.4vw,2rem)] font-medium leading-[1.1] tracking-[-0.05em] text-[#111111]">{block.title}</h2>
+            <p className="mt-4 text-[0.92rem] leading-[1.72] text-[#6a6a6a]">{block.body}</p>
           </div>
-
-          <div className="ml-auto w-[min(100%,70rem)] overflow-hidden rounded-[6px] border border-black/[0.1] bg-[#f3f4f4] shadow-[0_18px_55px_rgba(0,0,0,0.055)] max-[960px]:ml-0">
-            <div className="grid grid-cols-[minmax(0,1fr)_minmax(16rem,0.42fr)] max-[820px]:grid-cols-1">
+          <div className="overflow-hidden rounded-[6px] border border-black/[0.1] bg-[#f3f4f4]">
+            <div className="grid grid-cols-[1fr_220px] max-[820px]:grid-cols-1">
               <div className="border-r border-black/[0.1] p-7 max-[820px]:order-2 max-[820px]:border-r-0 max-[820px]:border-t max-[560px]:p-5">
-                <p className="max-w-[34rem] text-[clamp(1.35rem,2.1vw,2.05rem)] font-medium leading-[1.22] tracking-[-0.04em] text-[#080808]">
-                  <span className="text-[2.2rem] leading-none text-[#d0d0d0]">&ldquo;</span>{block.quote}<span className="text-[2.2rem] leading-none text-[#d0d0d0]">&rdquo;</span>
+                <p className="text-[clamp(1.15rem,1.8vw,1.6rem)] font-medium leading-[1.25] tracking-[-0.04em] text-[#080808]">
+                  <span className="text-[2rem] leading-none text-[#d0d0d0]">&ldquo;</span>{block.quote}<span className="text-[2rem] leading-none text-[#d0d0d0]">&rdquo;</span>
                 </p>
-
-                <div className="mt-14 grid grid-cols-2 gap-8 border-t border-dashed border-black/15 pt-8 max-[700px]:grid-cols-1 max-[700px]:gap-8 max-[560px]:mt-10">
+                <div className="mt-10 grid grid-cols-2 gap-8 border-t border-dashed border-black/15 pt-8 max-[700px]:grid-cols-1">
                   <div>
-                    <div className="mb-6 flex items-center gap-3">
-                      <FiCheckCircle
-                        aria-hidden="true"
-                        className="text-[1.35rem]"
-                        style={{ color: accent }}
-                      />
-                      <h3 className="text-[1.35rem] font-semibold tracking-[-0.05em]" style={{ color: accent }}>
-                        Goals
-                      </h3>
+                    <div className="mb-5 flex items-center gap-2.5">
+                      <FiCheckCircle aria-hidden="true" className="text-[1.1rem]" style={{ color: accent }} />
+                      <h3 className="text-[1.1rem] font-semibold tracking-[-0.04em]" style={{ color: accent }}>Goals</h3>
                     </div>
-                    <ul className="space-y-5 text-[0.92rem] font-medium leading-[1.55] text-[#343434]">
+                    <ul className="space-y-4 text-[0.88rem] font-medium leading-[1.55] text-[#343434]">
                       {block.goals.map((goal) => (
-                        <li key={goal} className="flex gap-3">
-                          <span className="mt-[0.5rem] h-1.5 w-1.5 shrink-0 rounded-full bg-[#222222]" />
+                        <li key={goal} className="flex gap-2.5">
+                          <span className="mt-[0.5rem] h-1.5 w-1.5 shrink-0 rounded-full bg-[#333333]" />
                           <span>{goal}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
-
                   <div>
-                    <div className="mb-6 flex items-center gap-3">
-                      <FiAlertTriangle
-                        aria-hidden="true"
-                        className="text-[1.35rem] text-[#f12d2d]"
-                      />
-                      <h3 className="text-[1.35rem] font-semibold tracking-[-0.05em] text-[#f12d2d]">
-                        Frustration
-                      </h3>
+                    <div className="mb-5 flex items-center gap-2.5">
+                      <FiAlertTriangle aria-hidden="true" className="text-[1.1rem] text-[#e03030]" />
+                      <h3 className="text-[1.1rem] font-semibold tracking-[-0.04em] text-[#e03030]">Frustration</h3>
                     </div>
-                    <ul className="space-y-5 text-[0.92rem] font-medium leading-[1.55] text-[#343434]">
-                      {block.frustrations.map((frustration) => (
-                        <li key={frustration} className="flex gap-3">
-                          <span className="mt-[0.5rem] h-1.5 w-1.5 shrink-0 rounded-full bg-[#222222]" />
-                          <span>{frustration}</span>
+                    <ul className="space-y-4 text-[0.88rem] font-medium leading-[1.55] text-[#343434]">
+                      {block.frustrations.map((f) => (
+                        <li key={f} className="flex gap-2.5">
+                          <span className="mt-[0.5rem] h-1.5 w-1.5 shrink-0 rounded-full bg-[#333333]" />
+                          <span>{f}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
                 </div>
               </div>
-
-              <aside className="flex flex-col justify-center p-7 max-[820px]:order-1 max-[820px]:items-center max-[820px]:text-center max-[560px]:p-5">
-                <div className="relative mx-auto h-[12rem] w-[12rem] overflow-hidden rounded-full bg-white shadow-[0_4px_16px_rgba(0,0,0,0.08)] max-[820px]:mx-auto max-[560px]:h-[11rem] max-[560px]:w-[11rem]">
+              <aside className="flex flex-col justify-center p-6 max-[820px]:order-1 max-[820px]:items-center max-[820px]:text-center">
+                <div className="relative mx-auto h-[10rem] w-[10rem] overflow-hidden rounded-full bg-white shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
                   {personaPhotoUrl && personaPhotoUrl !== block.photo ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={personaPhotoUrl}
-                      alt={`${block.name} persona portrait`}
-                      className="h-full w-full object-cover object-top"
-                    />
+                    <img src={personaPhotoUrl} alt={`${block.name} persona portrait`} className="h-full w-full object-cover object-top" />
                   ) : (
-                    <Image
-                      src={block.photo}
-                      alt={`${block.name} persona portrait`}
-                      width={608}
-                      height={658}
-                      className="h-full w-full object-cover object-top"
-                    />
+                    <Image src={block.photo} alt={`${block.name} persona portrait`} width={608} height={658} className="h-full w-full object-cover object-top" />
                   )}
                 </div>
-
-                <div className="mt-8">
-                  <h3 className="text-[2rem] font-semibold leading-none tracking-[-0.06em] text-[#080808]">
-                    {block.name}
-                  </h3>
-                  <p className="mt-3 text-[0.95rem] font-medium leading-[1.45] text-[#444444]">
-                    {block.role}
-                  </p>
+                <div className="mt-6">
+                  <h3 className="text-[1.6rem] font-semibold leading-none tracking-[-0.05em] text-[#080808]">{block.name}</h3>
+                  <p className="mt-2 text-[0.88rem] font-medium leading-[1.45] text-[#555555]">{block.role}</p>
                 </div>
-
-                <dl className="mt-7 grid gap-5 text-[0.9rem] leading-[1.45] max-[820px]:justify-items-center">
+                <dl className="mt-6 grid gap-4 text-[0.85rem] leading-[1.45] max-[820px]:justify-items-center">
                   {block.details.map((detail) => (
-                    <div key={detail.label} className="grid grid-cols-[7rem_1fr] gap-4 max-[560px]:grid-cols-1 max-[560px]:gap-1">
-                      <dt className="text-[#a7a7a7]">{detail.label}:</dt>
+                    <div key={detail.label} className="grid grid-cols-[6rem_1fr] gap-3 max-[560px]:grid-cols-1 max-[560px]:gap-0.5">
+                      <dt className="text-[#aaaaaa]">{detail.label}:</dt>
                       <dd className="font-semibold text-[#2c2c2c]">{detail.value}</dd>
                     </div>
                   ))}
@@ -274,91 +188,71 @@ function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: Cas
       );
 
     case "gallery": {
-      /* 5+ columns = mobile mockup row — actual screenshots in mobile format */
       if (block.columns === 5) {
         return (
-          <div data-reveal className="flex items-end justify-center gap-4 px-20 py-8 max-[900px]:flex-wrap max-[900px]:px-8 max-[560px]:px-4">
-            {block.images.map((img, i) => {
-              const dynamicUrl = getImageUrl ? getImageUrl(i, img.src, "mobile") : img.src;
-              return (
-                <div
-                  key={i}
-                  className="w-[11.5rem] flex-shrink-0 shadow-[0_10px_30px_rgba(0,0,0,0.1)] max-[1100px]:w-[10.5rem] max-[900px]:w-[10rem] max-[560px]:w-[9rem]"
-                  style={{ aspectRatio: "9/19.5" }}
-                >
-                  {dynamicUrl !== img.src ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={dynamicUrl} alt={img.alt} className="block h-full w-full object-cover" />
-                  ) : (
-                    <Image src={img.src} alt={img.alt} width={img.width} height={img.height} className="block h-full w-full object-cover" />
-                  )}
-                </div>
-              );
-            })}
+          <div data-reveal className={ROW}>
+            <div />
+            <div className="flex items-end justify-center gap-3 max-[700px]:flex-wrap">
+              {block.images.map((img, i) => {
+                const dynamicUrl = getImageUrl ? getImageUrl(i, img.src, "mobile") : img.src;
+                return (
+                  <div key={i} className="w-[11.5rem] flex-shrink-0 shadow-[0_8px_24px_rgba(0,0,0,0.09)] max-[1100px]:w-[10rem] max-[700px]:w-[9rem]" style={{ aspectRatio: "9/19.5" }}>
+                    {dynamicUrl !== img.src ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={dynamicUrl} alt={img.alt} className="block h-full w-full object-cover" />
+                    ) : (
+                      <Image src={img.src} alt={img.alt} width={img.width} height={img.height} className="block h-full w-full object-cover" />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         );
       }
 
       const cols =
-        block.columns === 4
-          ? "grid-cols-4 max-[900px]:grid-cols-2"
-          : block.columns === 3
-          ? "grid-cols-3 max-[900px]:grid-cols-2 max-[560px]:grid-cols-1"
-          : "grid-cols-2 max-[560px]:grid-cols-1";
+        block.columns === 4 ? "grid-cols-4 max-[900px]:grid-cols-2" :
+        block.columns === 3 ? "grid-cols-3 max-[900px]:grid-cols-2 max-[560px]:grid-cols-1" :
+        "grid-cols-2 max-[560px]:grid-cols-1";
+
       return (
-        <div data-reveal className={`grid gap-4 py-8 ${cols}`}>
-          {block.images.map((img, i) => {
-            const dynamicUrl = getImageUrl ? getImageUrl(i, img.src, "gallery") : img.src;
-            return (
-              <div key={i} className="overflow-hidden rounded-[3px] bg-[#f4f4f4]">
-                {dynamicUrl !== img.src ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={dynamicUrl} alt={img.alt} className="block h-auto w-full" />
-                ) : (
-                  <Image src={img.src} alt={img.alt} width={img.width} height={img.height} className="block h-auto w-full" />
-                )}
-                {img.caption && (
-                  <p className="px-3 pb-3 pt-2 text-[0.72rem] leading-[1.4] text-[#b0b0b0]">
-                    {img.caption}
-                  </p>
-                )}
-              </div>
-            );
-          })}
+        <div data-reveal className={ROW}>
+          <div />
+          <div className={`grid gap-4 ${cols}`}>
+            {block.images.map((img, i) => {
+              const dynamicUrl = getImageUrl ? getImageUrl(i, img.src, "gallery") : img.src;
+              return (
+                <div key={i} className="overflow-hidden rounded-[3px] bg-[#f4f4f4]">
+                  {dynamicUrl !== img.src ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={dynamicUrl} alt={img.alt} className="block h-auto w-full" />
+                  ) : (
+                    <Image src={img.src} alt={img.alt} width={img.width} height={img.height} className="block h-auto w-full" />
+                  )}
+                  {img.caption && <p className="px-3 pb-3 pt-2 text-[0.72rem] leading-[1.4] text-[#b0b0b0]">{img.caption}</p>}
+                </div>
+              );
+            })}
+          </div>
         </div>
       );
     }
 
     case "palette":
       return (
-        <div
-          data-reveal
-          className="grid grid-cols-[minmax(0,0.42fr)_minmax(0,1fr)] gap-12 border-t border-black/[0.07] py-12 max-[768px]:grid-cols-1 max-[768px]:gap-5"
-        >
-          <div className="pt-0.5">
-            <span className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#c0c0c0]">
-              {block.label}
-            </span>
-          </div>
-          <div className="max-w-[44rem]">
-            <h2 className="text-[1.4rem] font-medium leading-[1.3] tracking-[-0.04em] text-[#111111]">
-              {block.title}
-            </h2>
-            {block.body && (
-              <p className="mt-4 text-[1rem] leading-[1.82] text-[#444444]">{block.body}</p>
-            )}
+        <div data-reveal className={ROW}>
+          <div className={LABEL}>{block.label}</div>
+          <div>
+            <h2 className="text-[1.35rem] font-medium leading-[1.3] tracking-[-0.04em] text-[#111111]">{block.title}</h2>
+            {block.body && <p className="mt-4 text-[1rem] leading-[1.82] text-[#444444]">{block.body}</p>}
             <div className="mt-8 flex flex-wrap gap-5">
               {block.swatches.map((s) => (
                 <div key={s.hex} className="flex flex-col gap-1.5">
-                  <div
-                    className="h-12 w-[5rem] rounded-[3px] border border-black/[0.06]"
-                    style={{ background: s.hex }}
-                  />
+                  <div className="h-12 w-[5rem] rounded-[3px] border border-black/[0.06]" style={{ background: s.hex }} />
                   <span className="text-[0.75rem] font-medium text-[#1a1a1a]">{s.name}</span>
                   <span className="font-mono text-[0.68rem] text-[#aaaaaa]">{s.hex}</span>
-                  {s.usage && (
-                    <span className="text-[0.66rem] text-[#cccccc]">{s.usage}</span>
-                  )}
+                  {s.usage && <span className="text-[0.66rem] text-[#cccccc]">{s.usage}</span>}
                 </div>
               ))}
             </div>
@@ -368,36 +262,19 @@ function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: Cas
 
     case "typography":
       return (
-        <div
-          data-reveal
-          className="grid grid-cols-[minmax(0,0.42fr)_minmax(0,1fr)] gap-12 border-t border-black/[0.07] py-12 max-[768px]:grid-cols-1 max-[768px]:gap-5"
-        >
-          <div className="pt-0.5">
-            <span className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#c0c0c0]">
-              {block.label}
-            </span>
-          </div>
-          <div className="max-w-[44rem]">
-            <h2 className="text-[1.4rem] font-medium leading-[1.3] tracking-[-0.04em] text-[#111111]">
-              {block.title}
-            </h2>
-            {block.body && (
-              <p className="mt-4 text-[1rem] leading-[1.82] text-[#444444]">{block.body}</p>
-            )}
+        <div data-reveal className={ROW}>
+          <div className={LABEL}>{block.label}</div>
+          <div>
+            <h2 className="text-[1.35rem] font-medium leading-[1.3] tracking-[-0.04em] text-[#111111]">{block.title}</h2>
+            {block.body && <p className="mt-4 text-[1rem] leading-[1.82] text-[#444444]">{block.body}</p>}
             <div className="mt-8 flex flex-col divide-y divide-black/[0.06]">
               {block.samples.map((s) => (
                 <div key={s.name} className="py-6">
                   <div className="mb-3 flex items-center gap-3">
-                    <span className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-[#c0c0c0]">
-                      {s.name}
-                    </span>
-                    <span className="text-[0.68rem] text-[#dddddd]">
-                      {s.family} · {s.weight}
-                    </span>
+                    <span className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-[#c0c0c0]">{s.name}</span>
+                    <span className="text-[0.68rem] text-[#dddddd]">{s.family} · {s.weight}</span>
                   </div>
-                  <p className="text-[1.35rem] leading-[1.35] tracking-[-0.03em] text-[#111111]">
-                    {s.sample}
-                  </p>
+                  <p className="text-[1.35rem] leading-[1.35] tracking-[-0.03em] text-[#111111]">{s.sample}</p>
                 </div>
               ))}
             </div>
@@ -407,16 +284,13 @@ function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: Cas
 
     case "quote":
       return (
-        <div data-reveal className="border-t border-black/[0.07] py-12">
-          <blockquote className="max-w-[40rem]">
+        <div data-reveal className={ROW}>
+          <div />
+          <blockquote>
             <p className="text-[1.5rem] font-medium leading-[1.45] tracking-[-0.04em] text-[#111111] max-[768px]:text-[1.2rem]">
               &ldquo;{block.body}&rdquo;
             </p>
-            {block.attribution && (
-              <footer className="mt-5 text-[0.82rem] text-[#aaaaaa]">
-                — {block.attribution}
-              </footer>
-            )}
+            {block.attribution && <footer className="mt-5 text-[0.82rem] text-[#aaaaaa]">— {block.attribution}</footer>}
           </blockquote>
         </div>
       );
