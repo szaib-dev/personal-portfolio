@@ -105,9 +105,8 @@ function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: Cas
 
     case "image":
       return (
-        <div data-reveal className={ROW}>
-          <div />
-          <div className={`overflow-hidden rounded-[3px] bg-[#f4f4f4] ${block.contained ? "max-w-[44rem]" : ""}`}>
+        <div data-reveal className={`border-t border-black/[0.07] py-12 ${block.contained ? "max-w-[44rem]" : ""}`}>
+          <div className="overflow-hidden rounded-[3px] bg-[#f4f4f4]">
             <Image src={block.src} alt={block.alt} width={block.width} height={block.height} className="block h-auto w-full" />
             {block.caption && <p className="px-3 pb-3 pt-2 text-[0.72rem] leading-[1.4] text-[#b0b0b0]">{block.caption}</p>}
           </div>
@@ -190,13 +189,12 @@ function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: Cas
     case "gallery": {
       if (block.columns === 5) {
         return (
-          <div data-reveal className={ROW}>
-            <div />
+          <div data-reveal className="border-t border-black/[0.07] py-12 overflow-hidden">
             <div className="flex items-end justify-center gap-3 max-[700px]:flex-wrap">
               {block.images.map((img, i) => {
                 const dynamicUrl = getImageUrl ? getImageUrl(i, img.src, "mobile") : img.src;
                 return (
-                  <div key={i} className="w-[11.5rem] flex-shrink-0 shadow-[0_8px_24px_rgba(0,0,0,0.09)] max-[1100px]:w-[10rem] max-[700px]:w-[9rem]" style={{ aspectRatio: "9/19.5" }}>
+                  <div key={i} className="w-[14rem] flex-shrink-0 max-[1100px]:w-[12.5rem] max-[700px]:w-[10.5rem]" style={{ aspectRatio: "9/19.5", overflow: "hidden" }}>
                     {dynamicUrl !== img.src ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={dynamicUrl} alt={img.alt} className="block h-full w-full object-cover" />
@@ -217,24 +215,21 @@ function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: Cas
         "grid-cols-2 max-[560px]:grid-cols-1";
 
       return (
-        <div data-reveal className={ROW}>
-          <div />
-          <div className={`grid gap-4 ${cols}`}>
-            {block.images.map((img, i) => {
-              const dynamicUrl = getImageUrl ? getImageUrl(i, img.src, "gallery") : img.src;
-              return (
-                <div key={i} className="overflow-hidden rounded-[3px] bg-[#f4f4f4]">
-                  {dynamicUrl !== img.src ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={dynamicUrl} alt={img.alt} className="block h-auto w-full" />
-                  ) : (
-                    <Image src={img.src} alt={img.alt} width={img.width} height={img.height} className="block h-auto w-full" />
-                  )}
-                  {img.caption && <p className="px-3 pb-3 pt-2 text-[0.72rem] leading-[1.4] text-[#b0b0b0]">{img.caption}</p>}
-                </div>
-              );
-            })}
-          </div>
+        <div data-reveal className={`grid gap-4 border-t border-black/[0.07] py-12 ${cols}`}>
+          {block.images.map((img, i) => {
+            const dynamicUrl = getImageUrl ? getImageUrl(i, img.src, "gallery") : img.src;
+            return (
+              <div key={i} className="overflow-hidden rounded-[3px] bg-[#f4f4f4]">
+                {dynamicUrl !== img.src ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={dynamicUrl} alt={img.alt} className="block h-auto w-full" />
+                ) : (
+                  <Image src={img.src} alt={img.alt} width={img.width} height={img.height} className="block h-auto w-full" />
+                )}
+                {img.caption && <p className="px-3 pb-3 pt-2 text-[0.72rem] leading-[1.4] text-[#b0b0b0]">{img.caption}</p>}
+              </div>
+            );
+          })}
         </div>
       );
     }
@@ -422,8 +417,8 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
             ease: "power2.out",
             scrollTrigger: {
               trigger: el,
-              start: "top 85%",
-              toggleActions: "play none none reverse",
+              start: "top 90%",
+              toggleActions: "play none none none",
             },
           }
         );
@@ -460,11 +455,11 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
   }, []);
 
   return (
-    <div ref={wrapRef} className="min-h-screen bg-white px-8 pb-0 pt-7 text-[#111111] max-[1024px]:px-5 max-[560px]:px-4">
+    <div ref={wrapRef} className="min-h-screen bg-white text-[#111111]">
 
       {/* ── Project header / nav ── */}
-      <nav className="sticky top-0 z-30 -mx-8 border-b border-black/[0.06] bg-white/95 px-8 backdrop-blur-md max-[1024px]:-mx-5 max-[1024px]:px-5 max-[560px]:-mx-4 max-[560px]:px-4">
-        <div className="mx-auto flex max-w-[86rem] items-center justify-between py-3.5">
+      <nav className="sticky top-0 z-30 border-b border-black/[0.06] bg-white/95 backdrop-blur-md">
+        <div className="mx-auto flex max-w-[1280px] items-center justify-between px-16 py-3.5 max-[1024px]:px-10 max-[560px]:px-5">
 
           {/* Left — Works with grid icon */}
           <Link
@@ -554,7 +549,7 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
         </div>
       </nav>
 
-      <div className="mx-auto max-w-[86rem] pb-16 pt-14 max-[700px]:pt-10">
+      <div className="mx-auto max-w-[1280px] px-16 pb-16 pt-14 max-[1024px]:px-10 max-[700px]:px-6 max-[700px]:pt-10 max-[560px]:px-5">
 
         {/* ── Hero ── */}
         <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] items-start gap-16 max-[960px]:grid-cols-1 max-[960px]:gap-10">

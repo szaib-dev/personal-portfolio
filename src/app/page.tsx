@@ -306,6 +306,15 @@ export default function Home() {
       )}
 
       <div ref={contentRef} className="relative">
+        {/* SA monogram — top-left, scrolls with page */}
+        <a
+          href="/"
+          className="mb-0 inline-block text-[1.1rem] font-semibold tracking-[-0.04em] text-[#111111] transition-opacity hover:opacity-60"
+          aria-label="Home"
+        >
+          SA
+        </a>
+
         <aside className="fixed left-7 top-48 z-20 flex flex-col gap-[0.08rem] max-[1024px]:static max-[1024px]:mb-10 max-[1024px]:mt-16 max-[560px]:hidden">
           {navSections.map((section) => (
             <a
