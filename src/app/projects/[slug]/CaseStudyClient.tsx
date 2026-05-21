@@ -430,7 +430,42 @@ type Props = {
   otherProjects: ProjectEntry[];
 };
 
-export default function CaseStudyClient({ project, otherProjects }: Props) {
+type ConvexImages = {
+  heroImageUrl?: string;
+  galleryImages?: { slot: string; url: string }[];
+  mobileImages?: { slot: string; url: string }[];
+  personaImageUrl?: string;
+};
+
+export default function CaseStudyClient(props: Props) {
+  if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
+    return <CaseStudyContent {...props} />;
+  }
+
+  return <CaseStudyWithConvexImages {...props} />;
+}
+
+function CaseStudyWithConvexImages({ project, otherProjects }: Props) {
+  const heroImage = useQuery(api.images.getBySlot, { section: `${project.slug}-hero`, slot: "hero" });
+  const galleryImages = useQuery(api.images.getBySection, { section: `${project.slug}-gallery` });
+  const mobileImages = useQuery(api.images.getBySection, { section: `${project.slug}-mobile` });
+  const personaImage = useQuery(api.images.getBySlot, { section: `${project.slug}-persona`, slot: "persona" });
+
+  return (
+    <CaseStudyContent
+      project={project}
+      otherProjects={otherProjects}
+      convexImages={{
+        heroImageUrl: heroImage?.url,
+        galleryImages,
+        mobileImages,
+        personaImageUrl: personaImage?.url,
+      }}
+    />
+  );
+}
+
+function CaseStudyContent({ project, otherProjects, convexImages }: Props & { convexImages?: ConvexImages }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const heroKickerRef = useRef<HTMLParagraphElement>(null);
   const heroTitleRef = useRef<HTMLHeadingElement>(null);
@@ -438,22 +473,16 @@ export default function CaseStudyClient({ project, otherProjects }: Props) {
   const heroMetaRef = useRef<HTMLDivElement>(null);
   const heroImageRef = useRef<HTMLDivElement>(null);
 
-  // Fetch all images for this project from Convex
-  const heroImage = useQuery(api.images.getBySlot, { section: `${project.slug}-hero`, slot: "hero" });
-  const galleryImages = useQuery(api.images.getBySection, { section: `${project.slug}-gallery` });
-  const mobileImages = useQuery(api.images.getBySection, { section: `${project.slug}-mobile` });
-  const personaImage = useQuery(api.images.getBySlot, { section: `${project.slug}-persona`, slot: "persona" });
-
   // Helper to get dynamic image URL with fallback
   const getGalleryUrl = (index: number, fallback: string) => {
-    if (!galleryImages) return fallback;
-    const img = galleryImages.find((i) => i.slot === `gallery-${index}`);
+    if (!convexImages?.galleryImages) return fallback;
+    const img = convexImages.galleryImages.find((i) => i.slot === `gallery-${index}`);
     return img?.url ?? fallback;
   };
 
   const getMobileUrl = (index: number, fallback: string) => {
-    if (!mobileImages) return fallback;
-    const img = mobileImages.find((i) => i.slot === `mobile-${index}`);
+    if (!convexImages?.mobileImages) return fallback;
+    const img = convexImages.mobileImages.find((i) => i.slot === `mobile-${index}`);
     return img?.url ?? fallback;
   };
 
@@ -536,6 +565,24 @@ export default function CaseStudyClient({ project, otherProjects }: Props) {
     { label: "Stack", value: project.stack.join(" · ") },
     { label: "Year", value: project.year },
   ];
+
+  const blockImageStarts = project.caseStudyBlocks.reduce<
+    { galleryStart: number; mobileStart: number; galleryCount: number; mobileCount: number }[]
+  >((starts, block) => {
+    const previous = starts[starts.length - 1];
+    const galleryStart = previous ? previous.galleryCount : 0;
+    const mobileStart = previous ? previous.mobileCount : 0;
+    const galleryCount =
+      block.type === "gallery" && block.columns !== 5
+        ? galleryStart + block.images.length
+        : galleryStart;
+    const mobileCount =
+      block.type === "gallery" && block.columns === 5
+        ? mobileStart + block.images.length
+        : mobileStart;
+
+    return [...starts, { galleryStart, mobileStart, galleryCount, mobileCount }];
+  }, []);
 
   return (
     <div ref={wrapRef} className="min-h-screen bg-white px-8 pb-0 pt-7 text-[#111111] max-[1024px]:px-5 max-[560px]:px-4">
@@ -689,10 +736,10 @@ export default function CaseStudyClient({ project, otherProjects }: Props) {
 
           {/* Right: hero image */}
           <div ref={heroImageRef} className="overflow-hidden rounded-[4px] bg-[#f4f4f4]">
-            {heroImage?.url ? (
+            {convexImages?.heroImageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={heroImage.url}
+                src={convexImages.heroImageUrl}
                 alt={project.heroImage.alt}
                 className="block h-auto w-full"
               />
@@ -711,10 +758,7 @@ export default function CaseStudyClient({ project, otherProjects }: Props) {
 
         {/* ── Case study blocks ── */}
         <div className="mt-12">
-          {(() => {
-            let galleryIndex = 0;
-            let mobileIndex = 0;
-            return project.caseStudyBlocks.map((block, i) => {
+          {project.caseStudyBlocks.map((block, i) => {
               // Assign IDs for nav anchors
               let blockId: string | undefined;
               if (block.type === "overview") blockId = "overview";
@@ -730,27 +774,17 @@ export default function CaseStudyClient({ project, otherProjects }: Props) {
                 }
               }
 
-              // Track which gallery/mobile block this is for image indexing
-              const currentGalleryStart = galleryIndex;
-              const currentMobileStart = mobileIndex;
-              if (block.type === "gallery") {
-                if (block.columns === 5) {
-                  mobileIndex += block.images.length;
-                } else {
-                  galleryIndex += block.images.length;
-                }
-              }
+              const imageStart = blockImageStarts[i];
 
               const imageUrlGetter = (index: number, fallback: string, type: "gallery" | "mobile") => {
                 if (type === "mobile") {
-                  return getMobileUrl(currentMobileStart + index, fallback);
+                  return getMobileUrl(imageStart.mobileStart + index, fallback);
                 }
-                return getGalleryUrl(currentGalleryStart + index, fallback);
+                return getGalleryUrl(imageStart.galleryStart + index, fallback);
               };
 
-              return <Block key={i} block={block} accent={project.accent} id={blockId} getImageUrl={imageUrlGetter} personaPhotoUrl={personaImage?.url} />;
-            });
-          })()}
+              return <Block key={i} block={block} accent={project.accent} id={blockId} getImageUrl={imageUrlGetter} personaPhotoUrl={convexImages?.personaImageUrl} />;
+            })}
         </div>
 
         {/* ── Footer ── */}

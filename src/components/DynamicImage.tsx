@@ -29,6 +29,43 @@ export default function DynamicImage({
   className,
   priority,
 }: Props) {
+  if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
+    return (
+      <Image
+        src={fallbackSrc}
+        alt={alt}
+        width={width}
+        height={height}
+        className={className}
+        priority={priority}
+      />
+    );
+  }
+
+  return (
+    <DynamicConvexImage
+      section={section}
+      slot={slot}
+      fallbackSrc={fallbackSrc}
+      alt={alt}
+      width={width}
+      height={height}
+      className={className}
+      priority={priority}
+    />
+  );
+}
+
+function DynamicConvexImage({
+  section,
+  slot,
+  fallbackSrc,
+  alt,
+  width,
+  height,
+  className,
+  priority,
+}: Props) {
   const image = useQuery(api.images.getBySlot, { section, slot });
 
   const src = image?.url ?? fallbackSrc;

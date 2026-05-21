@@ -6,12 +6,14 @@ import { api } from "../../../convex/_generated/api";
 import AdminDashboard from "./AdminDashboard";
 
 export default function AdminPage() {
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("admin_token");
+  });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [checkingSession, setCheckingSession] = useState(true);
 
   const login = useMutation(api.auth.login);
   const sessionCheck = useQuery(
@@ -19,20 +21,11 @@ export default function AdminPage() {
     token ? { token } : "skip"
   );
 
-  // Check for existing session on mount
-  useEffect(() => {
-    const stored = localStorage.getItem("admin_token");
-    if (stored) {
-      setToken(stored);
-    }
-    setCheckingSession(false);
-  }, []);
-
   // Validate session when token changes
   useEffect(() => {
     if (sessionCheck && !sessionCheck.valid && token) {
       localStorage.removeItem("admin_token");
-      setToken(null);
+      queueMicrotask(() => setToken(null));
     }
   }, [sessionCheck, token]);
 
@@ -51,14 +44,6 @@ export default function AdminPage() {
       setLoading(false);
     }
   };
-
-  if (checkingSession) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#fafafa]">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#e0e0e0] border-t-[#111111]" />
-      </div>
-    );
-  }
 
   // Show login if no valid session
   if (!token || (sessionCheck && !sessionCheck.valid)) {
