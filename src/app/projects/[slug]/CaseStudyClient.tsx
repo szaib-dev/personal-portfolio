@@ -19,6 +19,9 @@ import {
   FiTarget,
   FiUserCheck,
   FiList,
+  FiUsers,
+  FiCheckCircle,
+  FiAlertTriangle,
 } from "react-icons/fi";
 import type { ProjectEntry, CaseStudyBlock, OverviewCard } from "@/data/site-content";
 
@@ -146,6 +149,116 @@ function Block({ block, accent, id }: { block: CaseStudyBlock; accent: string; i
             </p>
           )}
         </div>
+      );
+
+    case "persona":
+      return (
+        <section
+          id={id}
+          data-reveal
+          className="grid grid-cols-[minmax(18rem,0.36fr)_minmax(0,0.9fr)] gap-20 border-t border-black/[0.07] py-14 max-[1100px]:grid-cols-[minmax(16rem,0.35fr)_minmax(0,0.95fr)] max-[1100px]:gap-12 max-[960px]:grid-cols-1 max-[960px]:gap-8"
+        >
+          <div className="max-w-[25rem]">
+            <FiUsers
+              aria-hidden="true"
+              className="mb-7 text-[2rem]"
+              style={{ color: accent }}
+              strokeWidth={1.45}
+            />
+            <span className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#c0c0c0]">
+              {block.label}
+            </span>
+            <h2 className="mt-5 text-[clamp(1.9rem,3.2vw,3rem)] font-medium leading-[0.98] tracking-[-0.07em] text-[#111111]">
+              {block.title}
+            </h2>
+            <p className="mt-6 text-[1rem] leading-[1.72] text-[#6a6a6a]">
+              {block.body}
+            </p>
+          </div>
+
+          <div className="ml-auto w-[min(100%,70rem)] overflow-hidden rounded-[6px] border border-black/[0.1] bg-[#f3f4f4] shadow-[0_18px_55px_rgba(0,0,0,0.055)] max-[960px]:ml-0">
+            <div className="grid grid-cols-[minmax(0,1fr)_minmax(16rem,0.42fr)] max-[820px]:grid-cols-1">
+              <div className="border-r border-black/[0.1] p-7 max-[820px]:border-b max-[820px]:border-r-0 max-[560px]:p-5">
+                <p className="max-w-[34rem] text-[clamp(1.35rem,2.1vw,2.05rem)] font-medium leading-[1.22] tracking-[-0.04em] text-[#080808]">
+                  <span className="text-[2.2rem] leading-none text-[#d0d0d0]">&ldquo;</span>{block.quote}<span className="text-[2.2rem] leading-none text-[#d0d0d0]">&rdquo;</span>
+                </p>
+
+                <div className="mt-14 grid grid-cols-2 gap-8 border-t border-dashed border-black/15 pt-8 max-[700px]:grid-cols-1 max-[700px]:gap-8 max-[560px]:mt-10">
+                  <div>
+                    <div className="mb-6 flex items-center gap-3">
+                      <FiCheckCircle
+                        aria-hidden="true"
+                        className="text-[1.35rem]"
+                        style={{ color: accent }}
+                      />
+                      <h3 className="text-[1.35rem] font-semibold tracking-[-0.05em]" style={{ color: accent }}>
+                        Goals
+                      </h3>
+                    </div>
+                    <ul className="space-y-5 text-[0.92rem] font-medium leading-[1.55] text-[#343434]">
+                      {block.goals.map((goal) => (
+                        <li key={goal} className="flex gap-3">
+                          <span className="mt-[0.5rem] h-1.5 w-1.5 shrink-0 rounded-full bg-[#222222]" />
+                          <span>{goal}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div>
+                    <div className="mb-6 flex items-center gap-3">
+                      <FiAlertTriangle
+                        aria-hidden="true"
+                        className="text-[1.35rem] text-[#f12d2d]"
+                      />
+                      <h3 className="text-[1.35rem] font-semibold tracking-[-0.05em] text-[#f12d2d]">
+                        Frustration
+                      </h3>
+                    </div>
+                    <ul className="space-y-5 text-[0.92rem] font-medium leading-[1.55] text-[#343434]">
+                      {block.frustrations.map((frustration) => (
+                        <li key={frustration} className="flex gap-3">
+                          <span className="mt-[0.5rem] h-1.5 w-1.5 shrink-0 rounded-full bg-[#222222]" />
+                          <span>{frustration}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <aside className="flex flex-col justify-center p-7 max-[820px]:items-start max-[560px]:p-5">
+                <div className="relative mx-auto h-[12rem] w-[12rem] overflow-hidden rounded-full bg-white shadow-[0_4px_16px_rgba(0,0,0,0.08)] max-[820px]:mx-0 max-[560px]:h-[11rem] max-[560px]:w-[11rem]">
+                  <Image
+                    src={block.photo}
+                    alt={`${block.name} persona portrait`}
+                    width={608}
+                    height={658}
+                    className="h-full w-full object-cover object-top"
+                  />
+                </div>
+
+                <div className="mt-8">
+                  <h3 className="text-[2rem] font-semibold leading-none tracking-[-0.06em] text-[#080808]">
+                    {block.name}
+                  </h3>
+                  <p className="mt-3 text-[0.95rem] font-medium leading-[1.45] text-[#444444]">
+                    {block.role}
+                  </p>
+                </div>
+
+                <dl className="mt-7 grid gap-5 text-[0.9rem] leading-[1.45]">
+                  {block.details.map((detail) => (
+                    <div key={detail.label} className="grid grid-cols-[7rem_1fr] gap-4 max-[560px]:grid-cols-1 max-[560px]:gap-1">
+                      <dt className="text-[#a7a7a7]">{detail.label}:</dt>
+                      <dd className="font-semibold text-[#2c2c2c]">{detail.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </aside>
+            </div>
+          </div>
+        </section>
       );
 
     case "gallery": {
@@ -312,6 +425,9 @@ export default function CaseStudyClient({ project, otherProjects }: Props) {
 
   /* ── Lenis smooth scroll ── */
   useEffect(() => {
+    // Scroll to top on page load/reload
+    window.scrollTo(0, 0);
+    
     const lenis = new Lenis({
       duration: 1.15,
       smoothWheel: true,
@@ -360,16 +476,15 @@ export default function CaseStudyClient({ project, otherProjects }: Props) {
       gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) => {
         gsap.fromTo(
           el,
-          { opacity: 0, y: 28 },
+          { opacity: 0, y: 20 },
           {
             opacity: 1,
             y: 0,
-            duration: 0.95,
-            ease: "power3.out",
+            duration: 0.6,
+            ease: "power2.out",
             scrollTrigger: {
               trigger: el,
-              start: "top 82%",
-              end: "top 20%",
+              start: "top 85%",
               toggleActions: "play none none reverse",
             },
           }
@@ -574,8 +689,8 @@ export default function CaseStudyClient({ project, otherProjects }: Props) {
         </div>
 
         {/* ── Footer ── */}
-        <footer data-reveal className="mt-32 pb-0">
-          <p className="max-w-[44rem] text-[clamp(2.35rem,3.05vw,3.35rem)] font-normal leading-[1.12] tracking-[-0.075em] text-[#2b2b2b] max-[560px]:text-[1.8rem]">
+        <footer className="mt-32 pb-0">
+          <p data-reveal className="max-w-[44rem] text-[clamp(2.35rem,3.05vw,3.35rem)] font-normal leading-[1.12] tracking-[-0.075em] text-[#2b2b2b] max-[560px]:text-[1.8rem]">
             Let me help with a great visual
             <br />
             solution for your business.

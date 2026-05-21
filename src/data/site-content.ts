@@ -41,6 +41,19 @@ export type CaseStudyBlock =
       contained?: boolean;
     }
   | {
+      type: "persona";
+      label: string;
+      title: string;
+      body: string;
+      quote: string;
+      name: string;
+      role: string;
+      photo: string;
+      details: { label: string; value: string }[];
+      goals: string[];
+      frustrations: string[];
+    }
+  | {
       type: "gallery";
       columns?: 2 | 3 | 4 | 5;
       images: {
@@ -255,12 +268,32 @@ export const projectEntries: ProjectEntry[] = [
           "The direction was set around oversized type, measured spacing, and a strong hierarchy so the story feels sharp from the first frame without becoming cluttered. Every section is shaped to either explain the value or invite the visitor to subscribe.",
       },
       {
-        type: "image",
-        src: "/trend-bible.png",
-        alt: "Trend Bible homepage layout study",
-        width: 1086,
-        height: 633,
-        caption: "Homepage hero exploration with oversized headline and editorial spacing.",
+        type: "persona",
+        label: "User Personas",
+        title: "Decision maker profile",
+        body:
+          "User personas define the target buyer's mindset, goals, and points of friction so the page can make stronger design and content decisions.",
+        quote: "Find credible trend insight without wasting hours comparing vague reports.",
+        name: "Maya",
+        role: "Editorial Strategy Lead",
+        photo: "/my-personal-2.jpg",
+        details: [
+          { label: "Age", value: "32" },
+          { label: "Company", value: "Growth-stage brand" },
+          { label: "Location", value: "London, UK" },
+        ],
+        goals: [
+          "Understand the value of the subscription quickly",
+          "Compare trend categories without feeling lost",
+          "Trust the editorial quality before signing up",
+          "Find clear pricing and subscription benefits",
+        ],
+        frustrations: [
+          "Vague positioning with no clear buyer outcome",
+          "Dense reports that take too long to evaluate",
+          "Unclear difference between free and paid content",
+          "Weak trust signals before the conversion point",
+        ],
       },
       {
         type: "section",
@@ -453,12 +486,33 @@ export const projectEntries: ProjectEntry[] = [
           "The visual system was built mood-first. Typography, color balance, and whitespace work together so visitors feel a cinematic tone before they read a single word. That tone carries through the rest of the experience to keep the work feeling premium.",
       },
       {
-        type: "image",
-        src: "/visual-poetry.png",
-        alt: "Visual Poetry mood frame",
-        width: 631,
-        height: 423,
-        caption: "Opening frame study balancing typography and warm imagery.",
+        type: "persona",
+        label: "User Personas",
+        title: "Creative client profile",
+        body:
+          "The persona keeps the portfolio experience focused on the kind of visitor who needs to feel the work first, then understand how to start a serious conversation.",
+        quote: "I need the work to feel cinematic, but the inquiry path must stay simple.",
+        name: "Elena",
+        role: "Independent Visual Artist",
+        photo: "/my-perosnal.png",
+        details: [
+          { label: "Age", value: "29" },
+          { label: "Practice", value: "Visual storytelling" },
+          { label: "Location", value: "Berlin, Germany" },
+          { label: "Audience", value: "Brands and galleries" },
+        ],
+        goals: [
+          "Make the work feel distinctive from the opening frame",
+          "Show projects with enough space and mood",
+          "Create confidence for commissions and collaborations",
+          "Keep the contact path obvious without breaking the atmosphere",
+        ],
+        frustrations: [
+          "Generic portfolio grids that flatten the work",
+          "Too much explanation before the visual impact",
+          "Navigation that interrupts the cinematic mood",
+          "Beautiful pages that make inquiries harder",
+        ],
       },
       {
         type: "section",
