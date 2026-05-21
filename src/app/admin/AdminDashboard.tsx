@@ -107,19 +107,6 @@ const GROUPS: ProjectGroup[] = [
         slots: [{ id: "hero", label: "Hero Image" }],
       },
       {
-        id: "visual-poetry-gallery",
-        label: "Gallery",
-        icon: FiGrid,
-        slots: [
-          { id: "gallery-0", label: "Image 1" },
-          { id: "gallery-1", label: "Image 2" },
-          { id: "gallery-2", label: "Image 3" },
-          { id: "gallery-3", label: "Image 4" },
-          { id: "gallery-4", label: "Image 5" },
-          { id: "gallery-5", label: "Image 6" },
-        ],
-      },
-      {
         id: "visual-poetry-mobile",
         label: "Mobile Mockups",
         icon: FiSmartphone,

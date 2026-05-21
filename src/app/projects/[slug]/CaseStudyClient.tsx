@@ -46,7 +46,7 @@ const OVERVIEW_ICONS: Record<OverviewCard["icon"], React.ElementType> = {
   responsibilities: FiList,
 };
 
-function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: CaseStudyBlock; accent: string; id?: string; getImageUrl?: (index: number, fallback: string, type: "gallery" | "mobile") => string; personaPhotoUrl?: string }) {
+function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: CaseStudyBlock; accent: string; id?: string; getImageUrl?: (index: number, fallback: string, type: "gallery" | "mobile") => string | null; personaPhotoUrl?: string }) {
 
   // Unified two-column grid — 260px left label, right content
   const ROW = "grid grid-cols-[260px_1fr] gap-x-20 border-t border-black/[0.07] py-12 max-[900px]:grid-cols-1 max-[900px]:gap-y-5 max-[900px]:py-8";
@@ -188,15 +188,13 @@ function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: Cas
 
     case "gallery": {
       if (block.columns === 5) {
-        // Filter to only show images that have been uploaded (dynamic URL differs from fallback)
-        const mobileItems = block.images.map((img, i) => ({
+        const uploadedMobileItems = block.images.map((img, i) => ({
           img,
           url: getImageUrl ? getImageUrl(i, img.src, "mobile") : img.src,
           index: i,
-        })).filter((item) => item.url !== item.img.src);
+        })).filter((item) => item.url && item.url !== item.img.src);
 
-        // If no uploaded images, show all static fallbacks
-        const itemsToShow = mobileItems.length > 0 ? mobileItems : block.images.map((img, i) => ({
+        const mobileItems = uploadedMobileItems.length > 0 ? uploadedMobileItems : block.images.map((img, i) => ({
           img,
           url: img.src,
           index: i,
@@ -205,11 +203,11 @@ function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: Cas
         return (
           <div data-reveal className="border-t border-black/[0.07] py-12 overflow-hidden">
             <div className="flex items-end justify-center gap-3 max-[700px]:flex-wrap">
-              {itemsToShow.map((item) => (
+              {mobileItems.map((item) => (
                 <div key={item.index} className="w-[14rem] flex-shrink-0 max-[1100px]:w-[12.5rem] max-[700px]:w-[10.5rem]" style={{ aspectRatio: "9/19.5", overflow: "hidden" }}>
                   {item.url !== item.img.src ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={item.url} alt={item.img.alt} className="block h-full w-full object-cover" />
+                    <img src={item.url as string} alt={item.img.alt} className="block h-full w-full object-cover" />
                   ) : (
                     <Image src={item.img.src} alt={item.img.alt} width={item.img.width} height={item.img.height} className="block h-full w-full object-cover" />
                   )}
@@ -225,29 +223,23 @@ function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: Cas
         block.columns === 3 ? "grid-cols-3 max-[900px]:grid-cols-2 max-[560px]:grid-cols-1" :
         "grid-cols-2 max-[560px]:grid-cols-1";
 
-      // Filter to only show uploaded images for 3-column galleries (Final Design)
       const galleryItems = block.images.map((img, i) => ({
         img,
         url: getImageUrl ? getImageUrl(i, img.src, "gallery") : img.src,
         index: i,
-      })).filter((item) => item.url !== item.img.src);
+      })).filter((item) => item.url && (!block.hideMissing || item.url !== item.img.src));
 
-      // If no uploaded images, show all static fallbacks
-      const galleryToShow = galleryItems.length > 0 ? galleryItems : block.images.map((img, i) => ({
-        img,
-        url: img.src,
-        index: i,
-      }));
+      if (galleryItems.length === 0) return null;
 
       return (
         <div data-reveal className={`grid gap-4 border-t border-black/[0.07] py-12 ${cols}`}>
-          {galleryToShow.map((item) => (
-            <div key={item.index} className="overflow-hidden rounded-[3px] bg-[#f4f4f4]">
+          {galleryItems.map((item) => (
+            <div key={item.index} className="aspect-[4/3] overflow-hidden rounded-[3px] bg-[#f4f4f4]">
               {item.url !== item.img.src ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={item.url} alt={item.img.alt} className="block h-auto w-full" />
+                <img src={item.url as string} alt={item.img.alt} className="block h-full w-full object-cover" />
               ) : (
-                <Image src={item.img.src} alt={item.img.alt} width={item.img.width} height={item.img.height} className="block h-auto w-full" />
+                <Image src={item.img.src} alt={item.img.alt} width={item.img.width} height={item.img.height} className="block h-full w-full object-cover" />
               )}
               {item.img.caption && <p className="px-3 pb-3 pt-2 text-[0.72rem] leading-[1.4] text-[#b0b0b0]">{item.img.caption}</p>}
             </div>

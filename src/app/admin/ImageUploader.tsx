@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { FiUpload } from "react-icons/fi";
+import type { Id } from "../../../convex/_generated/dataModel";
 
 export default function ImageUploader({
   section,
@@ -34,7 +35,7 @@ export default function ImageUploader({
       setProgress(10);
 
       // Upload with real progress tracking via XMLHttpRequest
-      const storageId = await new Promise<string>((resolve, reject) => {
+      const storageId = await new Promise<Id<"_storage">>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
 
         xhr.upload.addEventListener("progress", (e) => {
@@ -48,7 +49,7 @@ export default function ImageUploader({
           if (xhr.status >= 200 && xhr.status < 300) {
             const response = JSON.parse(xhr.responseText);
             setProgress(95);
-            resolve(response.storageId);
+            resolve(response.storageId as Id<"_storage">);
           } else {
             reject(new Error(`Upload failed: ${xhr.status}`));
           }

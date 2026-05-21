@@ -56,6 +56,7 @@ export type CaseStudyBlock =
   | {
       type: "gallery";
       columns?: 2 | 3 | 4 | 5;
+      hideMissing?: boolean;
       images: {
         src: string;
         alt: string;
@@ -304,24 +305,6 @@ export const projectEntries: ProjectEntry[] = [
           "I structured the page into three pacing zones: a bold opening that establishes voice, a middle band that proves credibility through reports and signals, and a closing band that compresses the offer into a clear subscription decision.",
       },
       {
-        type: "gallery",
-        columns: 2,
-        images: [
-          {
-            src: "/trend-bible.png",
-            alt: "Trend Bible content section study",
-            width: 1086,
-            height: 633,
-          },
-          {
-            src: "/trend-bible.png",
-            alt: "Trend Bible subscription block study",
-            width: 1086,
-            height: 633,
-          },
-        ],
-      },
-      {
         type: "section",
         label: "Style System",
         title:
@@ -379,6 +362,7 @@ export const projectEntries: ProjectEntry[] = [
       {
         type: "gallery",
         columns: 3,
+        hideMissing: true,
         images: [
           { src: "/trend-bible.png", alt: "Trend Bible final design — hero section", width: 1086, height: 633 },
           { src: "/trend-bible.png", alt: "Trend Bible final design — content band", width: 1086, height: 633 },
@@ -559,18 +543,6 @@ export const projectEntries: ProjectEntry[] = [
         title: "A brand-led portfolio that is presentation ready.",
         body:
           "The result is a brand-led portfolio concept that feels premium, atmospheric, and polished while still being usable enough for real client presentation. The structure is kept flexible so future work blocks, deeper case studies, or richer image stacks can be added without rebuilding the visual system.",
-      },
-      {
-        type: "gallery",
-        columns: 3,
-        images: [
-          { src: "/visual-poetry.png", alt: "Visual Poetry final — opening frame", width: 631, height: 423 },
-          { src: "/visual-poetry.png", alt: "Visual Poetry final — gallery section", width: 631, height: 423 },
-          { src: "/visual-poetry.png", alt: "Visual Poetry final — about section", width: 631, height: 423 },
-          { src: "/visual-poetry.png", alt: "Visual Poetry final — project detail", width: 631, height: 423 },
-          { src: "/visual-poetry.png", alt: "Visual Poetry final — contact section", width: 631, height: 423 },
-          { src: "/visual-poetry.png", alt: "Visual Poetry final — full page view", width: 631, height: 423 },
-        ],
       },
       {
         type: "section",
