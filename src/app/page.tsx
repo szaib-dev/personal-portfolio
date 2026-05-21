@@ -5,8 +5,6 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
 import { FiArrowRight, FiPlus } from "react-icons/fi";
 import { RiDoubleQuotesL } from "react-icons/ri";
 import {
@@ -18,7 +16,6 @@ import {
   values,
 } from "@/data/site-content";
 import DynamicImage from "@/components/DynamicImage";
-import { getConvexUrlFromEnv } from "@/lib/convex-url";
 import { getProjectAccent } from "@/lib/project-settings";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -26,24 +23,12 @@ gsap.registerPlugin(ScrollTrigger);
 const TESTIMONIALS_PER_PAGE = 3;
 
 export default function Home() {
-  if (!getConvexUrlFromEnv()) {
-    return <HomeContent settings={null} />;
-  }
-
-  return <HomeWithSettings />;
-}
-
-function HomeWithSettings() {
-  const settings = useQuery(api.settings.getAll);
-  return <HomeContent settings={settings} />;
-}
-
-function HomeContent({ settings }: { settings?: { key: string; value: string }[] | null }) {
   const [activeAudience, setActiveAudience] = useState(audienceProfiles[0].id);
   const [activeSection, setActiveSection] = useState(navSections[0].id);
   const [activeReferencePage, setActiveReferencePage] = useState(0);
   const [showIntro, setShowIntro] = useState(true);
   const [introText, setIntroText] = useState("Shahzaib Mirza");
+  const [settings, setSettings] = useState<{ key: string; value: string }[] | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const introRef = useRef<HTMLDivElement | null>(null);
   const introNameRef = useRef<HTMLParagraphElement | null>(null);
@@ -89,6 +74,27 @@ function HomeContent({ settings }: { settings?: { key: string; value: string }[]
   const activeProfile =
     audienceProfiles.find((profile) => profile.id === activeAudience) ??
     audienceProfiles[0];
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch("/api/project-settings")
+      .then((response) => response.json())
+      .then((data: { settings?: { key: string; value: string }[] }) => {
+        if (!cancelled) {
+          setSettings(data.settings ?? []);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setSettings([]);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const lenis = new Lenis({
