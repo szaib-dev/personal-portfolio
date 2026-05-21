@@ -1,12 +1,54 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useState, useEffect, useMemo } from "react";
+import { ConvexProvider, ConvexReactClient, useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import AdminDashboard from "./AdminDashboard";
 
 export default function AdminPage() {
-  if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
+  const [convexUrl, setConvexUrl] = useState<string | null>(null);
+  const [configLoaded, setConfigLoaded] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+
+    fetch("/api/convex-config", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((config: { url?: string }) => {
+        if (alive) {
+          setConvexUrl(config.url?.trim() || null);
+        }
+      })
+      .catch(() => {
+        if (alive) {
+          setConvexUrl(null);
+        }
+      })
+      .finally(() => {
+        if (alive) {
+          setConfigLoaded(true);
+        }
+      });
+
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const convex = useMemo(
+    () => (convexUrl ? new ConvexReactClient(convexUrl) : null),
+    [convexUrl]
+  );
+
+  if (!configLoaded) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#fafafa]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#e0e0e0] border-t-[#111111]" />
+      </div>
+    );
+  }
+
+  if (!convex) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#fafafa] px-4">
         <div className="w-full max-w-[420px] rounded-[8px] border border-[#e5e5e5] bg-white p-6 text-center">
@@ -21,7 +63,11 @@ export default function AdminPage() {
     );
   }
 
-  return <AdminLogin />;
+  return (
+    <ConvexProvider client={convex}>
+      <AdminLogin />
+    </ConvexProvider>
+  );
 }
 
 function AdminLogin() {
