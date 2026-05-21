@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import Lenis from "lenis";
@@ -27,6 +26,7 @@ import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import type { ProjectEntry, CaseStudyBlock, OverviewCard } from "@/data/site-content";
 import { getConvexUrlFromEnv } from "@/lib/convex-url";
+import { ImageSkeleton } from "@/components/Skeleton";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -46,7 +46,21 @@ const OVERVIEW_ICONS: Record<OverviewCard["icon"], React.ElementType> = {
   responsibilities: FiList,
 };
 
-function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: CaseStudyBlock; accent: string; id?: string; getImageUrl?: (index: number, fallback: string, type: "gallery" | "mobile") => string | null; personaPhotoUrl?: string }) {
+function Block({
+  block,
+  accent,
+  id,
+  getImageUrl,
+  personaPhotoUrl,
+  imagesLoading = false,
+}: {
+  block: CaseStudyBlock;
+  accent: string;
+  id?: string;
+  getImageUrl?: (index: number, type: "gallery" | "mobile") => string | null;
+  personaPhotoUrl?: string | null;
+  imagesLoading?: boolean;
+}) {
 
   // Unified two-column grid — 260px left label, right content
   const ROW = "grid grid-cols-[260px_1fr] gap-x-20 border-t border-black/[0.07] py-12 max-[900px]:grid-cols-1 max-[900px]:gap-y-5 max-[900px]:py-8";
@@ -107,7 +121,7 @@ function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: Cas
       return (
         <div data-reveal className={`border-t border-black/[0.07] py-12 ${block.contained ? "max-w-[44rem]" : ""}`}>
           <div className="overflow-hidden rounded-[3px] bg-[#f4f4f4]">
-            <Image src={block.src} alt={block.alt} width={block.width} height={block.height} className="block h-auto w-full" />
+            <ImageSkeleton className="w-full" style={{ aspectRatio: `${block.width} / ${block.height}` }} />
             {block.caption && <p className="px-3 pb-3 pt-2 text-[0.72rem] leading-[1.4] text-[#b0b0b0]">{block.caption}</p>}
           </div>
         </div>
@@ -161,11 +175,11 @@ function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: Cas
               </div>
               <aside className="flex flex-col justify-center p-6 max-[820px]:order-1 max-[820px]:items-center max-[820px]:text-center">
                 <div className="relative mx-auto h-[10rem] w-[10rem] overflow-hidden rounded-full bg-white shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
-                  {personaPhotoUrl && personaPhotoUrl !== block.photo ? (
+                  {personaPhotoUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={personaPhotoUrl} alt={`${block.name} persona portrait`} className="h-full w-full object-cover object-top" />
                   ) : (
-                    <Image src={block.photo} alt={`${block.name} persona portrait`} width={608} height={658} className="h-full w-full object-cover object-top" />
+                    <ImageSkeleton className="h-full w-full rounded-full" />
                   )}
                 </div>
                 <div className="mt-6">
@@ -188,28 +202,29 @@ function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: Cas
 
     case "gallery": {
       if (block.columns === 5) {
-        const uploadedMobileItems = block.images.map((img, i) => ({
+        const mobileItems = block.images.map((img, i) => ({
           img,
-          url: getImageUrl ? getImageUrl(i, img.src, "mobile") : img.src,
+          url: getImageUrl ? getImageUrl(i, "mobile") : null,
           index: i,
-        })).filter((item) => item.url && item.url !== item.img.src);
+        })).filter((item) => imagesLoading || item.url);
 
-        const mobileItems = uploadedMobileItems.length > 0 ? uploadedMobileItems : block.images.map((img, i) => ({
-          img,
-          url: img.src,
-          index: i,
-        }));
+        if (mobileItems.length === 0) return null;
 
         return (
           <div data-reveal className="border-t border-black/[0.07] py-12 overflow-hidden">
             <div className="flex items-end justify-center gap-3 max-[700px]:flex-wrap">
               {mobileItems.map((item) => (
-                <div key={item.index} className="w-[14rem] flex-shrink-0 max-[1100px]:w-[12.5rem] max-[700px]:w-[10.5rem]" style={{ aspectRatio: "9/19.5", overflow: "hidden" }}>
-                  {item.url !== item.img.src ? (
+                <div
+                  key={item.index}
+                  data-project-image
+                  className="w-[14rem] flex-shrink-0 max-[1100px]:w-[12.5rem] max-[700px]:w-[10.5rem]"
+                  style={{ aspectRatio: "9/19.5", overflow: "hidden" }}
+                >
+                  {item.url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={item.url as string} alt={item.img.alt} className="block h-full w-full object-cover" />
                   ) : (
-                    <Image src={item.img.src} alt={item.img.alt} width={item.img.width} height={item.img.height} className="block h-full w-full object-cover" />
+                    <ImageSkeleton className="h-full w-full" />
                   )}
                 </div>
               ))}
@@ -225,21 +240,21 @@ function Block({ block, accent, id, getImageUrl, personaPhotoUrl }: { block: Cas
 
       const galleryItems = block.images.map((img, i) => ({
         img,
-        url: getImageUrl ? getImageUrl(i, img.src, "gallery") : img.src,
+        url: getImageUrl ? getImageUrl(i, "gallery") : null,
         index: i,
-      })).filter((item) => item.url && (!block.hideMissing || item.url !== item.img.src));
+      })).filter((item) => imagesLoading || item.url || !block.hideMissing);
 
       if (galleryItems.length === 0) return null;
 
       return (
         <div data-reveal className={`grid gap-4 border-t border-black/[0.07] py-12 ${cols}`}>
           {galleryItems.map((item) => (
-            <div key={item.index} className="aspect-[4/3] overflow-hidden rounded-[3px] bg-[#f4f4f4]">
-              {item.url !== item.img.src ? (
+            <div key={item.index} data-project-image className="aspect-[4/3] overflow-hidden rounded-[3px] bg-[#f4f4f4]">
+              {item.url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={item.url as string} alt={item.img.alt} className="block h-full w-full object-cover" />
               ) : (
-                <Image src={item.img.src} alt={item.img.alt} width={item.img.width} height={item.img.height} className="block h-full w-full object-cover" />
+                <ImageSkeleton className="h-full w-full" />
               )}
               {item.img.caption && <p className="px-3 pb-3 pt-2 text-[0.72rem] leading-[1.4] text-[#b0b0b0]">{item.img.caption}</p>}
             </div>
@@ -315,10 +330,11 @@ type Props = {
 };
 
 type ConvexImages = {
-  heroImageUrl?: string;
+  heroImageUrl?: string | null;
   galleryImages?: { slot: string; url: string }[];
   mobileImages?: { slot: string; url: string }[];
-  personaImageUrl?: string;
+  personaImageUrl?: string | null;
+  imagesLoading?: boolean;
 };
 
 export default function CaseStudyClient(props: Props) {
@@ -334,6 +350,11 @@ function CaseStudyWithConvexImages({ project, otherProjects }: Props) {
   const galleryImages = useQuery(api.images.getBySection, { section: `${project.slug}-gallery` });
   const mobileImages = useQuery(api.images.getBySection, { section: `${project.slug}-mobile` });
   const personaImage = useQuery(api.images.getBySlot, { section: `${project.slug}-persona`, slot: "persona" });
+  const imagesLoading =
+    heroImage === undefined ||
+    galleryImages === undefined ||
+    mobileImages === undefined ||
+    personaImage === undefined;
 
   return (
     <CaseStudyContent
@@ -344,6 +365,7 @@ function CaseStudyWithConvexImages({ project, otherProjects }: Props) {
         galleryImages,
         mobileImages,
         personaImageUrl: personaImage?.url,
+        imagesLoading,
       }}
     />
   );
@@ -357,17 +379,18 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
   const heroMetaRef = useRef<HTMLDivElement>(null);
   const heroImageRef = useRef<HTMLDivElement>(null);
 
-  // Helper to get dynamic image URL with fallback
-  const getGalleryUrl = (index: number, fallback: string) => {
-    if (!convexImages?.galleryImages) return fallback;
+  const imagesLoading = convexImages?.imagesLoading ?? false;
+
+  const getGalleryUrl = (index: number) => {
+    if (!convexImages?.galleryImages) return null;
     const img = convexImages.galleryImages.find((i) => i.slot === `gallery-${index}`);
-    return img?.url ?? fallback;
+    return img?.url ?? null;
   };
 
-  const getMobileUrl = (index: number, fallback: string) => {
-    if (!convexImages?.mobileImages) return fallback;
+  const getMobileUrl = (index: number) => {
+    if (!convexImages?.mobileImages) return null;
     const img = convexImages.mobileImages.find((i) => i.slot === `mobile-${index}`);
-    return img?.url ?? fallback;
+    return img?.url ?? null;
   };
 
   /* ── Lenis smooth scroll ── */
@@ -420,7 +443,7 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
   useEffect(() => {
     if (!wrapRef.current) return;
     const ctx = gsap.context(() => {
-      gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el, i) => {
+      gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) => {
         gsap.fromTo(
           el,
           { opacity: 0, y: 32, scale: 0.98 },
@@ -429,12 +452,33 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
             y: 0,
             scale: 1,
             duration: 0.75,
-            delay: i * 0.02,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 88%",
+              end: "bottom 12%",
+              toggleActions: "restart none restart reverse",
+            },
+          }
+        );
+      });
+
+      gsap.utils.toArray<HTMLElement>("[data-project-image]").forEach((el) => {
+        gsap.fromTo(
+          el,
+          { opacity: 0, y: 36, scale: 0.94, clipPath: "inset(8% 8% 8% 8%)" },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            clipPath: "inset(0% 0% 0% 0%)",
+            duration: 0.9,
             ease: "power3.out",
             scrollTrigger: {
               trigger: el,
               start: "top 92%",
-              toggleActions: "play none none none",
+              end: "bottom 10%",
+              toggleActions: "restart none restart reverse",
             },
           }
         );
@@ -621,23 +665,20 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
           </div>
 
           {/* Right: hero image */}
-          <div ref={heroImageRef} className="overflow-hidden rounded-[4px] bg-[#f4f4f4]">
+          <div
+            ref={heroImageRef}
+            className="overflow-hidden rounded-[4px] bg-[#f4f4f4]"
+            style={{ aspectRatio: `${project.heroImage.width} / ${project.heroImage.height}` }}
+          >
             {convexImages?.heroImageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={convexImages.heroImageUrl}
                 alt={project.heroImage.alt}
-                className="block h-auto w-full"
+                className="block h-full w-full object-cover"
               />
             ) : (
-              <Image
-                src={project.heroImage.src}
-                alt={project.heroImage.alt}
-                width={project.heroImage.width}
-                height={project.heroImage.height}
-                className="block h-auto w-full"
-                priority
-              />
+              <ImageSkeleton className="h-full w-full" />
             )}
           </div>
         </div>
@@ -662,14 +703,24 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
 
               const imageStart = blockImageStarts[i];
 
-              const imageUrlGetter = (index: number, fallback: string, type: "gallery" | "mobile") => {
+              const imageUrlGetter = (index: number, type: "gallery" | "mobile") => {
                 if (type === "mobile") {
-                  return getMobileUrl(imageStart.mobileStart + index, fallback);
+                  return getMobileUrl(imageStart.mobileStart + index);
                 }
-                return getGalleryUrl(imageStart.galleryStart + index, fallback);
+                return getGalleryUrl(imageStart.galleryStart + index);
               };
 
-              return <Block key={i} block={block} accent={project.accent} id={blockId} getImageUrl={imageUrlGetter} personaPhotoUrl={convexImages?.personaImageUrl} />;
+              return (
+                <Block
+                  key={i}
+                  block={block}
+                  accent={project.accent}
+                  id={blockId}
+                  getImageUrl={imageUrlGetter}
+                  personaPhotoUrl={convexImages?.personaImageUrl}
+                  imagesLoading={imagesLoading}
+                />
+              );
             })}
         </div>
 

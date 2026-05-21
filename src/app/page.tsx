@@ -410,7 +410,6 @@ export default function Home() {
                 <DynamicImage
                   section={`${project.slug}-hero`}
                   slot="hero"
-                  fallbackSrc={project.image}
                   alt={`${project.title} project preview`}
                   width={project.width}
                   height={project.height}
@@ -552,7 +551,6 @@ export default function Home() {
                   <DynamicImage
                     section="homepage-about"
                     slot="secondary"
-                    fallbackSrc={aboutContent.secondaryImage}
                     alt="Alternate portrait of Shahzaib Mirza"
                     width={1200}
                     height={1600}
@@ -564,7 +562,6 @@ export default function Home() {
                   <DynamicImage
                     section="homepage-about"
                     slot="primary"
-                    fallbackSrc={aboutContent.primaryImage}
                     alt="Portrait of Shahzaib Mirza"
                     width={608}
                     height={658}

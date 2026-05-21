@@ -1,14 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { getConvexUrlFromEnv } from "@/lib/convex-url";
+import { ImageSkeleton } from "@/components/Skeleton";
 
 type Props = {
   section: string;
   slot: string;
-  fallbackSrc: string;
   alt: string;
   width: number;
   height: number;
@@ -17,13 +16,12 @@ type Props = {
 };
 
 /**
- * Image component that pulls from Convex storage if available,
- * otherwise falls back to the static /public path.
+ * Image component that pulls from Convex storage if available.
+ * Missing or loading images render as skeletons instead of static fallbacks.
  */
 export default function DynamicImage({
   section,
   slot,
-  fallbackSrc,
   alt,
   width,
   height,
@@ -31,23 +29,13 @@ export default function DynamicImage({
   priority,
 }: Props) {
   if (!getConvexUrlFromEnv()) {
-    return (
-      <Image
-        src={fallbackSrc}
-        alt={alt}
-        width={width}
-        height={height}
-        className={className}
-        priority={priority}
-      />
-    );
+    return <ImageSkeleton className={className} style={{ aspectRatio: `${width} / ${height}` }} />;
   }
 
   return (
     <DynamicConvexImage
       section={section}
       slot={slot}
-      fallbackSrc={fallbackSrc}
       alt={alt}
       width={width}
       height={height}
@@ -60,7 +48,6 @@ export default function DynamicImage({
 function DynamicConvexImage({
   section,
   slot,
-  fallbackSrc,
   alt,
   width,
   height,
@@ -69,9 +56,6 @@ function DynamicConvexImage({
 }: Props) {
   const image = useQuery(api.images.getBySlot, { section, slot });
 
-  const src = image?.url ?? fallbackSrc;
-
-  // If using Convex URL (remote), we need unoptimized or use remotePatterns
   if (image?.url) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
@@ -84,14 +68,5 @@ function DynamicConvexImage({
     );
   }
 
-  return (
-    <Image
-      src={src}
-      alt={alt}
-      width={width}
-      height={height}
-      className={className}
-      priority={priority}
-    />
-  );
+  return <ImageSkeleton className={className} style={{ aspectRatio: `${width} / ${height}` }} />;
 }
