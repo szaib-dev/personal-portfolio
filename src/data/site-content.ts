@@ -42,7 +42,7 @@ export type CaseStudyBlock =
     }
   | {
       type: "gallery";
-      columns?: 2 | 3 | 4;
+      columns?: 2 | 3 | 4 | 5;
       images: {
         src: string;
         alt: string;
@@ -343,6 +343,37 @@ export const projectEntries: ProjectEntry[] = [
         body:
           "The final concept lands as a clean, bold, and memorable front-end experience that feels premium while still guiding the reader through a clear conversion structure. The system is set up so future content blocks can be added without disturbing the rhythm.",
       },
+      {
+        type: "gallery",
+        columns: 3,
+        images: [
+          { src: "/trend-bible.png", alt: "Trend Bible final design — hero section", width: 1086, height: 633 },
+          { src: "/trend-bible.png", alt: "Trend Bible final design — content band", width: 1086, height: 633 },
+          { src: "/trend-bible.png", alt: "Trend Bible final design — signal cards", width: 1086, height: 633 },
+          { src: "/trend-bible.png", alt: "Trend Bible final design — subscription block", width: 1086, height: 633 },
+          { src: "/trend-bible.png", alt: "Trend Bible final design — footer section", width: 1086, height: 633 },
+          { src: "/trend-bible.png", alt: "Trend Bible final design — full page overview", width: 1086, height: 633 },
+        ],
+      },
+      {
+        type: "section",
+        label: "Mobile Responsiveness",
+        title: "Every breakpoint considered. Every detail preserved.",
+        body:
+          "The responsive system was built to maintain the editorial confidence across all screen sizes. Typography scales fluidly, spacing compresses without losing rhythm, and the conversion flow stays clear on mobile without feeling cramped.",
+      },
+      {
+        type: "gallery",
+        columns: 5,
+        images: [
+          { src: "/trend-bible.png", alt: "Trend Bible mobile — hero view", width: 375, height: 812 },
+          { src: "/trend-bible.png", alt: "Trend Bible mobile — content section", width: 375, height: 812 },
+          { src: "/trend-bible.png", alt: "Trend Bible mobile — signal cards", width: 375, height: 812 },
+          { src: "/trend-bible.png", alt: "Trend Bible mobile — subscription CTA", width: 375, height: 812 },
+          { src: "/trend-bible.png", alt: "Trend Bible mobile — reports section", width: 375, height: 812 },
+          { src: "/trend-bible.png", alt: "Trend Bible mobile — footer", width: 375, height: 812 },
+        ],
+      },
     ],
     finalImage: {
       src: "/trend-bible.png",
@@ -499,6 +530,37 @@ export const projectEntries: ProjectEntry[] = [
         title: "A brand-led portfolio that is presentation ready.",
         body:
           "The result is a brand-led portfolio concept that feels premium, atmospheric, and polished while still being usable enough for real client presentation. The structure is kept flexible so future work blocks, deeper case studies, or richer image stacks can be added without rebuilding the visual system.",
+      },
+      {
+        type: "gallery",
+        columns: 3,
+        images: [
+          { src: "/visual-poetry.png", alt: "Visual Poetry final — opening frame", width: 631, height: 423 },
+          { src: "/visual-poetry.png", alt: "Visual Poetry final — gallery section", width: 631, height: 423 },
+          { src: "/visual-poetry.png", alt: "Visual Poetry final — about section", width: 631, height: 423 },
+          { src: "/visual-poetry.png", alt: "Visual Poetry final — project detail", width: 631, height: 423 },
+          { src: "/visual-poetry.png", alt: "Visual Poetry final — contact section", width: 631, height: 423 },
+          { src: "/visual-poetry.png", alt: "Visual Poetry final — full page view", width: 631, height: 423 },
+        ],
+      },
+      {
+        type: "section",
+        label: "Mobile Responsiveness",
+        title: "Cinematic on every screen. Immersive at every size.",
+        body:
+          "The responsive approach preserves the atmospheric quality of the design across breakpoints. Images scale gracefully, typography adjusts without losing its editorial weight, and the portfolio flow stays immersive on mobile without sacrificing usability.",
+      },
+      {
+        type: "gallery",
+        columns: 5,
+        images: [
+          { src: "/visual-poetry.png", alt: "Visual Poetry mobile — hero view", width: 375, height: 812 },
+          { src: "/visual-poetry.png", alt: "Visual Poetry mobile — gallery view", width: 375, height: 812 },
+          { src: "/visual-poetry.png", alt: "Visual Poetry mobile — detail view", width: 375, height: 812 },
+          { src: "/visual-poetry.png", alt: "Visual Poetry mobile — about section", width: 375, height: 812 },
+          { src: "/visual-poetry.png", alt: "Visual Poetry mobile — project page", width: 375, height: 812 },
+          { src: "/visual-poetry.png", alt: "Visual Poetry mobile — contact view", width: 375, height: 812 },
+        ],
       },
     ],
     finalImage: {
