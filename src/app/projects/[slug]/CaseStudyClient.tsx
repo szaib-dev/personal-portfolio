@@ -582,7 +582,8 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
             type="button"
             aria-label="Scroll to top"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="flex h-7 w-7 items-center justify-center text-[#cccccc] transition-colors hover:text-[#111111] max-[560px]:hidden"
+            className="flex h-7 w-7 items-center justify-center text-[#cccccc] transition-colors max-[560px]:hidden"
+            style={{ color: accent }}
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
               <path d="M7 2 L12 8 M7 2 L2 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

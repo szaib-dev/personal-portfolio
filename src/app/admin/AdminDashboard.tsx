@@ -8,7 +8,7 @@ import type { Id } from "../../../convex/_generated/dataModel";
 import ImageUploader from "./ImageUploader";
 import { AdminImageSkeleton } from "@/components/Skeleton";
 import { projectEntries } from "@/data/site-content";
-import { getProjectAccent, projectAccentSettingKey } from "@/lib/project-settings";
+import { getProjectAccent, isHexColor, projectAccentSettingKey } from "@/lib/project-settings";
 import {
   FiHome,
   FiGrid,
@@ -121,6 +121,11 @@ const GROUPS: ProjectGroup[] = [
   })),
 ];
 
+const getGroupAccent = (groupId: string, settings: { key: string; value: string }[]) => {
+  const project = projectEntries.find((entry) => entry.slug === groupId);
+  return project ? getProjectAccent(project.slug, project.accent, settings) : "#111111";
+};
+
 export default function AdminDashboard({
   token,
   onLogout,
@@ -217,6 +222,8 @@ export default function AdminDashboard({
   };
 
   const handleAccentChange = async (slug: string, value: string) => {
+    if (!isHexColor(value)) return;
+
     const key = projectAccentSettingKey(slug);
     setSettings((current) => {
       const withoutCurrent = current.filter((setting) => setting.key !== key);
@@ -271,17 +278,22 @@ export default function AdminDashboard({
               const uploaded = getUploadedCount(group.id);
               const total = getTotalSlots(group);
               const isActive = activeGroup === group.id;
+              const groupAccent = getGroupAccent(group.id, settings);
               return (
                 <button
                   key={group.id}
                   onClick={() => handleGroupChange(group.id)}
+                  style={{
+                    borderBottomColor: isActive ? groupAccent : "transparent",
+                    color: isActive ? groupAccent : undefined,
+                  }}
                   className={`flex shrink-0 items-center gap-2 border-b-2 pb-3 pt-3 text-[0.88rem] font-medium transition-colors ${
                     isActive
-                      ? "border-[#111111] text-[#111111]"
+                      ? ""
                       : "border-transparent text-[#888888] hover:text-[#444444]"
                   }`}
                 >
-                  <GroupIcon className="text-[1rem]" strokeWidth={1.8} />
+                  <GroupIcon className="text-[1rem]" strokeWidth={1.8} style={{ color: group.id === "homepage" ? undefined : groupAccent }} />
                   <span>{group.name}</span>
                   <span className="text-[0.72rem] text-[#aaaaaa]">
                     {uploaded}/{total}
@@ -352,6 +364,9 @@ export default function AdminDashboard({
           {currentGroup.sections.map((section) => {
             const SectionIcon = section.icon;
             const isExpanded = expandedSections.has(section.id);
+            const sectionAccent = currentProject
+              ? getProjectAccent(currentProject.slug, currentProject.accent, settings)
+              : "#777777";
             const sectionUploaded = section.slots.filter(
               (slot) => getImageForSlot(section.id, slot.id) !== null
             ).length;
@@ -369,8 +384,9 @@ export default function AdminDashboard({
                 >
                   <div className="flex items-center gap-3">
                     <SectionIcon
-                      className="text-[1.1rem] text-[#777777]"
+                      className="text-[1.1rem]"
                       strokeWidth={1.6}
+                      style={{ color: currentProject ? sectionAccent : "#777777" }}
                     />
                     <span className="text-[0.92rem] font-semibold tracking-[-0.01em] text-[#222222]">
                       {section.label}
