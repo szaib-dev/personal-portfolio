@@ -8,7 +8,7 @@ import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import ImageUploader from "./ImageUploader";
 import { AdminImageSkeleton } from "@/components/Skeleton";
-import { projectEntries } from "@/data/site-content";
+import { projectEntries } from "@/content/projects";
 import {
   getProjectAccent,
   isHexColor,

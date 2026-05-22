@@ -91,6 +91,7 @@ export type CaseStudyBlock =
     };
 
 export type ProjectEntry = {
+  order?: number;
   slug: string;
   kicker: string;
   title: string;

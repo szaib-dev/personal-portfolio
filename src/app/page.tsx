@@ -503,7 +503,7 @@ export default function Home() {
                 <Link
                   href={`/projects/${project.slug}`}
                   aria-label={`Open ${project.title} case study`}
-                  className={`${project.reverse ? "order-1 max-[1220px]:order-none" : ""} block aspect-[16/10] cursor-pointer overflow-hidden rounded-[3px] bg-[#f4f4f4]`}
+                  className={`${project.reverse ? "order-1 max-[1220px]:order-none" : ""} block cursor-pointer overflow-hidden rounded-[3px] bg-[#f4f4f4]`}
                 >
                   <DynamicImage
                     section={`${project.slug}-hero`}
@@ -512,7 +512,7 @@ export default function Home() {
                     width={project.width}
                     height={project.height}
                     priority={project.slug === "trend-bible"}
-                    className="block h-full w-full object-cover transition-transform duration-500 ease-out hover:-translate-y-1 hover:scale-[1.015]"
+                    className="block h-auto w-full transition-transform duration-500 ease-out hover:-translate-y-1 hover:scale-[1.015]"
                   />
                 </Link>
               </article>

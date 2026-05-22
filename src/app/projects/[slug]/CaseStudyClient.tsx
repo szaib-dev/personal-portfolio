@@ -254,11 +254,12 @@ function Block({
       return (
         <div data-reveal className={`grid gap-4 border-t border-black/[0.07] py-12 ${cols}`}>
           {galleryItems.map((item) => (
-            <div key={item.index} data-project-image className="aspect-[4/3] overflow-hidden rounded-[3px] bg-[#f4f4f4]">
+            <div key={item.index} data-project-image className="overflow-hidden rounded-[3px] bg-[#f4f4f4]">
               {item.url ? (
-                <Image src={item.url as string} alt={item.img.alt} fill className="object-cover" sizes="(max-width: 560px) 100vw, 33vw" loading="lazy" />
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={item.url as string} alt={item.img.alt} className="block h-auto w-full" loading="lazy" />
               ) : (
-                <ImageSkeleton className="h-full w-full" />
+                <ImageSkeleton className="aspect-[16/10] w-full" />
               )}
               {item.img.caption && <p className="px-3 pb-3 pt-2 text-[0.72rem] leading-[1.4] text-[#b0b0b0]">{item.img.caption}</p>}
             </div>
