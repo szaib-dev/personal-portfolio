@@ -7,28 +7,24 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { FiArrowRight, FiPlus } from "react-icons/fi";
 import { RiDoubleQuotesL } from "react-icons/ri";
+import {
+  aboutContent,
+  audienceProfiles,
+  navSections,
+  projectEntries,
+  referenceCards,
+  values,
+} from "@/data/site-content";
 import DynamicImage from "@/components/DynamicImage";
 import { getProjectAccent } from "@/lib/project-settings";
-import { useAudienceProfiles, useNavSections, useProjects, useValues, useReferences, useAboutContent, useSiteContent } from "@/hooks/useContent";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const TESTIMONIALS_PER_PAGE = 3;
-const DEFAULT_VALUES_DESCRIPTION =
-  "These are the core values behind the way I build. I care about digital work that solves a real problem, feels intentional in every detail, and stays strong as products grow. I like thinking big, building fast but carefully, staying practical, and creating systems that are not only beautiful on the surface, but dependable underneath. My goal is always the same: make something useful, well made, and built to last.";
 
 export default function Home() {
-  // Live content from Convex (falls back to static instantly)
-  const liveProfiles = useAudienceProfiles();
-  const liveNav = useNavSections();
-  const liveProjects = useProjects();
-  const liveValues = useValues();
-  const liveRefs = useReferences();
-  const liveAbout = useAboutContent();
-  const siteContent = useSiteContent();
-
-  const [activeAudience, setActiveAudience] = useState("everyone");
-  const [activeSection, setActiveSection] = useState("intro");
+  const [activeAudience, setActiveAudience] = useState(audienceProfiles[0].id);
+  const [activeSection, setActiveSection] = useState(navSections[0].id);
   const [activeReferencePage, setActiveReferencePage] = useState(0);
   const [showIntro, setShowIntro] = useState(true);
   const [introText, setIntroText] = useState("Shahzaib Mirza");
@@ -65,19 +61,19 @@ export default function Home() {
   const referencePages = useMemo(
     () =>
       Array.from(
-        { length: Math.ceil(liveRefs.length / TESTIMONIALS_PER_PAGE) },
+        { length: Math.ceil(referenceCards.length / TESTIMONIALS_PER_PAGE) },
         (_, index) =>
-          liveRefs.slice(
+          referenceCards.slice(
             index * TESTIMONIALS_PER_PAGE,
             index * TESTIMONIALS_PER_PAGE + TESTIMONIALS_PER_PAGE
           )
       ),
-    [liveRefs]
+    []
   );
 
   const activeProfile =
-    liveProfiles.find((profile) => profile.id === activeAudience) ??
-    liveProfiles[0];
+    audienceProfiles.find((profile) => profile.id === activeAudience) ??
+    audienceProfiles[0];
 
   useEffect(() => {
     let cancelled = false;
@@ -232,7 +228,7 @@ export default function Home() {
 
   useEffect(() => {
     const syncActiveSection = () => {
-      const sections = liveNav
+      const sections = navSections
         .map((section) => document.getElementById(section.id))
         .filter(Boolean) as HTMLElement[];
 
@@ -256,7 +252,7 @@ export default function Home() {
       window.removeEventListener("scroll", syncActiveSection);
       window.removeEventListener("resize", syncActiveSection);
     };
-  }, [liveNav]);
+  }, []);
 
   useEffect(() => {
     if (!contentRef.current) return;
@@ -413,7 +409,7 @@ export default function Home() {
         </Link>
 
         <aside className="fixed left-7 top-48 z-20 flex flex-col gap-[0.08rem] min-[1800px]:left-[max(1.75rem,calc((100vw-1720px)/2+1.75rem))] max-[1024px]:static max-[1024px]:mb-10 max-[1024px]:mt-16 max-[560px]:hidden">
-          {liveNav.map((section) => (
+          {navSections.map((section) => (
             <a
               key={section.id}
               href={`#${section.id}`}
@@ -432,7 +428,7 @@ export default function Home() {
           className="ml-[clamp(16.125rem,28vw,29.125rem)] min-h-screen w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),56rem)] scroll-mt-8 pt-[clamp(5.15rem,9vh,8rem)] max-[1024px]:ml-0 max-[1024px]:w-full max-[1024px]:min-h-0 max-[1024px]:pt-0"
         >
           <div className="flex w-[min(100%,43rem)] flex-wrap items-center gap-x-[1.15rem] gap-y-2 max-[1024px]:w-full">
-            {liveProfiles.map((profile) => {
+            {audienceProfiles.map((profile) => {
               const isActive = profile.id === activeAudience;
 
               return (
@@ -471,7 +467,7 @@ export default function Home() {
           data-section
           className="ml-[clamp(16.125rem,28vw,29.125rem)] w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),88rem)] scroll-mt-8 pt-12 max-[1024px]:ml-0 max-[1024px]:w-full max-[1024px]:pt-20"
         >
-          {liveProjects.map((project) => {
+          {projectEntries.map((project) => {
             const accent = getProjectAccent(project.slug, project.accent, settings);
 
             return (
@@ -533,7 +529,7 @@ export default function Home() {
             data-stagger-group
             className="absolute left-[clamp(6.6rem,8.2vw,8.85rem)] top-0 mt-5 max-w-[29rem] max-[1220px]:static max-[1220px]:mt-0 max-[1220px]:max-w-full"
           >
-            {liveValues.map((value) => (
+            {values.map((value) => (
               <span
                 key={value}
                 data-value-line
@@ -549,7 +545,13 @@ export default function Home() {
             className="absolute bottom-16 right-2 w-[min(100%,42rem)] text-[0.95rem] leading-[1.58] text-[#1f1f1f] max-[1220px]:static max-[1220px]:mt-8 max-[1220px]:w-full max-[1220px]:max-w-full max-[560px]:text-base"
           >
             <p>
-              {siteContent["values.description"] || DEFAULT_VALUES_DESCRIPTION}
+              These are the core values behind the way I build. I care about
+              digital work that solves a real problem, feels intentional in every
+              detail, and stays strong as products grow. I like thinking big,
+              building fast but carefully, staying practical, and creating
+              systems that are not only beautiful on the surface, but dependable
+              underneath. My goal is always the same: make something useful, well
+              made, and built to last.
             </p>
           </div>
         </section>
@@ -638,9 +640,9 @@ export default function Home() {
               className="absolute left-[34.2%] top-[8.6rem] w-[22rem] max-[1280px]:static max-[1280px]:w-full max-[1280px]:max-w-[28rem] max-[560px]:text-center"
             >
               <h2 className="m-0 text-[1.62rem] font-medium leading-[2.08rem] tracking-[-0.065em] text-[#111111]">
-                {liveAbout.heading[0]}
+                {aboutContent.heading[0]}
                 <br />
-                {liveAbout.heading[1]}
+                {aboutContent.heading[1]}
               </h2>
 
               <div className="group relative ml-[0.05rem] mt-8 h-[20.75rem] w-[14.5rem] max-[1280px]:ml-0 max-[1280px]:h-[22.25rem] max-[1280px]:w-[16rem] max-[560px]:mx-auto max-[560px]:h-[23rem] max-[560px]:w-[15rem]">
@@ -673,11 +675,11 @@ export default function Home() {
               className="absolute left-[56.9%] top-[8.6rem] w-[19rem] max-[1280px]:static max-[1280px]:w-full max-[1280px]:max-w-[28rem] max-[560px]:text-center"
             >
               <p className="m-0 text-[1.08rem] font-normal leading-[1.55rem] tracking-[-0.045em] text-[#111111]">
-                {liveAbout.columnTwo[0]}
+                {aboutContent.columnTwo[0]}
                 <br />
-                {liveAbout.columnTwo[1]}
+                {aboutContent.columnTwo[1]}
                 <br />
-                {liveAbout.columnTwo[2]}
+                {aboutContent.columnTwo[2]}
               </p>
             </div>
 
@@ -686,11 +688,11 @@ export default function Home() {
               className="absolute left-[78.2%] top-[8.6rem] w-[19rem] max-[1280px]:static max-[1280px]:w-full max-[1280px]:max-w-[28rem] max-[560px]:text-center"
             >
               <p className="m-0 text-[1.08rem] font-normal leading-[1.55rem] tracking-[-0.045em] text-[#111111]">
-                {liveAbout.columnThree[0]}
+                {aboutContent.columnThree[0]}
                 <br />
-                {liveAbout.columnThree[1]}
+                {aboutContent.columnThree[1]}
                 <br />
-                {liveAbout.columnThree[2]}
+                {aboutContent.columnThree[2]}
               </p>
             </div>
           </div>
@@ -700,12 +702,12 @@ export default function Home() {
            >
             <span className="block overflow-hidden">
               <span data-footer-cta-line className="block will-change-transform">
-                {liveAbout.bottomText[0]}
+                {aboutContent.bottomText[0]}
               </span>
             </span>
             <span className="block overflow-hidden">
               <span data-footer-cta-line className="block will-change-transform">
-                {liveAbout.bottomText[1]}
+                {aboutContent.bottomText[1]}
               </span>
             </span>
           </p>

@@ -1,7 +1,7 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
-export const list = query({
+export const getAll = query({
   handler: async (ctx) => {
     return await ctx.db.query("settings").collect();
   },
@@ -19,10 +19,17 @@ export const set = mutation({
       .first();
 
     if (existing) {
-      await ctx.db.patch(existing._id, { value: args.value });
+      await ctx.db.patch(existing._id, {
+        value: args.value,
+        updatedAt: Date.now(),
+      });
       return existing._id;
     }
 
-    return await ctx.db.insert("settings", args);
+    return await ctx.db.insert("settings", {
+      key: args.key,
+      value: args.value,
+      updatedAt: Date.now(),
+    });
   },
 });

@@ -22,7 +22,7 @@ export async function GET() {
 
   try {
     const client = new ConvexHttpClient(convexUrl);
-    const settings = await client.query(api.settings.list);
+    const settings = await client.query(api.settings.getAll);
     return NextResponse.json(
       { settings },
       {
