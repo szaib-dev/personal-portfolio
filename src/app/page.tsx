@@ -17,7 +17,7 @@ import {
 } from "@/data/site-content";
 import DynamicImage from "@/components/DynamicImage";
 import { getProjectAccent } from "@/lib/project-settings";
-import { useAudienceProfiles, useNavSections, useProjects, useValues, useReferences } from "@/hooks/useContent";
+import { useAudienceProfiles, useNavSections, useProjects, useValues, useReferences, useAboutContent } from "@/hooks/useContent";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -30,6 +30,7 @@ export default function Home() {
   const liveProjects = useProjects();
   const liveValues = useValues();
   const liveRefs = useReferences();
+  const liveAbout = useAboutContent();
 
   const [activeAudience, setActiveAudience] = useState(audienceProfiles[0].id);
   const [activeSection, setActiveSection] = useState(navSections[0].id);
@@ -648,9 +649,9 @@ export default function Home() {
               className="absolute left-[34.2%] top-[8.6rem] w-[22rem] max-[1280px]:static max-[1280px]:w-full max-[1280px]:max-w-[28rem] max-[560px]:text-center"
             >
               <h2 className="m-0 text-[1.62rem] font-medium leading-[2.08rem] tracking-[-0.065em] text-[#111111]">
-                {aboutContent.heading[0]}
+                {liveAbout.heading[0]}
                 <br />
-                {aboutContent.heading[1]}
+                {liveAbout.heading[1]}
               </h2>
 
               <div className="group relative ml-[0.05rem] mt-8 h-[20.75rem] w-[14.5rem] max-[1280px]:ml-0 max-[1280px]:h-[22.25rem] max-[1280px]:w-[16rem] max-[560px]:mx-auto max-[560px]:h-[23rem] max-[560px]:w-[15rem]">
@@ -683,11 +684,11 @@ export default function Home() {
               className="absolute left-[56.9%] top-[8.6rem] w-[19rem] max-[1280px]:static max-[1280px]:w-full max-[1280px]:max-w-[28rem] max-[560px]:text-center"
             >
               <p className="m-0 text-[1.08rem] font-normal leading-[1.55rem] tracking-[-0.045em] text-[#111111]">
-                {aboutContent.columnTwo[0]}
+                {liveAbout.columnTwo[0]}
                 <br />
-                {aboutContent.columnTwo[1]}
+                {liveAbout.columnTwo[1]}
                 <br />
-                {aboutContent.columnTwo[2]}
+                {liveAbout.columnTwo[2]}
               </p>
             </div>
 
@@ -696,11 +697,11 @@ export default function Home() {
               className="absolute left-[78.2%] top-[8.6rem] w-[19rem] max-[1280px]:static max-[1280px]:w-full max-[1280px]:max-w-[28rem] max-[560px]:text-center"
             >
               <p className="m-0 text-[1.08rem] font-normal leading-[1.55rem] tracking-[-0.045em] text-[#111111]">
-                {aboutContent.columnThree[0]}
+                {liveAbout.columnThree[0]}
                 <br />
-                {aboutContent.columnThree[1]}
+                {liveAbout.columnThree[1]}
                 <br />
-                {aboutContent.columnThree[2]}
+                {liveAbout.columnThree[2]}
               </p>
             </div>
           </div>
@@ -710,12 +711,12 @@ export default function Home() {
            >
             <span className="block overflow-hidden">
               <span data-footer-cta-line className="block will-change-transform">
-                {aboutContent.bottomText[0]}
+                {liveAbout.bottomText[0]}
               </span>
             </span>
             <span className="block overflow-hidden">
               <span data-footer-cta-line className="block will-change-transform">
-                {aboutContent.bottomText[1]}
+                {liveAbout.bottomText[1]}
               </span>
             </span>
           </p>

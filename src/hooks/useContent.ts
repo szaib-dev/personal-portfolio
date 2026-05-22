@@ -59,3 +59,23 @@ export function useReferences() {
   }
   return staticRefs;
 }
+
+export function useAboutContent() {
+  const db = useQuery(api.content.getAboutContent);
+  if (db && Object.keys(db).length > 0) {
+    return {
+      heading: db.heading || staticAbout.heading,
+      columnTwo: db.columnTwo || staticAbout.columnTwo,
+      columnThree: db.columnThree || staticAbout.columnThree,
+      bottomText: db.bottomText || staticAbout.bottomText,
+      primaryImage: staticAbout.primaryImage,
+      secondaryImage: staticAbout.secondaryImage,
+    };
+  }
+  return staticAbout;
+}
+
+export function useSiteContent() {
+  const db = useQuery(api.content.getAllSiteContent);
+  return db || {};
+}
