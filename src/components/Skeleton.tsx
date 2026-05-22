@@ -1,12 +1,7 @@
-"use client";
-
-import type { CSSProperties } from "react";
-
-export function ImageSkeleton({ className = "", style }: { className?: string; style?: CSSProperties }) {
+export function ImageSkeleton({ className = "" }: { className?: string }) {
   return (
     <div
       className={`relative overflow-hidden rounded-[3px] bg-[#f0f0f0] ${className}`}
-      style={style}
     >
       <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.6s_infinite] bg-gradient-to-r from-transparent via-white/70 to-transparent" />
     </div>

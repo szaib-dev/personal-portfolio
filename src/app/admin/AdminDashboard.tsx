@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
@@ -432,11 +433,13 @@ export default function AdminDashboard({
                             {image ? (
                               <div>
                                 <div className="relative aspect-[4/3] overflow-hidden rounded-[5px] border border-[#f0f0f0] bg-[#fafafa]">
-                                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                                  <img
+                                  <Image
                                     src={image.url}
                                     alt={slot.label}
-                                    className="h-full w-full object-cover"
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 560px) 100vw, 33vw"
+                                    loading="lazy"
                                   />
                                   <button
                                     onClick={() => handleDelete(image._id)}

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Lenis from "lenis";
 import { gsap } from "gsap";
@@ -128,7 +129,7 @@ function Block({
       return (
         <div data-reveal className={`border-t border-black/[0.07] py-12 ${block.contained ? "max-w-[44rem]" : ""}`}>
           <div className="overflow-hidden rounded-[3px] bg-[#f4f4f4]">
-            <ImageSkeleton className="w-full" style={{ aspectRatio: `${block.width} / ${block.height}` }} />
+            <ImageSkeleton className="aspect-[16/10] w-full" />
             {block.caption && <p className="px-3 pb-3 pt-2 text-[0.72rem] leading-[1.4] text-[#b0b0b0]">{block.caption}</p>}
           </div>
         </div>
@@ -183,8 +184,7 @@ function Block({
               <aside className="flex flex-col justify-center p-6 max-[820px]:order-1 max-[820px]:items-center max-[820px]:text-center">
                 <div className="relative mx-auto h-[10rem] w-[10rem] overflow-hidden rounded-full bg-white shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
                   {personaPhotoUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={personaPhotoUrl} alt={`${block.name} persona portrait`} className="h-full w-full object-cover object-top" />
+                    <Image src={personaPhotoUrl} alt={`${block.name} persona portrait`} fill className="object-cover object-top" sizes="10rem" />
                   ) : (
                     <ImageSkeleton className="h-full w-full rounded-full" />
                   )}
@@ -224,12 +224,10 @@ function Block({
                 <div
                   key={item.index}
                   data-project-image
-                  className="w-[14rem] flex-shrink-0 max-[1100px]:w-[12.5rem] max-[700px]:w-[10.5rem]"
-                  style={{ aspectRatio: "9/19.5", overflow: "hidden" }}
+                  className="aspect-[9/19.5] w-[14rem] flex-shrink-0 overflow-hidden max-[1100px]:w-[12.5rem] max-[700px]:w-[10.5rem]"
                 >
                   {item.url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={item.url as string} alt={item.img.alt} className="block h-full w-full object-cover" />
+                    <Image src={item.url as string} alt={item.img.alt} fill className="object-cover" sizes="14rem" loading="lazy" />
                   ) : (
                     <ImageSkeleton className="h-full w-full" />
                   )}
@@ -258,8 +256,7 @@ function Block({
           {galleryItems.map((item) => (
             <div key={item.index} data-project-image className="aspect-[4/3] overflow-hidden rounded-[3px] bg-[#f4f4f4]">
               {item.url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={item.url as string} alt={item.img.alt} className="block h-full w-full object-cover" />
+                <Image src={item.url as string} alt={item.img.alt} fill className="object-cover" sizes="(max-width: 560px) 100vw, 33vw" loading="lazy" />
               ) : (
                 <ImageSkeleton className="h-full w-full" />
               )}
@@ -748,15 +745,16 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
           {/* Right: hero image */}
           <div
             ref={heroImageRef}
-            className="overflow-hidden rounded-[4px] bg-[#f4f4f4]"
-            style={{ aspectRatio: `${project.heroImage.width} / ${project.heroImage.height}` }}
+            className="relative aspect-[16/10] overflow-hidden rounded-[4px] bg-[#f4f4f4]"
           >
             {convexImages?.heroImageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={convexImages.heroImageUrl}
                 alt={project.heroImage.alt}
-                className="block h-full w-full object-cover"
+                fill
+                priority
+                className="object-cover"
+                sizes="(max-width: 900px) 100vw, 50vw"
               />
             ) : (
               <ImageSkeleton className="h-full w-full" />

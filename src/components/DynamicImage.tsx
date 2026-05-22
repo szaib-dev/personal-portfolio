@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { getConvexUrlFromEnv } from "@/lib/convex-url";
@@ -29,7 +30,7 @@ export default function DynamicImage({
   priority,
 }: Props) {
   if (!getConvexUrlFromEnv()) {
-    return <ImageSkeleton className={className} style={{ aspectRatio: `${width} / ${height}` }} />;
+    return <ImageSkeleton className={className} />;
   }
 
   return (
@@ -58,15 +59,18 @@ function DynamicConvexImage({
 
   if (image?.url) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
+      <Image
         src={image.url}
         alt={alt}
+        width={width}
+        height={height}
         className={className}
+        priority={priority}
         loading={priority ? "eager" : "lazy"}
+        sizes="(max-width: 768px) 100vw, 50vw"
       />
     );
   }
 
-  return <ImageSkeleton className={className} style={{ aspectRatio: `${width} / ${height}` }} />;
+  return <ImageSkeleton className={className} />;
 }
