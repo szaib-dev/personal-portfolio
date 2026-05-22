@@ -467,20 +467,21 @@ export default function Home() {
           data-section
           className="ml-[clamp(16.125rem,28vw,29.125rem)] w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),88rem)] scroll-mt-8 pt-12 max-[1024px]:ml-0 max-[1024px]:w-full max-[1024px]:pt-20"
         >
-          {projectEntries.map((project) => {
+          {projectEntries.map((project, index) => {
             const accent = getProjectAccent(project.slug, project.accent, settings);
+            const isReversed = index % 2 === 1;
 
             return (
               <article
                 key={project.slug}
                 data-stagger-group
                 className={`grid items-center gap-12 border-t border-black/10 py-[3.25rem] ${
-                  project.reverse
+                  isReversed
                     ? "grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)] max-[1220px]:grid-cols-1"
                     : "grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] max-[1220px]:grid-cols-1"
                 }`}
               >
-                <div className={`${project.reverse ? "order-2 max-[1220px]:order-none" : ""} max-w-[26rem]`}>
+                <div className={`${isReversed ? "order-2 max-[1220px]:order-none" : ""} max-w-[26rem]`}>
                 <p
                   className="text-[0.92rem] font-semibold tracking-[-0.02em]"
                   style={{ color: accent }}
@@ -503,7 +504,7 @@ export default function Home() {
                 <Link
                   href={`/projects/${project.slug}`}
                   aria-label={`Open ${project.title} case study`}
-                  className={`${project.reverse ? "order-1 max-[1220px]:order-none" : ""} block cursor-pointer overflow-hidden rounded-[3px] bg-[#f4f4f4]`}
+                  className={`${isReversed ? "order-1 max-[1220px]:order-none" : ""} block cursor-pointer overflow-hidden rounded-[3px] bg-[#f4f4f4]`}
                 >
                   <DynamicImage
                     section={`${project.slug}-hero`}
