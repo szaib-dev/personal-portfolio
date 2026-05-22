@@ -7,21 +7,15 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { FiArrowRight, FiPlus } from "react-icons/fi";
 import { RiDoubleQuotesL } from "react-icons/ri";
-import {
-  aboutContent,
-  audienceProfiles,
-  navSections,
-  projectEntries,
-  referenceCards,
-  values,
-} from "@/data/site-content";
 import DynamicImage from "@/components/DynamicImage";
 import { getProjectAccent } from "@/lib/project-settings";
-import { useAudienceProfiles, useNavSections, useProjects, useValues, useReferences, useAboutContent } from "@/hooks/useContent";
+import { useAudienceProfiles, useNavSections, useProjects, useValues, useReferences, useAboutContent, useSiteContent } from "@/hooks/useContent";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const TESTIMONIALS_PER_PAGE = 3;
+const DEFAULT_VALUES_DESCRIPTION =
+  "These are the core values behind the way I build. I care about digital work that solves a real problem, feels intentional in every detail, and stays strong as products grow. I like thinking big, building fast but carefully, staying practical, and creating systems that are not only beautiful on the surface, but dependable underneath. My goal is always the same: make something useful, well made, and built to last.";
 
 export default function Home() {
   // Live content from Convex (falls back to static instantly)
@@ -31,9 +25,10 @@ export default function Home() {
   const liveValues = useValues();
   const liveRefs = useReferences();
   const liveAbout = useAboutContent();
+  const siteContent = useSiteContent();
 
-  const [activeAudience, setActiveAudience] = useState(audienceProfiles[0].id);
-  const [activeSection, setActiveSection] = useState(navSections[0].id);
+  const [activeAudience, setActiveAudience] = useState("everyone");
+  const [activeSection, setActiveSection] = useState("intro");
   const [activeReferencePage, setActiveReferencePage] = useState(0);
   const [showIntro, setShowIntro] = useState(true);
   const [introText, setIntroText] = useState("Shahzaib Mirza");
@@ -261,7 +256,7 @@ export default function Home() {
       window.removeEventListener("scroll", syncActiveSection);
       window.removeEventListener("resize", syncActiveSection);
     };
-  }, []);
+  }, [liveNav]);
 
   useEffect(() => {
     if (!contentRef.current) return;
@@ -554,13 +549,7 @@ export default function Home() {
             className="absolute bottom-16 right-2 w-[min(100%,42rem)] text-[0.95rem] leading-[1.58] text-[#1f1f1f] max-[1220px]:static max-[1220px]:mt-8 max-[1220px]:w-full max-[1220px]:max-w-full max-[560px]:text-base"
           >
             <p>
-              These are the core values behind the way I build. I care about
-              digital work that solves a real problem, feels intentional in every
-              detail, and stays strong as products grow. I like thinking big,
-              building fast but carefully, staying practical, and creating
-              systems that are not only beautiful on the surface, but dependable
-              underneath. My goal is always the same: make something useful, well
-              made, and built to last.
+              {siteContent["values.description"] || DEFAULT_VALUES_DESCRIPTION}
             </p>
           </div>
         </section>

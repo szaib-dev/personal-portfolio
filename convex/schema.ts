@@ -8,6 +8,11 @@ export default defineSchema({
     value: v.string(),
   }).index("by_key", ["key"]),
 
+  settings: defineTable({
+    key: v.string(),
+    value: v.string(),
+  }).index("by_key", ["key"]),
+
   // ─── Audience profiles (hero section tabs) ───
   audienceProfiles: defineTable({
     profileId: v.string(),

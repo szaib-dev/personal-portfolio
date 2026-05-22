@@ -4,16 +4,26 @@ import { useState, useEffect, useMemo } from "react";
 import { ConvexProvider, ConvexReactClient, useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { FiEdit2, FiSave, FiX, FiPlus, FiTrash2, FiUser, FiMessageSquare, FiType, FiLayers, FiArrowUp, FiArrowDown } from "react-icons/fi";
+import {
+  aboutContent as staticAbout,
+  audienceProfiles as staticProfiles,
+  navSections as staticNav,
+  projectEntries as staticProjects,
+  referenceCards as staticReferences,
+  values as staticValues,
+} from "@/data/site-content";
+
+const DEFAULT_VALUES_DESCRIPTION =
+  "These are the core values behind the way I build. I care about digital work that solves a real problem, feels intentional in every detail, and stays strong as products grow. I like thinking big, building fast but carefully, staying practical, and creating systems that are not only beautiful on the surface, but dependable underneath. My goal is always the same: make something useful, well made, and built to last.";
 
 export default function ContentPage() {
   const [convexUrl, setConvexUrl] = useState<string | null>(null);
   const [configLoaded, setConfigLoaded] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
+  const [token] = useState<string | null>(() =>
+    typeof window === "undefined" ? null : localStorage.getItem("admin_token")
+  );
 
   useEffect(() => {
-    const stored = localStorage.getItem("admin_token");
-    setToken(stored);
-
     fetch("/api/convex-config", { cache: "no-store" })
       .then((r) => r.json())
       .then((c: { url?: string }) => setConvexUrl(c.url?.trim() || null))
@@ -51,7 +61,15 @@ type Tab = "profiles" | "references" | "values" | "about" | "projects";
 
 function ContentEditor() {
   const [activeTab, setActiveTab] = useState<Tab>("profiles");
+  const [syncing, setSyncing] = useState(false);
   const sessionCheck = useQuery(api.auth.validateSession, { token: localStorage.getItem("admin_token") || "" });
+  const upsertProfile = useMutation(api.content.upsertAudienceProfile);
+  const upsertNav = useMutation(api.content.upsertNavSection);
+  const upsertProject = useMutation(api.content.upsertProject);
+  const upsertReference = useMutation(api.content.upsertReference);
+  const upsertValue = useMutation(api.content.upsertValue);
+  const setAbout = useMutation(api.content.setAboutContent);
+  const setSiteContent = useMutation(api.content.setSiteContent);
 
   if (sessionCheck && !sessionCheck.valid) {
     return (
@@ -71,12 +89,72 @@ function ContentEditor() {
     { id: "about", label: "About", icon: FiEdit2 },
   ];
 
+  const syncStaticContent = async () => {
+    setSyncing(true);
+    try {
+      await Promise.all([
+        ...staticProfiles.map((profile, order) =>
+          upsertProfile({
+            profileId: profile.id,
+            label: profile.label,
+            headline: profile.headline,
+            summary: profile.summary,
+            order,
+          })
+        ),
+        ...staticNav.map((section, order) =>
+          upsertNav({ sectionId: section.id, label: section.label, order })
+        ),
+        ...staticProjects.map((project, order) =>
+          upsertProject({
+            slug: project.slug,
+            kicker: project.kicker,
+            title: project.title,
+            summary: project.summary,
+            metaLeft: project.metaLeft,
+            metaRight: project.metaRight,
+            accent: project.accent,
+            year: project.year,
+            role: project.role,
+            client: project.client,
+            duration: project.duration,
+            stack: project.stack,
+            reverse: project.reverse,
+            order,
+          })
+        ),
+        ...staticReferences.map((reference, order) =>
+          upsertReference({ ...reference, order })
+        ),
+        ...staticValues.map((text, order) => upsertValue({ text, order })),
+        setAbout({ key: "heading", lines: staticAbout.heading }),
+        setAbout({ key: "columnTwo", lines: staticAbout.columnTwo }),
+        setAbout({ key: "columnThree", lines: staticAbout.columnThree }),
+        setAbout({ key: "bottomText", lines: staticAbout.bottomText }),
+        setSiteContent({ key: "site.name", value: "SA" }),
+        setSiteContent({ key: "values.description", value: DEFAULT_VALUES_DESCRIPTION }),
+      ]);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <header className="sticky top-0 z-20 border-b border-[#eaeaea] bg-white">
         <div className="mx-auto flex max-w-[960px] items-center justify-between px-6 py-4 max-[560px]:px-4">
           <span className="text-[0.95rem] font-semibold tracking-[-0.03em] text-[#111]">Content Manager</span>
-          <a href="/admin" className="text-[0.82rem] font-medium text-[#888] hover:text-[#111]">← Images</a>
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={syncStaticContent}
+              disabled={syncing}
+              className="rounded-[5px] border border-[#dedede] px-3 py-1.5 text-[0.8rem] font-medium text-[#555] transition-colors hover:border-[#111] hover:text-[#111] disabled:cursor-wait disabled:opacity-60"
+            >
+              {syncing ? "Syncing..." : "Sync current content"}
+            </button>
+            <a href="/admin" className="text-[0.82rem] font-medium text-[#888] hover:text-[#111]">Images</a>
+          </div>
         </div>
       </header>
       <div className="border-b border-[#eaeaea]">
@@ -113,6 +191,15 @@ function ProfilesEditor() {
   const [form, setForm] = useState({ profileId: "", label: "", headline: "", summary: "", order: 0 });
 
   if (!profiles) return <Skeleton />;
+  const displayProfiles = profiles.length
+    ? profiles
+    : staticProfiles.map((profile, order) => ({
+        profileId: profile.id,
+        label: profile.label,
+        headline: profile.headline,
+        summary: profile.summary,
+        order,
+      }));
 
   const startEdit = (p: any) => { setEditing(p.profileId); setForm({ profileId: p.profileId, label: p.label, headline: p.headline, summary: p.summary, order: p.order }); };
   const save = async () => { await upsert(form); setEditing(null); };
@@ -122,7 +209,7 @@ function ProfilesEditor() {
       <h2 className="text-[1.2rem] font-semibold tracking-[-0.02em] text-[#111]">Audience Profiles</h2>
       <p className="text-[0.85rem] text-[#888]">Hero section tab content</p>
       <div className="mt-4 space-y-3">
-        {profiles.map((p: any) => (
+        {displayProfiles.map((p: any) => (
           <div key={p.profileId} className="rounded-[8px] border border-[#eaeaea] p-4">
             {editing === p.profileId ? (
               <div className="space-y-3">
@@ -157,24 +244,42 @@ function ProjectsEditor() {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   if (!projects) return <Skeleton />;
+  const displayProjects = projects.length
+    ? projects
+    : staticProjects.map((project, order) => ({
+        slug: project.slug,
+        kicker: project.kicker,
+        title: project.title,
+        summary: project.summary,
+        metaLeft: project.metaLeft,
+        metaRight: project.metaRight,
+        accent: project.accent,
+        year: project.year,
+        role: project.role,
+        client: project.client,
+        duration: project.duration,
+        stack: project.stack,
+        reverse: project.reverse,
+        order,
+      }));
 
   const startEdit = (p: any) => { setEditing(p.slug); setForm({ slug: p.slug, kicker: p.kicker, title: p.title, summary: p.summary, metaLeft: p.metaLeft, metaRight: p.metaRight, accent: p.accent, year: p.year, role: p.role, client: p.client, duration: p.duration, stack: p.stack, reverse: p.reverse, order: p.order }); };
-  const startAdd = () => { setShowAdd(true); setForm({ slug: "", kicker: "", title: "", summary: "", metaLeft: "", metaRight: "", accent: "#111111", year: new Date().getFullYear().toString(), role: "", client: "", duration: "", stack: [], reverse: false, order: projects.length }); };
+  const startAdd = () => { setShowAdd(true); setForm({ slug: "", kicker: "", title: "", summary: "", metaLeft: "", metaRight: "", accent: "#111111", year: new Date().getFullYear().toString(), role: "", client: "", duration: "", stack: [], reverse: false, order: displayProjects.length }); };
   const save = async () => { if (!form.slug) return; await upsert(form); setEditing(null); setShowAdd(false); };
   const confirmDel = async () => { if (deleteConfirm) { await deleteProject({ slug: deleteConfirm }); setDeleteConfirm(null); } };
 
   // Reorder
   const reorder = async (slug: string, direction: "up" | "down") => {
-    const idx = projects.findIndex((p: any) => p.slug === slug);
+    const idx = displayProjects.findIndex((p: any) => p.slug === slug);
     const swapIdx = direction === "up" ? idx - 1 : idx + 1;
-    if (swapIdx < 0 || swapIdx >= projects.length) return;
-    const current = projects[idx];
-    const swap = projects[swapIdx];
+    if (swapIdx < 0 || swapIdx >= displayProjects.length) return;
+    const current = displayProjects[idx];
+    const swap = displayProjects[swapIdx];
     await upsert({ ...current, order: swap.order });
     await upsert({ ...swap, order: current.order });
   };
 
-  const FormFields = () => (
+  const renderFormFields = () => (
     <div className="space-y-3 rounded-[8px] border border-[#eaeaea] bg-[#fafafa] p-5">
       <div className="grid grid-cols-2 gap-3 max-[560px]:grid-cols-1">
         <input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Slug" disabled={!!editing} />
@@ -207,16 +312,16 @@ function ProjectsEditor() {
         <div><h2 className="text-[1.2rem] font-semibold tracking-[-0.02em] text-[#111]">Projects</h2><p className="text-[0.85rem] text-[#888]">Manage portfolio projects</p></div>
         <button onClick={startAdd} className="flex items-center gap-1.5 rounded-[5px] bg-[#111] px-3 py-1.5 text-[0.82rem] font-medium text-white"><FiPlus className="text-[0.75rem]" /> Add</button>
       </div>
-      {showAdd && <FormFields />}
+      {showAdd && renderFormFields()}
       <div className="mt-4 space-y-3">
-        {projects.map((p: any, idx: number) => (
+        {displayProjects.map((p: any, idx: number) => (
           <div key={p.slug}>
-            {editing === p.slug ? <FormFields /> : (
+            {editing === p.slug ? renderFormFields() : (
               <div className="flex items-center justify-between rounded-[8px] border border-[#eaeaea] p-4">
                 <div><p className="text-[0.9rem] font-semibold text-[#222]">{p.title}</p><p className="mt-0.5 text-[0.8rem] text-[#aaa]">{p.metaLeft} · {p.year}</p></div>
                 <div className="flex items-center gap-2">
                   <button onClick={() => reorder(p.slug, "up")} disabled={idx === 0} className="text-[#ccc] hover:text-[#111] disabled:opacity-30"><FiArrowUp className="text-[0.8rem]" /></button>
-                  <button onClick={() => reorder(p.slug, "down")} disabled={idx === projects.length - 1} className="text-[#ccc] hover:text-[#111] disabled:opacity-30"><FiArrowDown className="text-[0.8rem]" /></button>
+                  <button onClick={() => reorder(p.slug, "down")} disabled={idx === displayProjects.length - 1} className="text-[#ccc] hover:text-[#111] disabled:opacity-30"><FiArrowDown className="text-[0.8rem]" /></button>
                   <button onClick={() => startEdit(p)} className="text-[#aaa] hover:text-[#111]"><FiEdit2 className="text-[0.85rem]" /></button>
                   <button onClick={() => setDeleteConfirm(p.slug)} className="text-[#aaa] hover:text-[#e03030]"><FiTrash2 className="text-[0.85rem]" /></button>
                 </div>
@@ -248,6 +353,9 @@ function ReferencesEditor() {
   const [form, setForm] = useState({ name: "", role: "", body: "", order: 0 });
 
   if (!references) return <Skeleton />;
+  const displayReferences = references.length
+    ? references
+    : staticReferences.map((reference, order) => ({ ...reference, order }));
 
   const startEdit = (r: any) => { setEditing(r.name); setForm({ name: r.name, role: r.role, body: r.body, order: r.order }); };
   const save = async () => { await upsert(form); setEditing(null); };
@@ -257,7 +365,7 @@ function ReferencesEditor() {
       <h2 className="text-[1.2rem] font-semibold tracking-[-0.02em] text-[#111]">References</h2>
       <p className="text-[0.85rem] text-[#888]">Edit testimonials</p>
       <div className="mt-4 space-y-3">
-        {references.map((r: any) => (
+        {displayReferences.map((r: any) => (
           <div key={r.name} className="rounded-[8px] border border-[#eaeaea] p-4">
             {editing === r.name ? (
               <div className="space-y-3">
@@ -286,21 +394,46 @@ function ValuesEditor() {
   const values = useQuery(api.content.getValues);
   const siteContent = useQuery(api.content.getAllSiteContent);
   const setSiteContent = useMutation(api.content.setSiteContent);
+  const upsertValue = useMutation(api.content.upsertValue);
   const [editingDesc, setEditingDesc] = useState(false);
+  const [editingValue, setEditingValue] = useState<string | null>(null);
   const [desc, setDesc] = useState("");
+  const [valueForm, setValueForm] = useState({ text: "", order: 0, previousText: "" });
 
   if (!values || !siteContent) return <Skeleton />;
+  const displayValues = values.length
+    ? values
+    : staticValues.map((text, order) => ({ text, order }));
 
-  const startEditDesc = () => { setEditingDesc(true); setDesc(siteContent["values.description"] || ""); };
+  const startEditDesc = () => { setEditingDesc(true); setDesc(siteContent["values.description"] || DEFAULT_VALUES_DESCRIPTION); };
   const saveDesc = async () => { await setSiteContent({ key: "values.description", value: desc }); setEditingDesc(false); };
+  const startEditValue = (item: { text: string; order: number }) => {
+    setEditingValue(item.text);
+    setValueForm({ text: item.text, order: item.order, previousText: item.text });
+  };
+  const saveValue = async () => {
+    await upsertValue(valueForm);
+    setEditingValue(null);
+  };
 
   return (
     <div className="space-y-3">
       <h2 className="text-[1.2rem] font-semibold tracking-[-0.02em] text-[#111]">Values</h2>
       <div className="mt-4 space-y-2">
-        {values.map((v: any) => (
+        {displayValues.map((v: any) => (
           <div key={v.text} className="rounded-[8px] border border-[#eaeaea] px-4 py-3">
-            <p className="text-[1rem] font-semibold tracking-[-0.02em] text-[#222]">{v.text}</p>
+            {editingValue === v.text ? (
+              <div className="flex gap-2">
+                <input value={valueForm.text} onChange={(e) => setValueForm({ ...valueForm, text: e.target.value })} className="min-w-0 flex-1 rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" />
+                <button onClick={saveValue} className="rounded-[5px] bg-[#111] px-3 py-2 text-[0.8rem] font-medium text-white">Save</button>
+                <button onClick={() => setEditingValue(null)} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.8rem] font-medium text-[#666]">Cancel</button>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between">
+                <p className="text-[1rem] font-semibold tracking-[-0.02em] text-[#222]">{v.text}</p>
+                <button onClick={() => startEditValue(v)} className="text-[#aaa] hover:text-[#111]"><FiEdit2 className="text-[0.85rem]" /></button>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -318,7 +451,7 @@ function ValuesEditor() {
             </div>
           </div>
         ) : (
-          <p className="mt-2 text-[0.82rem] leading-[1.6] text-[#888]">{siteContent["values.description"]?.slice(0, 150)}...</p>
+          <p className="mt-2 text-[0.82rem] leading-[1.6] text-[#888]">{(siteContent["values.description"] || DEFAULT_VALUES_DESCRIPTION).slice(0, 180)}...</p>
         )}
       </div>
     </div>
@@ -332,6 +465,14 @@ function AboutEditor() {
   const [lines, setLines] = useState<string[]>([]);
 
   if (!about) return <Skeleton />;
+  const displayAbout = Object.keys(about).length
+    ? about
+    : {
+        heading: staticAbout.heading,
+        columnTwo: staticAbout.columnTwo,
+        columnThree: staticAbout.columnThree,
+        bottomText: staticAbout.bottomText,
+      };
 
   const sections = [
     { key: "heading", label: "Heading" },
@@ -340,7 +481,7 @@ function AboutEditor() {
     { key: "bottomText", label: "Bottom Text" },
   ];
 
-  const startEdit = (key: string) => { setEditing(key); setLines(about[key] || []); };
+  const startEdit = (key: string) => { setEditing(key); setLines(displayAbout[key] || []); };
   const save = async () => { if (!editing) return; await setAbout({ key: editing, lines }); setEditing(null); };
 
   return (
@@ -360,7 +501,7 @@ function AboutEditor() {
               </div>
             ) : (
               <div className="flex items-start justify-between">
-                <div><p className="text-[0.88rem] font-semibold text-[#222]">{s.label}</p><p className="mt-1 text-[0.82rem] leading-[1.5] text-[#888]">{(about[s.key] || []).join(" ")}</p></div>
+                <div><p className="text-[0.88rem] font-semibold text-[#222]">{s.label}</p><p className="mt-1 text-[0.82rem] leading-[1.5] text-[#888]">{(displayAbout[s.key] || []).join(" ")}</p></div>
                 <button onClick={() => startEdit(s.key)} className="shrink-0 text-[#aaa] hover:text-[#111]"><FiEdit2 className="text-[0.85rem]" /></button>
               </div>
             )}

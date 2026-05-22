@@ -12,6 +12,7 @@ import type * as auth from "../auth.js";
 import type * as content from "../content.js";
 import type * as images from "../images.js";
 import type * as seed from "../seed.js";
+import type * as settings from "../settings.js";
 
 import type {
   ApiFromModules,
@@ -24,6 +25,7 @@ declare const fullApi: ApiFromModules<{
   content: typeof content;
   images: typeof images;
   seed: typeof seed;
+  settings: typeof settings;
 }>;
 
 /**

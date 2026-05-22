@@ -63,6 +63,26 @@ export const getNavSections = query({
   },
 });
 
+export const upsertNavSection = mutation({
+  args: {
+    sectionId: v.string(),
+    label: v.string(),
+    order: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("navSections")
+      .filter((q) => q.eq(q.field("sectionId"), args.sectionId))
+      .first();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, args);
+    } else {
+      await ctx.db.insert("navSections", args);
+    }
+  },
+});
+
 // ─── Projects ───
 export const getProjects = query({
   handler: async (ctx) => {
@@ -125,6 +145,28 @@ export const deleteProject = mutation({
 export const getValues = query({
   handler: async (ctx) => {
     return await ctx.db.query("values").withIndex("by_order").collect();
+  },
+});
+
+export const upsertValue = mutation({
+  args: {
+    text: v.string(),
+    order: v.number(),
+    previousText: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const lookupText = args.previousText || args.text;
+    const existing = await ctx.db
+      .query("values")
+      .filter((q) => q.eq(q.field("text"), lookupText))
+      .first();
+
+    const value = { text: args.text, order: args.order };
+    if (existing) {
+      await ctx.db.patch(existing._id, value);
+    } else {
+      await ctx.db.insert("values", value);
+    }
   },
 });
 
