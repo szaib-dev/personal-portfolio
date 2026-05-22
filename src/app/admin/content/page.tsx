@@ -308,6 +308,9 @@ function ProjectsEditor() {
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState<EditorProject>({ slug: "", kicker: "", title: "", summary: "", metaLeft: "", metaRight: "", accent: "#111111", year: "", role: "", client: "", duration: "", stack: [], reverse: false, order: 0, caseStudyBlocksJson: "[]" });
   const [stackText, setStackText] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [savedNotice, setSavedNotice] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   if (!projects) return <Skeleton />;
@@ -325,12 +328,17 @@ function ProjectsEditor() {
   };
   const startEdit = (p: EditorProject) => {
     setEditing(p.slug);
+    setSaveError(null);
+    setSavedNotice(null);
     setExpandedProjects((current) => new Set(current).add(p.slug));
     setForm({ ...p, caseStudyBlocksJson: getProjectBlocksJson(p) });
     setStackText(p.stack.join(", "));
   };
   const startAdd = () => {
     setShowAdd(true);
+    setEditing(null);
+    setSaveError(null);
+    setSavedNotice(null);
     const defaultBlocks = createDefaultCaseStudyBlocks();
     setStackText("");
     setExpandedBlocks(new Set(defaultBlocks.map((_, index) => index)));
@@ -342,11 +350,50 @@ function ProjectsEditor() {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
-    if (!slug) return;
+    const missing = [
+      !form.title.trim() && "Title",
+      !form.kicker.trim() && "Kicker",
+      !form.summary.trim() && "Summary",
+      !form.metaLeft.trim() && "Meta left",
+      !form.metaRight.trim() && "Meta right",
+    ].filter(Boolean) as string[];
+
+    if (!slug) {
+      setSaveError("Add a title or slug before saving.");
+      return;
+    }
+
+    if (missing.length > 0) {
+      setSaveError(`Please fill: ${missing.join(", ")}.`);
+      return;
+    }
+
+    if (!/^#[0-9a-fA-F]{6}$/.test(form.accent.trim())) {
+      setSaveError("Accent must be a valid hex color like #111111.");
+      return;
+    }
+
     const nextStack = stackText.split(",").map((item) => item.trim()).filter(Boolean);
-    await upsert({ ...form, slug, stack: nextStack, caseStudyBlocksJson: JSON.stringify(blocks.length ? blocks : createDefaultCaseStudyBlocks(form.title || slug), null, 2) });
-    setEditing(null);
-    setShowAdd(false);
+    setSaving(true);
+    setSaveError(null);
+    setSavedNotice(null);
+
+    try {
+      await upsert({
+        ...form,
+        slug,
+        accent: form.accent.trim(),
+        stack: nextStack,
+        caseStudyBlocksJson: JSON.stringify(blocks.length ? blocks : createDefaultCaseStudyBlocks(form.title || slug), null, 2),
+      });
+      setEditing(null);
+      setShowAdd(false);
+      setSavedNotice(`Saved ${form.title.trim() || slug}.`);
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "Project could not be saved. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   };
   const confirmDel = async () => { if (deleteConfirm) { await deleteProject({ slug: deleteConfirm }); setDeleteConfirm(null); } };
 
@@ -381,19 +428,19 @@ function ProjectsEditor() {
         <p className="mt-1 text-[0.78rem] leading-[1.45] text-[#888]">This controls the homepage project card plus the project page hero/meta text.</p>
       </div>
       <div className="grid grid-cols-2 gap-3 max-[560px]:grid-cols-1">
-        <input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Slug" disabled={!!editing} />
-        <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Title" />
+        <input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Slug (auto from title if empty)" disabled={!!editing} />
+        <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Title *" />
       </div>
-      <input value={form.kicker} onChange={(e) => setForm({ ...form, kicker: e.target.value })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Kicker" />
-      <textarea value={form.summary} onChange={(e) => setForm({ ...form, summary: e.target.value })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" rows={3} placeholder="Summary" />
+      <input value={form.kicker} onChange={(e) => setForm({ ...form, kicker: e.target.value })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Kicker *" />
+      <textarea value={form.summary} onChange={(e) => setForm({ ...form, summary: e.target.value })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" rows={3} placeholder="Summary *" />
       <div className="grid grid-cols-3 gap-3 max-[560px]:grid-cols-1">
         <input value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Role" />
         <input value={form.client} onChange={(e) => setForm({ ...form, client: e.target.value })} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Client" />
         <input value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Duration" />
       </div>
       <div className="grid grid-cols-3 gap-3 max-[560px]:grid-cols-1">
-        <input value={form.metaLeft} onChange={(e) => setForm({ ...form, metaLeft: e.target.value })} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Meta Left" />
-        <input value={form.metaRight} onChange={(e) => setForm({ ...form, metaRight: e.target.value })} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Meta Right" />
+        <input value={form.metaLeft} onChange={(e) => setForm({ ...form, metaLeft: e.target.value })} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Meta Left *" />
+        <input value={form.metaRight} onChange={(e) => setForm({ ...form, metaRight: e.target.value })} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Meta Right *" />
         <input value={form.accent} onChange={(e) => setForm({ ...form, accent: e.target.value })} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Accent (#hex)" />
       </div>
       <input value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Year" />
@@ -501,9 +548,10 @@ function ProjectsEditor() {
         </div>
       </div>
       <div className="flex gap-2">
-        <button onClick={save} className="flex items-center gap-1.5 rounded-[5px] bg-[#111] px-3 py-1.5 text-[0.82rem] font-medium text-white"><FiSave className="text-[0.75rem]" /> Save</button>
-        <button onClick={() => { setEditing(null); setShowAdd(false); }} className="flex items-center gap-1.5 rounded-[5px] border border-[#e0e0e0] px-3 py-1.5 text-[0.82rem] font-medium text-[#666]"><FiX className="text-[0.75rem]" /> Cancel</button>
+        <button type="button" onClick={save} disabled={saving} className="flex items-center gap-1.5 rounded-[5px] bg-[#111] px-3 py-1.5 text-[0.82rem] font-medium text-white disabled:cursor-wait disabled:opacity-60"><FiSave className="text-[0.75rem]" /> {saving ? "Saving..." : "Save project"}</button>
+        <button type="button" onClick={() => { setEditing(null); setShowAdd(false); setSaveError(null); }} className="flex items-center gap-1.5 rounded-[5px] border border-[#e0e0e0] px-3 py-1.5 text-[0.82rem] font-medium text-[#666]"><FiX className="text-[0.75rem]" /> Cancel</button>
       </div>
+      {saveError && <p className="rounded-[6px] border border-[#f0caca] bg-[#fff7f7] px-3 py-2 text-[0.82rem] font-medium text-[#c93333]">{saveError}</p>}
     </div>
   );
 
@@ -513,6 +561,7 @@ function ProjectsEditor() {
         <div><h2 className="text-[1.2rem] font-semibold tracking-[-0.02em] text-[#111]">Project pages</h2><p className="text-[0.85rem] text-[#888]">Edit only the project-page text you can see: overview, persona, mood, final design, mobile response, and case-study copy.</p></div>
         <button onClick={startAdd} className="flex items-center gap-1.5 rounded-[5px] bg-[#111] px-3 py-1.5 text-[0.82rem] font-medium text-white"><FiPlus className="text-[0.75rem]" /> Add</button>
       </div>
+      {savedNotice && <p className="rounded-[6px] border border-[#d7ead8] bg-[#f7fff7] px-3 py-2 text-[0.82rem] font-medium text-[#347a3b]">{savedNotice}</p>}
       <div className="flex gap-2">
         <button type="button" onClick={() => setExpandedProjects(new Set(displayProjects.map((p: any) => p.slug)))} className="rounded-[5px] border border-[#dedede] px-3 py-1.5 text-[0.78rem] font-medium text-[#666] hover:text-[#111]">Expand all projects</button>
         <button type="button" onClick={() => setExpandedProjects(new Set())} className="rounded-[5px] border border-[#dedede] px-3 py-1.5 text-[0.78rem] font-medium text-[#666] hover:text-[#111]">Collapse all</button>
