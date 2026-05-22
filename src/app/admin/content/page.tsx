@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useMemo } from "react";
 import { ConvexProvider, ConvexReactClient, useQuery, useMutation } from "convex/react";
@@ -294,7 +294,6 @@ function ProjectsEditor() {
   const [expandedBlocks, setExpandedBlocks] = useState<Set<number>>(new Set());
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState<EditorProject>({ slug: "", kicker: "", title: "", summary: "", metaLeft: "", metaRight: "", accent: "#111111", year: "", role: "", client: "", duration: "", stack: [], reverse: false, order: 0, caseStudyBlocksJson: "[]" });
-  const [jsonError, setJsonError] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   if (!projects) return <Skeleton />;
@@ -312,27 +311,18 @@ function ProjectsEditor() {
   };
   const startEdit = (p: EditorProject) => {
     setEditing(p.slug);
-    setJsonError(null);
     setExpandedProjects((current) => new Set(current).add(p.slug));
     setForm({ ...p, caseStudyBlocksJson: getProjectBlocksJson(p) });
   };
   const startAdd = () => {
     setShowAdd(true);
-    setJsonError(null);
     setForm({ slug: "", kicker: "", title: "", summary: "", metaLeft: "", metaRight: "", accent: "#111111", year: new Date().getFullYear().toString(), role: "", client: "", duration: "", stack: [], reverse: false, order: displayProjects.length, caseStudyBlocksJson: "[]" });
   };
   const save = async () => {
     if (!form.slug) return;
-    try {
-      const parsed = JSON.parse(form.caseStudyBlocksJson || "[]");
-      if (!Array.isArray(parsed)) throw new Error("Case-study sections must be an array.");
-      await upsert({ ...form, caseStudyBlocksJson: JSON.stringify(parsed, null, 2) });
-      setEditing(null);
-      setShowAdd(false);
-      setJsonError(null);
-    } catch (error) {
-      setJsonError(error instanceof Error ? error.message : "Case-study JSON is not valid.");
-    }
+    await upsert({ ...form, caseStudyBlocksJson: JSON.stringify(blocks, null, 2) });
+    setEditing(null);
+    setShowAdd(false);
   };
   const confirmDel = async () => { if (deleteConfirm) { await deleteProject({ slug: deleteConfirm }); setDeleteConfirm(null); } };
 
@@ -348,6 +338,18 @@ function ProjectsEditor() {
   };
 
   const blocks = parseProjectBlocks(form.caseStudyBlocksJson || "[]");
+  const editableBlocks = blocks
+    .map((block, index) => ({ block, index }))
+    .filter(({ block }) => block.type === "overview" || block.type === "section" || block.type === "persona");
+  const updateBlock = (index: number, nextBlock: CaseStudyBlock) => {
+    const nextBlocks = [...blocks];
+    nextBlocks[index] = nextBlock;
+    setForm({ ...form, caseStudyBlocksJson: JSON.stringify(nextBlocks, null, 2) });
+  };
+  const linesToList = (value: string, fallback: string[] = []) => {
+    const lines = value.split("\n").map((line) => line.trim()).filter(Boolean);
+    return lines.length ? lines : fallback;
+  };
   const renderFormFields = () => (
     <div className="space-y-3 rounded-[8px] border border-[#eaeaea] bg-[#fafafa] p-5">
       <div>
@@ -375,16 +377,16 @@ function ProjectsEditor() {
       <div className="rounded-[8px] border border-[#e4e4e4] bg-white">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#eeeeee] px-4 py-3">
           <div>
-            <p className="text-[0.92rem] font-semibold text-[#111]">Project page sections</p>
-            <p className="mt-1 text-[0.76rem] leading-[1.45] text-[#888]">Overview, persona, palette, typography, final design, galleries, mobile notes, and any other case-study text.</p>
+            <p className="text-[0.92rem] font-semibold text-[#111]">Case-study text</p>
+            <p className="mt-1 text-[0.76rem] leading-[1.45] text-[#888]">Only editable writing is shown here: overview, mood/direction, persona, case-study text, final design text, and mobile response text.</p>
           </div>
           <div className="flex gap-2">
-            <button type="button" onClick={() => setExpandedBlocks(new Set(blocks.map((_, index) => index)))} className="rounded-[5px] border border-[#dedede] px-2.5 py-1.5 text-[0.76rem] font-medium text-[#666] hover:text-[#111]">Expand all</button>
+            <button type="button" onClick={() => setExpandedBlocks(new Set(editableBlocks.map(({ index }) => index)))} className="rounded-[5px] border border-[#dedede] px-2.5 py-1.5 text-[0.76rem] font-medium text-[#666] hover:text-[#111]">Expand all</button>
             <button type="button" onClick={() => setExpandedBlocks(new Set())} className="rounded-[5px] border border-[#dedede] px-2.5 py-1.5 text-[0.76rem] font-medium text-[#666] hover:text-[#111]">Collapse all</button>
           </div>
         </div>
         <div className="divide-y divide-[#eeeeee]">
-          {blocks.map((block, index) => {
+          {editableBlocks.map(({ block, index }) => {
             const isOpen = expandedBlocks.has(index);
             return (
               <div key={`${block.type}-${index}`}>
@@ -402,42 +404,76 @@ function ProjectsEditor() {
                     <span className="block text-[0.84rem] font-semibold text-[#222]">{getBlockTitle(block, index)}</span>
                     <span className="mt-0.5 block text-[0.72rem] uppercase tracking-[0.12em] text-[#aaa]">{block.type}</span>
                   </span>
-                  <span className="text-[1.1rem] text-[#aaa]">{isOpen ? "−" : "+"}</span>
+                  <span className="text-[1.1rem] text-[#aaa]">{isOpen ? "âˆ’" : "+"}</span>
                 </button>
                 {isOpen && (
-                  <div className="bg-[#fbfbfb] px-4 pb-4">
-                    <textarea
-                      value={JSON.stringify(block, null, 2)}
-                      onChange={(event) => {
-                        try {
-                          const nextBlock = JSON.parse(event.target.value);
-                          const nextBlocks = [...blocks];
-                          nextBlocks[index] = nextBlock;
-                          setForm({ ...form, caseStudyBlocksJson: JSON.stringify(nextBlocks, null, 2) });
-                          setJsonError(null);
-                        } catch {
-                          setJsonError("This block JSON is not valid yet.");
-                        }
-                      }}
-                      className="min-h-[13rem] w-full rounded-[5px] border border-[#e0e0e0] bg-white px-3 py-2 font-mono text-[0.76rem] leading-[1.55] text-[#333] outline-none focus:border-[#111]"
-                    />
+                  <div className="space-y-3 bg-[#fbfbfb] px-4 pb-4">
+                    {block.type === "overview" && (
+                      <>
+                        <input value={block.superLabel} onChange={(e) => updateBlock(index, { ...block, superLabel: e.target.value })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Small label" />
+                        <input value={block.title} onChange={(e) => updateBlock(index, { ...block, title: e.target.value })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Title" />
+                        <textarea value={block.body} onChange={(e) => updateBlock(index, { ...block, body: e.target.value })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] leading-[1.6] outline-none focus:border-[#111]" rows={4} placeholder="Body" />
+                        <div className="grid grid-cols-2 gap-3 max-[760px]:grid-cols-1">
+                          {block.cards.map((card, cardIndex) => (
+                            <div key={cardIndex} className="rounded-[6px] border border-[#e7e7e7] bg-white p-3">
+                              <input
+                                value={card.label}
+                                onChange={(e) => {
+                                  const cards = [...block.cards];
+                                  cards[cardIndex] = { ...card, label: e.target.value };
+                                  updateBlock(index, { ...block, cards });
+                                }}
+                                className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.82rem] outline-none focus:border-[#111]"
+                                placeholder="Card label"
+                              />
+                              <textarea
+                                value={card.body || card.bullets?.join("\n") || ""}
+                                onChange={(e) => {
+                                  const cards = [...block.cards];
+                                  cards[cardIndex] = card.bullets
+                                    ? { ...card, bullets: linesToList(e.target.value, card.bullets) }
+                                    : { ...card, body: e.target.value };
+                                  updateBlock(index, { ...block, cards });
+                                }}
+                                className="mt-2 w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.82rem] leading-[1.55] outline-none focus:border-[#111]"
+                                rows={4}
+                                placeholder={card.bullets ? "One bullet per line" : "Card body"}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                    {block.type === "section" && (
+                      <>
+                        <input value={block.label} onChange={(e) => updateBlock(index, { ...block, label: e.target.value })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Section label" />
+                        <input value={block.title} onChange={(e) => updateBlock(index, { ...block, title: e.target.value })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Title" />
+                        <textarea value={block.body} onChange={(e) => updateBlock(index, { ...block, body: e.target.value })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] leading-[1.6] outline-none focus:border-[#111]" rows={5} placeholder="Body" />
+                      </>
+                    )}
+                    {block.type === "persona" && (
+                      <>
+                        <div className="grid grid-cols-2 gap-3 max-[760px]:grid-cols-1">
+                          <input value={block.label} onChange={(e) => updateBlock(index, { ...block, label: e.target.value })} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Label" />
+                          <input value={block.title} onChange={(e) => updateBlock(index, { ...block, title: e.target.value })} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Title" />
+                        </div>
+                        <textarea value={block.body} onChange={(e) => updateBlock(index, { ...block, body: e.target.value })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] leading-[1.6] outline-none focus:border-[#111]" rows={3} placeholder="Persona intro" />
+                        <textarea value={block.quote} onChange={(e) => updateBlock(index, { ...block, quote: e.target.value })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] leading-[1.6] outline-none focus:border-[#111]" rows={2} placeholder="Quote" />
+                        <div className="grid grid-cols-2 gap-3 max-[760px]:grid-cols-1">
+                          <input value={block.name} onChange={(e) => updateBlock(index, { ...block, name: e.target.value })} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Persona name" />
+                          <input value={block.role} onChange={(e) => updateBlock(index, { ...block, role: e.target.value })} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Persona role" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3 max-[760px]:grid-cols-1">
+                          <textarea value={block.goals.join("\n")} onChange={(e) => updateBlock(index, { ...block, goals: linesToList(e.target.value, block.goals) })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] leading-[1.6] outline-none focus:border-[#111]" rows={5} placeholder="Goals, one per line" />
+                          <textarea value={block.frustrations.join("\n")} onChange={(e) => updateBlock(index, { ...block, frustrations: linesToList(e.target.value, block.frustrations) })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] leading-[1.6] outline-none focus:border-[#111]" rows={5} placeholder="Frustrations, one per line" />
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
             );
           })}
-        </div>
-        <div className="border-t border-[#eeeeee] p-4">
-          <p className="mb-2 text-[0.78rem] font-semibold text-[#555]">Full sections JSON</p>
-          <textarea
-            value={form.caseStudyBlocksJson || "[]"}
-            onChange={(event) => {
-              setForm({ ...form, caseStudyBlocksJson: event.target.value });
-              setJsonError(null);
-            }}
-            className="min-h-[14rem] w-full rounded-[5px] border border-[#e0e0e0] bg-white px-3 py-2 font-mono text-[0.76rem] leading-[1.55] text-[#333] outline-none focus:border-[#111]"
-          />
-          {jsonError && <p className="mt-2 text-[0.78rem] font-medium text-[#d33]">{jsonError}</p>}
         </div>
       </div>
       <div className="flex gap-2">
@@ -450,28 +486,45 @@ function ProjectsEditor() {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <div><h2 className="text-[1.2rem] font-semibold tracking-[-0.02em] text-[#111]">Projects</h2><p className="text-[0.85rem] text-[#888]">Manage portfolio projects</p></div>
+        <div><h2 className="text-[1.2rem] font-semibold tracking-[-0.02em] text-[#111]">Project pages</h2><p className="text-[0.85rem] text-[#888]">Edit only the project-page text you can see: overview, persona, mood, final design, mobile response, and case-study copy.</p></div>
         <button onClick={startAdd} className="flex items-center gap-1.5 rounded-[5px] bg-[#111] px-3 py-1.5 text-[0.82rem] font-medium text-white"><FiPlus className="text-[0.75rem]" /> Add</button>
+      </div>
+      <div className="flex gap-2">
+        <button type="button" onClick={() => setExpandedProjects(new Set(displayProjects.map((p: any) => p.slug)))} className="rounded-[5px] border border-[#dedede] px-3 py-1.5 text-[0.78rem] font-medium text-[#666] hover:text-[#111]">Expand all projects</button>
+        <button type="button" onClick={() => setExpandedProjects(new Set())} className="rounded-[5px] border border-[#dedede] px-3 py-1.5 text-[0.78rem] font-medium text-[#666] hover:text-[#111]">Collapse all</button>
       </div>
       {showAdd && renderFormFields()}
       <div className="mt-4 space-y-3">
         {displayProjects.map((p: any, idx: number) => (
           <div key={p.slug}>
             {editing === p.slug ? renderFormFields() : (
-              <div className="flex items-center justify-between rounded-[8px] border border-[#eaeaea] p-4">
-                <div><p className="text-[0.9rem] font-semibold text-[#222]">{p.title}</p><p className="mt-0.5 text-[0.8rem] text-[#aaa]">{p.metaLeft} · {p.year}</p></div>
-                <div className="flex items-center gap-2">
-                  <button onClick={() => reorder(p.slug, "up")} disabled={idx === 0} className="text-[#ccc] hover:text-[#111] disabled:opacity-30"><FiArrowUp className="text-[0.8rem]" /></button>
-                  <button onClick={() => reorder(p.slug, "down")} disabled={idx === displayProjects.length - 1} className="text-[#ccc] hover:text-[#111] disabled:opacity-30"><FiArrowDown className="text-[0.8rem]" /></button>
-                  <button onClick={() => startEdit(p)} className="text-[#aaa] hover:text-[#111]"><FiEdit2 className="text-[0.85rem]" /></button>
-                  <button onClick={() => setDeleteConfirm(p.slug)} className="text-[#aaa] hover:text-[#e03030]"><FiTrash2 className="text-[0.85rem]" /></button>
-                </div>
+              <div className="overflow-hidden rounded-[8px] border border-[#eaeaea]">
+                <button type="button" onClick={() => toggleProject(p.slug)} className="flex w-full items-center justify-between p-4 text-left">
+                  <div><p className="text-[0.9rem] font-semibold text-[#222]">{p.title}</p><p className="mt-0.5 text-[0.8rem] text-[#aaa]">{p.metaLeft} · {p.year}</p></div>
+                  <span className="text-[1.1rem] text-[#aaa]">{expandedProjects.has(p.slug) ? "-" : "+"}</span>
+                </button>
+                {expandedProjects.has(p.slug) && (
+                  <div className="border-t border-[#eeeeee] bg-[#fbfbfb] p-4">
+                    <p className="max-w-[42rem] text-[0.84rem] leading-[1.55] text-[#666]">{p.summary}</p>
+                    <div className="mt-4 grid grid-cols-4 gap-3 text-[0.78rem] max-[760px]:grid-cols-2">
+                      <span><b className="text-[#aaa]">Client:</b> {p.client}</span>
+                      <span><b className="text-[#aaa]">Role:</b> {p.role}</span>
+                      <span><b className="text-[#aaa]">Duration:</b> {p.duration}</span>
+                      <span><b className="text-[#aaa]">Text sections:</b> {parseProjectBlocks(getProjectBlocksJson(p)).filter((block) => block.type === "overview" || block.type === "section" || block.type === "persona").length}</span>
+                    </div>
+                    <div className="mt-4 flex items-center gap-2">
+                      <button onClick={() => reorder(p.slug, "up")} disabled={idx === 0} className="rounded-[5px] border border-[#dedede] px-2.5 py-1.5 text-[#777] hover:text-[#111] disabled:opacity-30"><FiArrowUp className="text-[0.8rem]" /></button>
+                      <button onClick={() => reorder(p.slug, "down")} disabled={idx === displayProjects.length - 1} className="rounded-[5px] border border-[#dedede] px-2.5 py-1.5 text-[#777] hover:text-[#111] disabled:opacity-30"><FiArrowDown className="text-[0.8rem]" /></button>
+                      <button onClick={() => startEdit(p)} className="flex items-center gap-1.5 rounded-[5px] bg-[#111] px-3 py-1.5 text-[0.8rem] font-medium text-white"><FiEdit2 className="text-[0.78rem]" /> Edit text</button>
+                      <button onClick={() => setDeleteConfirm(p.slug)} className="rounded-[5px] border border-[#dedede] px-2.5 py-1.5 text-[#aaa] hover:text-[#e03030]"><FiTrash2 className="text-[0.85rem]" /></button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
         ))}
-      </div>
-      {deleteConfirm && (
+      </div>      {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="w-full max-w-[340px] rounded-[10px] bg-white p-6">
             <h3 className="text-[1.05rem] font-semibold text-[#111]">Delete project?</h3>
@@ -665,3 +718,5 @@ function Skeleton() {
     </div>
   );
 }
+
+
