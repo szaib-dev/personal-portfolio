@@ -266,12 +266,17 @@ export default function AdminDashboard({
               Images Manager
             </span>
           </Link>
-          <button
-            onClick={handleLogout}
-            className="text-[0.82rem] font-medium text-[#888888] transition-colors hover:text-[#111111]"
-          >
-            Sign out
-          </button>
+          <div className="flex items-center gap-4">
+            <a href="/admin/content" className="text-[0.82rem] font-medium text-[#888888] transition-colors hover:text-[#111111]">
+              Content →
+            </a>
+            <button
+              onClick={handleLogout}
+              className="text-[0.82rem] font-medium text-[#888888] transition-colors hover:text-[#111111]"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
       </header>
 

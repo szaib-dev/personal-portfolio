@@ -9,8 +9,9 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as content from "../content.js";
 import type * as images from "../images.js";
-import type * as settings from "../settings.js";
+import type * as seed from "../seed.js";
 
 import type {
   ApiFromModules,
@@ -20,8 +21,9 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  content: typeof content;
   images: typeof images;
-  settings: typeof settings;
+  seed: typeof seed;
 }>;
 
 /**
