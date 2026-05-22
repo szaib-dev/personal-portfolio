@@ -17,12 +17,20 @@ import {
 } from "@/data/site-content";
 import DynamicImage from "@/components/DynamicImage";
 import { getProjectAccent } from "@/lib/project-settings";
+import { useAudienceProfiles, useNavSections, useProjects, useValues, useReferences } from "@/hooks/useContent";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const TESTIMONIALS_PER_PAGE = 3;
 
 export default function Home() {
+  // Live content from Convex (falls back to static instantly)
+  const liveProfiles = useAudienceProfiles();
+  const liveNav = useNavSections();
+  const liveProjects = useProjects();
+  const liveValues = useValues();
+  const liveRefs = useReferences();
+
   const [activeAudience, setActiveAudience] = useState(audienceProfiles[0].id);
   const [activeSection, setActiveSection] = useState(navSections[0].id);
   const [activeReferencePage, setActiveReferencePage] = useState(0);
@@ -61,19 +69,19 @@ export default function Home() {
   const referencePages = useMemo(
     () =>
       Array.from(
-        { length: Math.ceil(referenceCards.length / TESTIMONIALS_PER_PAGE) },
+        { length: Math.ceil(liveRefs.length / TESTIMONIALS_PER_PAGE) },
         (_, index) =>
-          referenceCards.slice(
+          liveRefs.slice(
             index * TESTIMONIALS_PER_PAGE,
             index * TESTIMONIALS_PER_PAGE + TESTIMONIALS_PER_PAGE
           )
       ),
-    []
+    [liveRefs]
   );
 
   const activeProfile =
-    audienceProfiles.find((profile) => profile.id === activeAudience) ??
-    audienceProfiles[0];
+    liveProfiles.find((profile) => profile.id === activeAudience) ??
+    liveProfiles[0];
 
   useEffect(() => {
     let cancelled = false;
@@ -228,7 +236,7 @@ export default function Home() {
 
   useEffect(() => {
     const syncActiveSection = () => {
-      const sections = navSections
+      const sections = liveNav
         .map((section) => document.getElementById(section.id))
         .filter(Boolean) as HTMLElement[];
 
@@ -409,7 +417,7 @@ export default function Home() {
         </Link>
 
         <aside className="fixed left-7 top-48 z-20 flex flex-col gap-[0.08rem] min-[1800px]:left-[max(1.75rem,calc((100vw-1720px)/2+1.75rem))] max-[1024px]:static max-[1024px]:mb-10 max-[1024px]:mt-16 max-[560px]:hidden">
-          {navSections.map((section) => (
+          {liveNav.map((section) => (
             <a
               key={section.id}
               href={`#${section.id}`}
@@ -428,7 +436,7 @@ export default function Home() {
           className="ml-[clamp(16.125rem,28vw,29.125rem)] min-h-screen w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),56rem)] scroll-mt-8 pt-[clamp(5.15rem,9vh,8rem)] max-[1024px]:ml-0 max-[1024px]:w-full max-[1024px]:min-h-0 max-[1024px]:pt-0"
         >
           <div className="flex w-[min(100%,43rem)] flex-wrap items-center gap-x-[1.15rem] gap-y-2 max-[1024px]:w-full">
-            {audienceProfiles.map((profile) => {
+            {liveProfiles.map((profile) => {
               const isActive = profile.id === activeAudience;
 
               return (
@@ -467,7 +475,7 @@ export default function Home() {
           data-section
           className="ml-[clamp(16.125rem,28vw,29.125rem)] w-[min(calc(100%-clamp(16.125rem,28vw,29.125rem)-2rem),88rem)] scroll-mt-8 pt-12 max-[1024px]:ml-0 max-[1024px]:w-full max-[1024px]:pt-20"
         >
-          {projectEntries.map((project) => {
+          {liveProjects.map((project) => {
             const accent = getProjectAccent(project.slug, project.accent, settings);
 
             return (
@@ -529,7 +537,7 @@ export default function Home() {
             data-stagger-group
             className="absolute left-[clamp(6.6rem,8.2vw,8.85rem)] top-0 mt-5 max-w-[29rem] max-[1220px]:static max-[1220px]:mt-0 max-[1220px]:max-w-full"
           >
-            {values.map((value) => (
+            {liveValues.map((value) => (
               <span
                 key={value}
                 data-value-line
