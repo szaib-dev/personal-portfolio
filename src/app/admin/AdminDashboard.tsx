@@ -1,13 +1,13 @@
-"use client";
+﻿"use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import ImageUploader from "./ImageUploader";
 import { AdminImageSkeleton } from "@/components/Skeleton";
-import { projectEntries } from "@/data/site-content";
+import { projectEntries, type CaseStudyBlock } from "@/data/site-content";
 import {
   getProjectAccent,
   isHexColor,
@@ -24,6 +24,7 @@ import {
   FiTrash2,
   FiCheck,
   FiLayers,
+  FiFileText,
 } from "react-icons/fi";
 
 type Slot = { id: string; label: string };
@@ -42,7 +43,24 @@ type ProjectGroup = {
   sections: Section[];
 };
 
-const buildProjectSections = (project: (typeof projectEntries)[number]): Section[] => {
+type AdminProject = {
+  slug: string;
+  title: string;
+  accent: string;
+  caseStudyBlocks: CaseStudyBlock[];
+};
+
+const parseCaseStudyBlocks = (value?: string) => {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? (parsed as CaseStudyBlock[]) : [];
+  } catch {
+    return [];
+  }
+};
+
+const buildProjectSections = (project: AdminProject): Section[] => {
   const hasPersona = project.caseStudyBlocks.some((block) => block.type === "persona");
   const galleryCount = project.caseStudyBlocks.reduce((count, block) => {
     if (block.type !== "gallery" || block.columns === 5) return count;
@@ -101,22 +119,26 @@ const buildProjectSections = (project: (typeof projectEntries)[number]): Section
   ];
 };
 
-const GROUPS: ProjectGroup[] = [
+const HOMEPAGE_GROUP: ProjectGroup = {
+  id: "homepage",
+  name: "Homepage",
+  icon: FiHome,
+  sections: [
+    {
+      id: "homepage-about",
+      label: "About Portraits",
+      icon: FiUser,
+      slots: [
+        { id: "primary", label: "Primary Portrait" },
+        { id: "secondary", label: "Secondary Portrait" },
+      ],
+    },
+  ],
+};
+
+const STATIC_GROUPS: ProjectGroup[] = [
   {
-    id: "homepage",
-    name: "Homepage",
-    icon: FiHome,
-    sections: [
-      {
-        id: "homepage-about",
-        label: "About Portraits",
-        icon: FiUser,
-        slots: [
-          { id: "primary", label: "Primary Portrait" },
-          { id: "secondary", label: "Secondary Portrait" },
-        ],
-      },
-    ],
+    ...HOMEPAGE_GROUP,
   },
   ...projectEntries.map((project) => ({
     id: project.slug,
@@ -126,8 +148,8 @@ const GROUPS: ProjectGroup[] = [
   })),
 ];
 
-const getGroupAccent = (groupId: string, settings: { key: string; value: string }[]) => {
-  const project = projectEntries.find((entry) => entry.slug === groupId);
+const getGroupAccent = (groupId: string, settings: { key: string; value: string }[], projects: AdminProject[]) => {
+  const project = projects.find((entry) => entry.slug === groupId);
   return project ? getProjectAccent(project.slug, project.accent, settings) : "#111111";
 };
 
@@ -138,21 +160,59 @@ export default function AdminDashboard({
   token: string;
   onLogout: () => void;
 }) {
-  const [activeGroup, setActiveGroup] = useState<string>(GROUPS[0].id);
+  const [activeGroup, setActiveGroup] = useState<string>(STATIC_GROUPS[0].id);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(GROUPS[0].sections.map((s) => s.id))
+    new Set(STATIC_GROUPS[0].sections.map((s) => s.id))
   );
 
   const [deleteTarget, setDeleteTarget] = useState<Id<"images"> | null>(null);
   const [settings, setSettings] = useState<{ key: string; value: string }[]>([]);
 
   const allImages = useQuery(api.images.getAll);
+  const contentProjects = useQuery(api.content.getProjects);
   const deleteImage = useMutation(api.images.deleteImage);
   const setSetting = useMutation(api.settings.set);
   const logout = useMutation(api.auth.logout);
 
-  const currentGroup = GROUPS.find((g) => g.id === activeGroup)!;
-  const currentProject = projectEntries.find((project) => project.slug === activeGroup);
+  const adminProjects = useMemo<AdminProject[]>(() => {
+    if (contentProjects && contentProjects.length > 0) {
+      return contentProjects.map((project: any) => {
+        const staticProject = projectEntries.find((entry) => entry.slug === project.slug);
+        return {
+          slug: project.slug,
+          title: project.title,
+          accent: project.accent,
+          caseStudyBlocks:
+            parseCaseStudyBlocks(project.caseStudyBlocksJson).length > 0
+              ? parseCaseStudyBlocks(project.caseStudyBlocksJson)
+              : staticProject?.caseStudyBlocks ?? [],
+        };
+      });
+    }
+
+    return projectEntries.map((project) => ({
+      slug: project.slug,
+      title: project.title,
+      accent: project.accent,
+      caseStudyBlocks: project.caseStudyBlocks,
+    }));
+  }, [contentProjects]);
+
+  const groups = useMemo<ProjectGroup[]>(
+    () => [
+      HOMEPAGE_GROUP,
+      ...adminProjects.map((project) => ({
+        id: project.slug,
+        name: project.title,
+        icon: FiLayers,
+        sections: buildProjectSections(project),
+      })),
+    ],
+    [adminProjects]
+  );
+
+  const currentGroup = groups.find((g) => g.id === activeGroup) ?? groups[0];
+  const currentProject = adminProjects.find((project) => project.slug === activeGroup);
 
   useEffect(() => {
     let cancelled = false;
@@ -222,7 +282,7 @@ export default function AdminDashboard({
 
   const handleGroupChange = (groupId: string) => {
     setActiveGroup(groupId);
-    const group = GROUPS.find((g) => g.id === groupId)!;
+    const group = groups.find((g) => g.id === groupId) ?? groups[0];
     setExpandedSections(new Set(group.sections.map((s) => s.id)));
   };
 
@@ -266,9 +326,14 @@ export default function AdminDashboard({
               Images Manager
             </span>
           </Link>
-          <div className="flex items-center gap-4">
-            <a href="/admin/content" className="text-[0.82rem] font-medium text-[#888888] transition-colors hover:text-[#111111]">
-              Content →
+          <div className="flex items-center gap-2">
+            <a href="/admin" className="inline-flex items-center gap-1.5 rounded-[5px] bg-[#111] px-3 py-1.5 text-[0.8rem] font-medium text-white">
+              <FiImage className="text-[0.9rem]" />
+              Images
+            </a>
+            <a href="/admin/content" className="inline-flex items-center gap-1.5 rounded-[5px] border border-[#dedede] px-3 py-1.5 text-[0.8rem] font-medium text-[#555] transition-colors hover:border-[#111] hover:text-[#111]">
+              <FiFileText className="text-[0.9rem]" />
+              Content
             </a>
             <button
               onClick={handleLogout}
@@ -284,12 +349,12 @@ export default function AdminDashboard({
       <div className="border-b border-[#eaeaea]">
         <div className="mx-auto max-w-[960px] px-6 max-[560px]:px-4">
           <div className="flex gap-6 overflow-x-auto pt-1 max-[560px]:gap-4">
-            {GROUPS.map((group) => {
+            {groups.map((group) => {
               const GroupIcon = group.icon;
               const uploaded = getUploadedCount(group.id);
               const total = getTotalSlots(group);
               const isActive = activeGroup === group.id;
-              const groupAccent = getGroupAccent(group.id, settings);
+              const groupAccent = getGroupAccent(group.id, settings, adminProjects);
               return (
                 <button
                   key={group.id}
@@ -351,7 +416,7 @@ export default function AdminDashboard({
 
         <div className="mb-5 flex items-center justify-between">
           <p className="text-[0.82rem] font-medium text-[#888888]">
-            {currentGroup.sections.length} sections · {getTotalSlots(currentGroup)} slots
+            {currentGroup.sections.length} sections Â· {getTotalSlots(currentGroup)} slots
           </p>
           <button
             onClick={() => {
@@ -506,3 +571,4 @@ export default function AdminDashboard({
     </div>
   );
 }
+

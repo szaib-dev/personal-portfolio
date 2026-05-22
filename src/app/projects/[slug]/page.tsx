@@ -68,7 +68,7 @@ async function getLiveProject(slug: string): Promise<ProjectEntry | null> {
     if (dbProject.caseStudyBlocksJson) {
       try {
         const parsed = JSON.parse(dbProject.caseStudyBlocksJson);
-        if (Array.isArray(parsed)) {
+        if (Array.isArray(parsed) && parsed.length > 0) {
           liveBlocks = parsed as CaseStudyBlock[];
         }
       } catch {

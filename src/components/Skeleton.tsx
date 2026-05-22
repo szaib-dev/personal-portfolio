@@ -5,10 +5,12 @@ import type { CSSProperties } from "react";
 export function ImageSkeleton({ className = "", style }: { className?: string; style?: CSSProperties }) {
   return (
     <div
-      className={`relative overflow-hidden rounded-[3px] bg-[#f0f0f0] ${className}`}
+      className={`relative overflow-hidden rounded-[3px] bg-[#f1f1f1] ${className}`}
       style={style}
     >
-      <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.6s_infinite] bg-gradient-to-r from-transparent via-white/70 to-transparent" />
+      <div className="absolute inset-0 animate-pulse bg-[linear-gradient(180deg,#f6f6f6_0%,#ececec_100%)]" />
+      <div className="absolute left-4 top-4 h-2 w-20 rounded-full bg-white/70" />
+      <div className="absolute bottom-4 left-4 h-2 w-32 rounded-full bg-white/60" />
     </div>
   );
 }

@@ -3,11 +3,10 @@
 import { useState, useEffect, useMemo } from "react";
 import { ConvexProvider, ConvexReactClient, useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
-import { FiEdit2, FiSave, FiX, FiPlus, FiTrash2, FiUser, FiMessageSquare, FiType, FiLayers, FiArrowUp, FiArrowDown } from "react-icons/fi";
+import { FiEdit2, FiSave, FiX, FiPlus, FiTrash2, FiUser, FiMessageSquare, FiType, FiLayers, FiArrowUp, FiArrowDown, FiImage, FiFileText } from "react-icons/fi";
 import {
   aboutContent as staticAbout,
   audienceProfiles as staticProfiles,
-  navSections as staticNav,
   projectEntries as staticProjects,
   referenceCards as staticReferences,
   type CaseStudyBlock,
@@ -118,17 +117,69 @@ const getBlockTitle = (block: CaseStudyBlock, index: number) => {
   return `${index + 1}. ${block.type}`;
 };
 
+const createDefaultCaseStudyBlocks = (projectName = "New Project"): CaseStudyBlock[] => [
+  {
+    type: "overview",
+    superLabel: "The project itself :",
+    title: "Project Overview",
+    body: `${projectName} overview copy goes here.`,
+    cards: [
+      { icon: "problem", label: "Problem:", body: "Describe the core problem." },
+      { icon: "goal", label: "Goal:", body: "Describe the project goal." },
+      { icon: "role", label: "My role:", body: "Describe your role." },
+      {
+        icon: "responsibilities",
+        label: "Responsibilities:",
+        bullets: ["Visual direction", "Layout", "Development"],
+      },
+    ],
+  },
+  {
+    type: "section",
+    label: "Mood",
+    title: "Define the project direction.",
+    body: "Add the mood, app direction, or strategy text here.",
+  },
+  {
+    type: "persona",
+    label: "User Personas",
+    title: "User profile",
+    body: "Describe who this project is designed for.",
+    quote: "Add the persona quote here.",
+    name: "Persona Name",
+    role: "Persona Role",
+    photo: "",
+    details: [
+      { label: "Age", value: "00" },
+      { label: "Location", value: "City, Country" },
+      { label: "Need", value: "Primary need" },
+    ],
+    goals: ["Add a goal"],
+    frustrations: ["Add a frustration"],
+  },
+  {
+    type: "section",
+    label: "Case Study",
+    title: "Explain the case-study thinking.",
+    body: "Add the main case-study text here.",
+  },
+  {
+    type: "section",
+    label: "Final Design",
+    title: "Describe the final design.",
+    body: "Add the final design text here.",
+  },
+  {
+    type: "section",
+    label: "Mobile Responsiveness",
+    title: "Describe the mobile response.",
+    body: "Add the mobile response text here.",
+  },
+];
+
 function ContentEditor() {
   const [activeTab, setActiveTab] = useState<Tab>("profiles");
-  const [syncing, setSyncing] = useState(false);
   const sessionCheck = useQuery(api.auth.validateSession, { token: localStorage.getItem("admin_token") || "" });
-  const upsertProfile = useMutation(api.content.upsertAudienceProfile);
-  const upsertNav = useMutation(api.content.upsertNavSection);
-  const upsertProject = useMutation(api.content.upsertProject);
-  const upsertReference = useMutation(api.content.upsertReference);
-  const upsertValue = useMutation(api.content.upsertValue);
-  const setAbout = useMutation(api.content.setAboutContent);
-  const setSiteContent = useMutation(api.content.setSiteContent);
 
   if (sessionCheck && !sessionCheck.valid) {
     return (
@@ -148,58 +199,20 @@ function ContentEditor() {
     { id: "about", label: "About + Footer Text", description: "About copy before the page ends", icon: FiEdit2 },
   ];
 
-  const syncStaticContent = async () => {
-    setSyncing(true);
-    try {
-      await Promise.all([
-        ...staticProfiles.map((profile, order) =>
-          upsertProfile({
-            profileId: profile.id,
-            label: profile.label,
-            headline: profile.headline,
-            summary: profile.summary,
-            order,
-          })
-        ),
-        ...staticNav.map((section, order) =>
-          upsertNav({ sectionId: section.id, label: section.label, order })
-        ),
-        ...staticProjects.map((project, order) =>
-          upsertProject({
-            ...makeStaticProject(project, order),
-          })
-        ),
-        ...staticReferences.map((reference, order) =>
-          upsertReference({ ...reference, order })
-        ),
-        ...staticValues.map((text, order) => upsertValue({ text, order })),
-        setAbout({ key: "heading", lines: staticAbout.heading }),
-        setAbout({ key: "columnTwo", lines: staticAbout.columnTwo }),
-        setAbout({ key: "columnThree", lines: staticAbout.columnThree }),
-        setAbout({ key: "bottomText", lines: staticAbout.bottomText }),
-        setSiteContent({ key: "site.name", value: "SA" }),
-        setSiteContent({ key: "values.description", value: DEFAULT_VALUES_DESCRIPTION }),
-      ]);
-    } finally {
-      setSyncing(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-white">
       <header className="sticky top-0 z-20 border-b border-[#eaeaea] bg-white">
         <div className="mx-auto flex max-w-[960px] items-center justify-between px-6 py-4 max-[560px]:px-4">
           <span className="text-[0.95rem] font-semibold tracking-[-0.03em] text-[#111]">Content Manager</span>
-          <div className="flex items-center gap-4">
-            <button
-              type="button"
-              onClick={syncStaticContent}
-              disabled={syncing}
-              className="rounded-[5px] border border-[#dedede] px-3 py-1.5 text-[0.8rem] font-medium text-[#555] transition-colors hover:border-[#111] hover:text-[#111] disabled:cursor-wait disabled:opacity-60"
-            >
-              {syncing ? "Syncing..." : "Sync current content"}
-            </button>
-            <a href="/admin" className="text-[0.82rem] font-medium text-[#888] hover:text-[#111]">Images</a>
+          <div className="flex items-center gap-2">
+            <a href="/admin" className="inline-flex items-center gap-1.5 rounded-[5px] border border-[#dedede] px-3 py-1.5 text-[0.8rem] font-medium text-[#555] transition-colors hover:border-[#111] hover:text-[#111]">
+              <FiImage className="text-[0.9rem]" />
+              Images
+            </a>
+            <a href="/admin/content" className="inline-flex items-center gap-1.5 rounded-[5px] bg-[#111] px-3 py-1.5 text-[0.8rem] font-medium text-white">
+              <FiFileText className="text-[0.9rem]" />
+              Content
+            </a>
           </div>
         </div>
       </header>
@@ -294,6 +307,7 @@ function ProjectsEditor() {
   const [expandedBlocks, setExpandedBlocks] = useState<Set<number>>(new Set());
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState<EditorProject>({ slug: "", kicker: "", title: "", summary: "", metaLeft: "", metaRight: "", accent: "#111111", year: "", role: "", client: "", duration: "", stack: [], reverse: false, order: 0, caseStudyBlocksJson: "[]" });
+  const [stackText, setStackText] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   if (!projects) return <Skeleton />;
@@ -313,14 +327,24 @@ function ProjectsEditor() {
     setEditing(p.slug);
     setExpandedProjects((current) => new Set(current).add(p.slug));
     setForm({ ...p, caseStudyBlocksJson: getProjectBlocksJson(p) });
+    setStackText(p.stack.join(", "));
   };
   const startAdd = () => {
     setShowAdd(true);
-    setForm({ slug: "", kicker: "", title: "", summary: "", metaLeft: "", metaRight: "", accent: "#111111", year: new Date().getFullYear().toString(), role: "", client: "", duration: "", stack: [], reverse: false, order: displayProjects.length, caseStudyBlocksJson: "[]" });
+    const defaultBlocks = createDefaultCaseStudyBlocks();
+    setStackText("");
+    setExpandedBlocks(new Set(defaultBlocks.map((_, index) => index)));
+    setForm({ slug: "", kicker: "", title: "", summary: "", metaLeft: "", metaRight: "", accent: "#111111", year: new Date().getFullYear().toString(), role: "", client: "", duration: "", stack: [], reverse: false, order: displayProjects.length, caseStudyBlocksJson: JSON.stringify(defaultBlocks, null, 2) });
   };
   const save = async () => {
-    if (!form.slug) return;
-    await upsert({ ...form, caseStudyBlocksJson: JSON.stringify(blocks, null, 2) });
+    const slug = (form.slug || form.title)
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+    if (!slug) return;
+    const nextStack = stackText.split(",").map((item) => item.trim()).filter(Boolean);
+    await upsert({ ...form, slug, stack: nextStack, caseStudyBlocksJson: JSON.stringify(blocks.length ? blocks : createDefaultCaseStudyBlocks(form.title || slug), null, 2) });
     setEditing(null);
     setShowAdd(false);
   };
@@ -373,7 +397,7 @@ function ProjectsEditor() {
         <input value={form.accent} onChange={(e) => setForm({ ...form, accent: e.target.value })} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Accent (#hex)" />
       </div>
       <input value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Year" />
-      <input value={form.stack.join(", ")} onChange={(e) => setForm({ ...form, stack: e.target.value.split(",").map(s => s.trim()).filter(Boolean) })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Stack (comma separated)" />
+      <input value={stackText} onChange={(e) => setStackText(e.target.value)} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Stack (comma separated)" />
       <div className="rounded-[8px] border border-[#e4e4e4] bg-white">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#eeeeee] px-4 py-3">
           <div>
@@ -404,7 +428,7 @@ function ProjectsEditor() {
                     <span className="block text-[0.84rem] font-semibold text-[#222]">{getBlockTitle(block, index)}</span>
                     <span className="mt-0.5 block text-[0.72rem] uppercase tracking-[0.12em] text-[#aaa]">{block.type}</span>
                   </span>
-                  <span className="text-[1.1rem] text-[#aaa]">{isOpen ? "âˆ’" : "+"}</span>
+                  <span className="text-[1.1rem] text-[#aaa]">{isOpen ? "-" : "+"}</span>
                 </button>
                 {isOpen && (
                   <div className="space-y-3 bg-[#fbfbfb] px-4 pb-4">
@@ -524,7 +548,8 @@ function ProjectsEditor() {
             )}
           </div>
         ))}
-      </div>      {deleteConfirm && (
+      </div>
+      {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="w-full max-w-[340px] rounded-[10px] bg-white p-6">
             <h3 className="text-[1.05rem] font-semibold text-[#111]">Delete project?</h3>
@@ -544,6 +569,7 @@ function ReferencesEditor() {
   const references = useQuery(api.content.getReferences);
   const upsert = useMutation(api.content.upsertReference);
   const [editing, setEditing] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [form, setForm] = useState({ name: "", role: "", body: "", order: 0 });
 
   if (!references) return <Skeleton />;
@@ -553,6 +579,14 @@ function ReferencesEditor() {
 
   const startEdit = (r: any) => { setEditing(r.name); setForm({ name: r.name, role: r.role, body: r.body, order: r.order }); };
   const save = async () => { await upsert(form); setEditing(null); };
+  const toggle = (name: string) => {
+    setExpanded((current) => {
+      const next = new Set(current);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
+      return next;
+    });
+  };
 
   return (
     <div className="space-y-3">
@@ -560,9 +594,9 @@ function ReferencesEditor() {
       <p className="text-[0.85rem] text-[#888]">Edit testimonials</p>
       <div className="mt-4 space-y-3">
         {displayReferences.map((r: any) => (
-          <div key={r.name} className="rounded-[8px] border border-[#eaeaea] p-4">
+          <div key={r.name} className="overflow-hidden rounded-[8px] border border-[#eaeaea]">
             {editing === r.name ? (
-              <div className="space-y-3">
+              <div className="space-y-3 p-4">
                 <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Name" />
                 <input value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Role" />
                 <textarea value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" rows={3} placeholder="Testimonial" />
@@ -572,10 +606,18 @@ function ReferencesEditor() {
                 </div>
               </div>
             ) : (
-              <div className="flex items-start justify-between">
-                <div><p className="text-[0.9rem] font-semibold text-[#222]">{r.name}</p><p className="text-[0.78rem] text-[#aaa]">{r.role}</p><p className="mt-1 text-[0.82rem] leading-[1.5] text-[#666]">{r.body.slice(0, 100)}...</p></div>
-                <button onClick={() => startEdit(r)} className="shrink-0 text-[#aaa] hover:text-[#111]"><FiEdit2 className="text-[0.85rem]" /></button>
-              </div>
+              <>
+                <button type="button" onClick={() => toggle(r.name)} className="flex w-full items-start justify-between gap-4 p-4 text-left">
+                  <div><p className="text-[0.9rem] font-semibold text-[#222]">{r.name}</p><p className="text-[0.78rem] text-[#aaa]">{r.role}</p></div>
+                  <span className="text-[1.1rem] text-[#aaa]">{expanded.has(r.name) ? "-" : "+"}</span>
+                </button>
+                {expanded.has(r.name) && (
+                  <div className="border-t border-[#eeeeee] bg-[#fbfbfb] p-4">
+                    <p className="text-[0.82rem] leading-[1.55] text-[#666]">{r.body}</p>
+                    <button onClick={() => startEdit(r)} className="mt-4 inline-flex items-center gap-1.5 rounded-[5px] bg-[#111] px-3 py-1.5 text-[0.8rem] font-medium text-white"><FiEdit2 className="text-[0.78rem]" /> Edit</button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         ))}
@@ -591,6 +633,8 @@ function ValuesEditor() {
   const upsertValue = useMutation(api.content.upsertValue);
   const [editingDesc, setEditingDesc] = useState(false);
   const [editingValue, setEditingValue] = useState<string | null>(null);
+  const [expandedValues, setExpandedValues] = useState<Set<string>>(new Set());
+  const [descExpanded, setDescExpanded] = useState(false);
   const [desc, setDesc] = useState("");
   const [valueForm, setValueForm] = useState({ text: "", order: 0, previousText: "" });
 
@@ -609,32 +653,49 @@ function ValuesEditor() {
     await upsertValue(valueForm);
     setEditingValue(null);
   };
+  const toggleValue = (text: string) => {
+    setExpandedValues((current) => {
+      const next = new Set(current);
+      if (next.has(text)) next.delete(text);
+      else next.add(text);
+      return next;
+    });
+  };
 
   return (
     <div className="space-y-3">
       <h2 className="text-[1.2rem] font-semibold tracking-[-0.02em] text-[#111]">Values</h2>
       <div className="mt-4 space-y-2">
         {displayValues.map((v: any) => (
-          <div key={v.text} className="rounded-[8px] border border-[#eaeaea] px-4 py-3">
+          <div key={v.text} className="overflow-hidden rounded-[8px] border border-[#eaeaea]">
             {editingValue === v.text ? (
-              <div className="flex gap-2">
+              <div className="flex gap-2 p-4">
                 <input value={valueForm.text} onChange={(e) => setValueForm({ ...valueForm, text: e.target.value })} className="min-w-0 flex-1 rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" />
                 <button onClick={saveValue} className="rounded-[5px] bg-[#111] px-3 py-2 text-[0.8rem] font-medium text-white">Save</button>
                 <button onClick={() => setEditingValue(null)} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.8rem] font-medium text-[#666]">Cancel</button>
               </div>
             ) : (
-              <div className="flex items-center justify-between">
-                <p className="text-[1rem] font-semibold tracking-[-0.02em] text-[#222]">{v.text}</p>
-                <button onClick={() => startEditValue(v)} className="text-[#aaa] hover:text-[#111]"><FiEdit2 className="text-[0.85rem]" /></button>
-              </div>
+              <>
+                <button type="button" onClick={() => toggleValue(v.text)} className="flex w-full items-center justify-between px-4 py-3 text-left">
+                  <p className="text-[1rem] font-semibold tracking-[-0.02em] text-[#222]">{v.text}</p>
+                  <span className="text-[1.1rem] text-[#aaa]">{expandedValues.has(v.text) ? "-" : "+"}</span>
+                </button>
+                {expandedValues.has(v.text) && (
+                  <div className="border-t border-[#eeeeee] bg-[#fbfbfb] p-4">
+                    <button onClick={() => startEditValue(v)} className="inline-flex items-center gap-1.5 rounded-[5px] bg-[#111] px-3 py-1.5 text-[0.8rem] font-medium text-white"><FiEdit2 className="text-[0.78rem]" /> Edit</button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         ))}
       </div>
       <div className="mt-6 rounded-[8px] border border-[#eaeaea] p-4">
         <div className="flex items-center justify-between">
-          <p className="text-[0.88rem] font-semibold text-[#222]">Description</p>
-          {!editingDesc && <button onClick={startEditDesc} className="text-[#aaa] hover:text-[#111]"><FiEdit2 className="text-[0.85rem]" /></button>}
+          <button type="button" onClick={() => setDescExpanded((current) => !current)} className="flex flex-1 items-center justify-between text-left">
+            <p className="text-[0.88rem] font-semibold text-[#222]">Description</p>
+            <span className="text-[1.1rem] text-[#aaa]">{descExpanded ? "-" : "+"}</span>
+          </button>
         </div>
         {editingDesc ? (
           <div className="mt-3 space-y-3">
@@ -644,8 +705,13 @@ function ValuesEditor() {
               <button onClick={() => setEditingDesc(false)} className="flex items-center gap-1.5 rounded-[5px] border border-[#e0e0e0] px-3 py-1.5 text-[0.82rem] font-medium text-[#666]"><FiX className="text-[0.75rem]" /> Cancel</button>
             </div>
           </div>
+        ) : descExpanded ? (
+          <div className="mt-3 border-t border-[#eeeeee] pt-3">
+            <p className="text-[0.82rem] leading-[1.6] text-[#888]">{siteContent["values.description"] || DEFAULT_VALUES_DESCRIPTION}</p>
+            <button onClick={startEditDesc} className="mt-4 inline-flex items-center gap-1.5 rounded-[5px] bg-[#111] px-3 py-1.5 text-[0.8rem] font-medium text-white"><FiEdit2 className="text-[0.78rem]" /> Edit</button>
+          </div>
         ) : (
-          <p className="mt-2 text-[0.82rem] leading-[1.6] text-[#888]">{(siteContent["values.description"] || DEFAULT_VALUES_DESCRIPTION).slice(0, 180)}...</p>
+          <p className="mt-2 text-[0.82rem] leading-[1.6] text-[#888]">{(siteContent["values.description"] || DEFAULT_VALUES_DESCRIPTION).slice(0, 120)}...</p>
         )}
       </div>
     </div>
