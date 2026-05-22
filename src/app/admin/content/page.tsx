@@ -94,6 +94,24 @@ const makeStaticProject = (project: (typeof staticProjects)[number], order: numb
   caseStudyBlocksJson: JSON.stringify(project.caseStudyBlocks, null, 2),
 });
 
+const mergeEditorProjects = (projects: EditorProject[] | undefined) => {
+  if (!projects || projects.length === 0) {
+    return staticProjects.map((project, order) => makeStaticProject(project, order));
+  }
+
+  const bySlug = new Map(projects.map((project) => [project.slug, project]));
+  const mergedStatic = staticProjects.map((project, order) => ({
+    ...makeStaticProject(project, order),
+    ...bySlug.get(project.slug),
+    caseStudyBlocksJson: getProjectBlocksJson(bySlug.get(project.slug) || makeStaticProject(project, order)),
+  }));
+  const newProjects = projects.filter(
+    (project) => !staticProjects.some((staticProject) => staticProject.slug === project.slug)
+  );
+
+  return [...mergedStatic, ...newProjects].sort((a, b) => a.order - b.order);
+};
+
 const getProjectBlocksJson = (project: Partial<EditorProject>) =>
   project.caseStudyBlocksJson ||
   JSON.stringify(
@@ -314,9 +332,7 @@ function ProjectsEditor() {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   if (!projects) return <Skeleton />;
-  const displayProjects = projects.length
-    ? projects
-    : staticProjects.map((project, order) => makeStaticProject(project, order));
+  const displayProjects = mergeEditorProjects(projects as EditorProject[] | undefined);
 
   const toggleProject = (slug: string) => {
     setExpandedProjects((current) => {

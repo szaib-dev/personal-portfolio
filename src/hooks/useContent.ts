@@ -30,16 +30,59 @@ export function useNavSections() {
 export function useProjects() {
   const db = useQuery(api.content.getProjects);
   if (db && db.length > 0) {
-    return db.map((p: any) => ({
-      slug: p.slug, kicker: p.kicker, title: p.title, summary: p.summary,
-      metaLeft: p.metaLeft, metaRight: p.metaRight, accent: p.accent,
-      year: p.year, role: p.role, client: p.client, duration: p.duration,
-      stack: p.stack, reverse: p.reverse,
-      // Keep image/width/height from static for now (images managed separately)
-      image: staticProjects.find((sp) => sp.slug === p.slug)?.image ?? "/trend-bible.png",
-      width: staticProjects.find((sp) => sp.slug === p.slug)?.width ?? 1086,
-      height: staticProjects.find((sp) => sp.slug === p.slug)?.height ?? 633,
-    }));
+    const dbBySlug = new Map(db.map((project: any) => [project.slug, project]));
+    const mergedStatic = staticProjects.map((staticProject) => {
+      const p: any = dbBySlug.get(staticProject.slug);
+      if (!p) return staticProject;
+      return {
+        ...staticProject,
+        slug: p.slug,
+        kicker: p.kicker,
+        title: p.title,
+        summary: p.summary,
+        metaLeft: p.metaLeft,
+        metaRight: p.metaRight,
+        accent: p.accent,
+        year: p.year,
+        role: p.role,
+        client: p.client,
+        duration: p.duration,
+        stack: p.stack,
+        reverse: p.reverse,
+      };
+    });
+    const newProjects = db
+      .filter((project: any) => !staticProjects.some((staticProject) => staticProject.slug === project.slug))
+      .map((p: any) => ({
+        slug: p.slug,
+        kicker: p.kicker,
+        title: p.title,
+        summary: p.summary,
+        metaLeft: p.metaLeft,
+        metaRight: p.metaRight,
+        accent: p.accent,
+        year: p.year,
+        role: p.role,
+        client: p.client,
+        duration: p.duration,
+        stack: p.stack,
+        reverse: p.reverse,
+        image: "",
+        width: 1086,
+        height: 633,
+        heroImage: {
+          src: "",
+          alt: `${p.title} project hero`,
+          width: 1086,
+          height: 633,
+        },
+        caseStudyBlocks: [],
+      }));
+    return [...mergedStatic, ...newProjects].sort((a: any, b: any) => {
+      const aOrder = dbBySlug.get(a.slug)?.order ?? staticProjects.findIndex((project) => project.slug === a.slug);
+      const bOrder = dbBySlug.get(b.slug)?.order ?? staticProjects.findIndex((project) => project.slug === b.slug);
+      return aOrder - bOrder;
+    });
   }
   return staticProjects;
 }

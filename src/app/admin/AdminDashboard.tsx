@@ -153,6 +153,48 @@ const getGroupAccent = (groupId: string, settings: { key: string; value: string 
   return project ? getProjectAccent(project.slug, project.accent, settings) : "#111111";
 };
 
+const mergeAdminProjects = (projects: any[] | undefined): AdminProject[] => {
+  if (!projects || projects.length === 0) {
+    return projectEntries.map((project) => ({
+      slug: project.slug,
+      title: project.title,
+      accent: project.accent,
+      caseStudyBlocks: project.caseStudyBlocks,
+    }));
+  }
+
+  const bySlug = new Map(projects.map((project: any) => [project.slug, project]));
+  const mergedStatic = projectEntries.map((staticProject) => {
+    const project: any = bySlug.get(staticProject.slug);
+    if (!project) {
+      return {
+        slug: staticProject.slug,
+        title: staticProject.title,
+        accent: staticProject.accent,
+        caseStudyBlocks: staticProject.caseStudyBlocks,
+      };
+    }
+
+    const parsedBlocks = parseCaseStudyBlocks(project.caseStudyBlocksJson);
+    return {
+      slug: project.slug,
+      title: project.title,
+      accent: project.accent,
+      caseStudyBlocks: parsedBlocks.length > 0 ? parsedBlocks : staticProject.caseStudyBlocks,
+    };
+  });
+  const newProjects = projects
+    .filter((project: any) => !projectEntries.some((staticProject) => staticProject.slug === project.slug))
+    .map((project: any) => ({
+      slug: project.slug,
+      title: project.title,
+      accent: project.accent,
+      caseStudyBlocks: parseCaseStudyBlocks(project.caseStudyBlocksJson),
+    }));
+
+  return [...mergedStatic, ...newProjects];
+};
+
 export default function AdminDashboard({
   token,
   onLogout,
@@ -175,27 +217,7 @@ export default function AdminDashboard({
   const logout = useMutation(api.auth.logout);
 
   const adminProjects = useMemo<AdminProject[]>(() => {
-    if (contentProjects && contentProjects.length > 0) {
-      return contentProjects.map((project: any) => {
-        const staticProject = projectEntries.find((entry) => entry.slug === project.slug);
-        return {
-          slug: project.slug,
-          title: project.title,
-          accent: project.accent,
-          caseStudyBlocks:
-            parseCaseStudyBlocks(project.caseStudyBlocksJson).length > 0
-              ? parseCaseStudyBlocks(project.caseStudyBlocksJson)
-              : staticProject?.caseStudyBlocks ?? [],
-        };
-      });
-    }
-
-    return projectEntries.map((project) => ({
-      slug: project.slug,
-      title: project.title,
-      accent: project.accent,
-      caseStudyBlocks: project.caseStudyBlocks,
-    }));
+    return mergeAdminProjects(contentProjects);
   }, [contentProjects]);
 
   const groups = useMemo<ProjectGroup[]>(
