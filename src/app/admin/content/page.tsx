@@ -10,6 +10,7 @@ import {
   navSections as staticNav,
   projectEntries as staticProjects,
   referenceCards as staticReferences,
+  type CaseStudyBlock,
   values as staticValues,
 } from "@/data/site-content";
 
@@ -58,6 +59,64 @@ export default function ContentPage() {
 }
 
 type Tab = "profiles" | "references" | "values" | "about" | "projects";
+type EditorProject = {
+  slug: string;
+  kicker: string;
+  title: string;
+  summary: string;
+  metaLeft: string;
+  metaRight: string;
+  accent: string;
+  year: string;
+  role: string;
+  client: string;
+  duration: string;
+  stack: string[];
+  reverse: boolean;
+  order: number;
+  caseStudyBlocksJson?: string;
+};
+
+const makeStaticProject = (project: (typeof staticProjects)[number], order: number): EditorProject => ({
+  slug: project.slug,
+  kicker: project.kicker,
+  title: project.title,
+  summary: project.summary,
+  metaLeft: project.metaLeft,
+  metaRight: project.metaRight,
+  accent: project.accent,
+  year: project.year,
+  role: project.role,
+  client: project.client,
+  duration: project.duration,
+  stack: project.stack,
+  reverse: project.reverse,
+  order,
+  caseStudyBlocksJson: JSON.stringify(project.caseStudyBlocks, null, 2),
+});
+
+const getProjectBlocksJson = (project: Partial<EditorProject>) =>
+  project.caseStudyBlocksJson ||
+  JSON.stringify(
+    staticProjects.find((item) => item.slug === project.slug)?.caseStudyBlocks || [],
+    null,
+    2
+  );
+
+const parseProjectBlocks = (json: string): CaseStudyBlock[] => {
+  try {
+    const parsed = JSON.parse(json);
+    return Array.isArray(parsed) ? (parsed as CaseStudyBlock[]) : [];
+  } catch {
+    return [];
+  }
+};
+
+const getBlockTitle = (block: CaseStudyBlock, index: number) => {
+  if ("label" in block && block.label) return `${index + 1}. ${block.label}`;
+  if ("title" in block && block.title) return `${index + 1}. ${block.title}`;
+  return `${index + 1}. ${block.type}`;
+};
 
 function ContentEditor() {
   const [activeTab, setActiveTab] = useState<Tab>("profiles");
@@ -81,12 +140,12 @@ function ContentEditor() {
     );
   }
 
-  const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
-    { id: "profiles", label: "Profiles", icon: FiUser },
-    { id: "projects", label: "Projects", icon: FiLayers },
-    { id: "references", label: "References", icon: FiMessageSquare },
-    { id: "values", label: "Values", icon: FiType },
-    { id: "about", label: "About", icon: FiEdit2 },
+  const tabs: { id: Tab; label: string; description: string; icon: React.ElementType }[] = [
+    { id: "profiles", label: "Homepage Hero", description: "Audience tabs and intro copy", icon: FiUser },
+    { id: "projects", label: "Project Pages", description: "Cards, details, and case-study sections", icon: FiLayers },
+    { id: "references", label: "Testimonials", description: "Reference cards on the homepage", icon: FiMessageSquare },
+    { id: "values", label: "Values Section", description: "Big value words and paragraph", icon: FiType },
+    { id: "about", label: "About + Footer Text", description: "About copy before the page ends", icon: FiEdit2 },
   ];
 
   const syncStaticContent = async () => {
@@ -107,20 +166,7 @@ function ContentEditor() {
         ),
         ...staticProjects.map((project, order) =>
           upsertProject({
-            slug: project.slug,
-            kicker: project.kicker,
-            title: project.title,
-            summary: project.summary,
-            metaLeft: project.metaLeft,
-            metaRight: project.metaRight,
-            accent: project.accent,
-            year: project.year,
-            role: project.role,
-            client: project.client,
-            duration: project.duration,
-            stack: project.stack,
-            reverse: project.reverse,
-            order,
+            ...makeStaticProject(project, order),
           })
         ),
         ...staticReferences.map((reference, order) =>
@@ -159,14 +205,19 @@ function ContentEditor() {
       </header>
       <div className="border-b border-[#eaeaea]">
         <div className="mx-auto max-w-[960px] px-6 max-[560px]:px-4">
-          <div className="flex gap-6 overflow-x-auto pt-1 max-[560px]:gap-4">
+          <div className="grid grid-cols-5 gap-2 py-3 max-[900px]:flex max-[900px]:overflow-x-auto">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
                 <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                  className={`flex shrink-0 items-center gap-2 border-b-2 pb-3 pt-3 text-[0.88rem] font-medium transition-colors ${activeTab === tab.id ? "border-[#111] text-[#111]" : "border-transparent text-[#888] hover:text-[#444]"}`}>
-                  <Icon className="text-[0.9rem]" strokeWidth={1.8} />
-                  <span>{tab.label}</span>
+                  className={`min-h-[4.5rem] rounded-[7px] border p-3 text-left transition-colors max-[900px]:w-[15rem] max-[900px]:shrink-0 ${activeTab === tab.id ? "border-[#111] bg-[#111] text-white" : "border-[#e9e9e9] bg-white text-[#777] hover:border-[#cfcfcf] hover:text-[#111]"}`}>
+                  <span className="flex items-center gap-2 text-[0.84rem] font-semibold">
+                    <Icon className="text-[0.9rem]" strokeWidth={1.8} />
+                    <span>{tab.label}</span>
+                  </span>
+                  <span className={`mt-1.5 block text-[0.72rem] leading-[1.35] ${activeTab === tab.id ? "text-white/68" : "text-[#aaa]"}`}>
+                    {tab.description}
+                  </span>
                 </button>
               );
             })}
@@ -239,33 +290,50 @@ function ProjectsEditor() {
   const upsert = useMutation(api.content.upsertProject);
   const deleteProject = useMutation(api.content.deleteProject);
   const [editing, setEditing] = useState<string | null>(null);
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
+  const [expandedBlocks, setExpandedBlocks] = useState<Set<number>>(new Set());
   const [showAdd, setShowAdd] = useState(false);
-  const [form, setForm] = useState({ slug: "", kicker: "", title: "", summary: "", metaLeft: "", metaRight: "", accent: "#111111", year: "", role: "", client: "", duration: "", stack: [] as string[], reverse: false, order: 0 });
+  const [form, setForm] = useState<EditorProject>({ slug: "", kicker: "", title: "", summary: "", metaLeft: "", metaRight: "", accent: "#111111", year: "", role: "", client: "", duration: "", stack: [], reverse: false, order: 0, caseStudyBlocksJson: "[]" });
+  const [jsonError, setJsonError] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   if (!projects) return <Skeleton />;
   const displayProjects = projects.length
     ? projects
-    : staticProjects.map((project, order) => ({
-        slug: project.slug,
-        kicker: project.kicker,
-        title: project.title,
-        summary: project.summary,
-        metaLeft: project.metaLeft,
-        metaRight: project.metaRight,
-        accent: project.accent,
-        year: project.year,
-        role: project.role,
-        client: project.client,
-        duration: project.duration,
-        stack: project.stack,
-        reverse: project.reverse,
-        order,
-      }));
+    : staticProjects.map((project, order) => makeStaticProject(project, order));
 
-  const startEdit = (p: any) => { setEditing(p.slug); setForm({ slug: p.slug, kicker: p.kicker, title: p.title, summary: p.summary, metaLeft: p.metaLeft, metaRight: p.metaRight, accent: p.accent, year: p.year, role: p.role, client: p.client, duration: p.duration, stack: p.stack, reverse: p.reverse, order: p.order }); };
-  const startAdd = () => { setShowAdd(true); setForm({ slug: "", kicker: "", title: "", summary: "", metaLeft: "", metaRight: "", accent: "#111111", year: new Date().getFullYear().toString(), role: "", client: "", duration: "", stack: [], reverse: false, order: displayProjects.length }); };
-  const save = async () => { if (!form.slug) return; await upsert(form); setEditing(null); setShowAdd(false); };
+  const toggleProject = (slug: string) => {
+    setExpandedProjects((current) => {
+      const next = new Set(current);
+      if (next.has(slug)) next.delete(slug);
+      else next.add(slug);
+      return next;
+    });
+  };
+  const startEdit = (p: EditorProject) => {
+    setEditing(p.slug);
+    setJsonError(null);
+    setExpandedProjects((current) => new Set(current).add(p.slug));
+    setForm({ ...p, caseStudyBlocksJson: getProjectBlocksJson(p) });
+  };
+  const startAdd = () => {
+    setShowAdd(true);
+    setJsonError(null);
+    setForm({ slug: "", kicker: "", title: "", summary: "", metaLeft: "", metaRight: "", accent: "#111111", year: new Date().getFullYear().toString(), role: "", client: "", duration: "", stack: [], reverse: false, order: displayProjects.length, caseStudyBlocksJson: "[]" });
+  };
+  const save = async () => {
+    if (!form.slug) return;
+    try {
+      const parsed = JSON.parse(form.caseStudyBlocksJson || "[]");
+      if (!Array.isArray(parsed)) throw new Error("Case-study sections must be an array.");
+      await upsert({ ...form, caseStudyBlocksJson: JSON.stringify(parsed, null, 2) });
+      setEditing(null);
+      setShowAdd(false);
+      setJsonError(null);
+    } catch (error) {
+      setJsonError(error instanceof Error ? error.message : "Case-study JSON is not valid.");
+    }
+  };
   const confirmDel = async () => { if (deleteConfirm) { await deleteProject({ slug: deleteConfirm }); setDeleteConfirm(null); } };
 
   // Reorder
@@ -273,14 +341,19 @@ function ProjectsEditor() {
     const idx = displayProjects.findIndex((p: any) => p.slug === slug);
     const swapIdx = direction === "up" ? idx - 1 : idx + 1;
     if (swapIdx < 0 || swapIdx >= displayProjects.length) return;
-    const current = displayProjects[idx];
-    const swap = displayProjects[swapIdx];
-    await upsert({ ...current, order: swap.order });
-    await upsert({ ...swap, order: current.order });
+    const current = displayProjects[idx] as EditorProject;
+    const swap = displayProjects[swapIdx] as EditorProject;
+    await upsert({ ...current, caseStudyBlocksJson: getProjectBlocksJson(current), order: swap.order });
+    await upsert({ ...swap, caseStudyBlocksJson: getProjectBlocksJson(swap), order: current.order });
   };
 
+  const blocks = parseProjectBlocks(form.caseStudyBlocksJson || "[]");
   const renderFormFields = () => (
     <div className="space-y-3 rounded-[8px] border border-[#eaeaea] bg-[#fafafa] p-5">
+      <div>
+        <p className="text-[0.92rem] font-semibold text-[#111]">Project overview content</p>
+        <p className="mt-1 text-[0.78rem] leading-[1.45] text-[#888]">This controls the homepage project card plus the project page hero/meta text.</p>
+      </div>
       <div className="grid grid-cols-2 gap-3 max-[560px]:grid-cols-1">
         <input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Slug" disabled={!!editing} />
         <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Title" />
@@ -299,6 +372,74 @@ function ProjectsEditor() {
       </div>
       <input value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Year" />
       <input value={form.stack.join(", ")} onChange={(e) => setForm({ ...form, stack: e.target.value.split(",").map(s => s.trim()).filter(Boolean) })} className="w-full rounded-[5px] border border-[#e0e0e0] px-3 py-2 text-[0.85rem] outline-none focus:border-[#111]" placeholder="Stack (comma separated)" />
+      <div className="rounded-[8px] border border-[#e4e4e4] bg-white">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#eeeeee] px-4 py-3">
+          <div>
+            <p className="text-[0.92rem] font-semibold text-[#111]">Project page sections</p>
+            <p className="mt-1 text-[0.76rem] leading-[1.45] text-[#888]">Overview, persona, palette, typography, final design, galleries, mobile notes, and any other case-study text.</p>
+          </div>
+          <div className="flex gap-2">
+            <button type="button" onClick={() => setExpandedBlocks(new Set(blocks.map((_, index) => index)))} className="rounded-[5px] border border-[#dedede] px-2.5 py-1.5 text-[0.76rem] font-medium text-[#666] hover:text-[#111]">Expand all</button>
+            <button type="button" onClick={() => setExpandedBlocks(new Set())} className="rounded-[5px] border border-[#dedede] px-2.5 py-1.5 text-[0.76rem] font-medium text-[#666] hover:text-[#111]">Collapse all</button>
+          </div>
+        </div>
+        <div className="divide-y divide-[#eeeeee]">
+          {blocks.map((block, index) => {
+            const isOpen = expandedBlocks.has(index);
+            return (
+              <div key={`${block.type}-${index}`}>
+                <button
+                  type="button"
+                  onClick={() => setExpandedBlocks((current) => {
+                    const next = new Set(current);
+                    if (next.has(index)) next.delete(index);
+                    else next.add(index);
+                    return next;
+                  })}
+                  className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+                >
+                  <span>
+                    <span className="block text-[0.84rem] font-semibold text-[#222]">{getBlockTitle(block, index)}</span>
+                    <span className="mt-0.5 block text-[0.72rem] uppercase tracking-[0.12em] text-[#aaa]">{block.type}</span>
+                  </span>
+                  <span className="text-[1.1rem] text-[#aaa]">{isOpen ? "−" : "+"}</span>
+                </button>
+                {isOpen && (
+                  <div className="bg-[#fbfbfb] px-4 pb-4">
+                    <textarea
+                      value={JSON.stringify(block, null, 2)}
+                      onChange={(event) => {
+                        try {
+                          const nextBlock = JSON.parse(event.target.value);
+                          const nextBlocks = [...blocks];
+                          nextBlocks[index] = nextBlock;
+                          setForm({ ...form, caseStudyBlocksJson: JSON.stringify(nextBlocks, null, 2) });
+                          setJsonError(null);
+                        } catch {
+                          setJsonError("This block JSON is not valid yet.");
+                        }
+                      }}
+                      className="min-h-[13rem] w-full rounded-[5px] border border-[#e0e0e0] bg-white px-3 py-2 font-mono text-[0.76rem] leading-[1.55] text-[#333] outline-none focus:border-[#111]"
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div className="border-t border-[#eeeeee] p-4">
+          <p className="mb-2 text-[0.78rem] font-semibold text-[#555]">Full sections JSON</p>
+          <textarea
+            value={form.caseStudyBlocksJson || "[]"}
+            onChange={(event) => {
+              setForm({ ...form, caseStudyBlocksJson: event.target.value });
+              setJsonError(null);
+            }}
+            className="min-h-[14rem] w-full rounded-[5px] border border-[#e0e0e0] bg-white px-3 py-2 font-mono text-[0.76rem] leading-[1.55] text-[#333] outline-none focus:border-[#111]"
+          />
+          {jsonError && <p className="mt-2 text-[0.78rem] font-medium text-[#d33]">{jsonError}</p>}
+        </div>
+      </div>
       <div className="flex gap-2">
         <button onClick={save} className="flex items-center gap-1.5 rounded-[5px] bg-[#111] px-3 py-1.5 text-[0.82rem] font-medium text-white"><FiSave className="text-[0.75rem]" /> Save</button>
         <button onClick={() => { setEditing(null); setShowAdd(false); }} className="flex items-center gap-1.5 rounded-[5px] border border-[#e0e0e0] px-3 py-1.5 text-[0.82rem] font-medium text-[#666]"><FiX className="text-[0.75rem]" /> Cancel</button>

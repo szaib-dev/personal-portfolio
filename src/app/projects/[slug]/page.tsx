@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../../../convex/_generated/api";
-import { getProjectBySlug, projectEntries, type ProjectEntry } from "@/data/site-content";
+import { getProjectBySlug, projectEntries, type CaseStudyBlock, type ProjectEntry } from "@/data/site-content";
 import { getConvexUrlFromEnv } from "@/lib/convex-url";
 import CaseStudyClient from "./CaseStudyClient";
 
@@ -64,6 +64,18 @@ async function getLiveProject(slug: string): Promise<ProjectEntry | null> {
         ],
       } satisfies ProjectEntry);
 
+    let liveBlocks: CaseStudyBlock[] | null = null;
+    if (dbProject.caseStudyBlocksJson) {
+      try {
+        const parsed = JSON.parse(dbProject.caseStudyBlocksJson);
+        if (Array.isArray(parsed)) {
+          liveBlocks = parsed as CaseStudyBlock[];
+        }
+      } catch {
+        liveBlocks = null;
+      }
+    }
+
     return {
       ...base,
       slug: dbProject.slug,
@@ -79,6 +91,7 @@ async function getLiveProject(slug: string): Promise<ProjectEntry | null> {
       client: dbProject.client,
       duration: dbProject.duration,
       stack: dbProject.stack,
+      caseStudyBlocks: liveBlocks ?? base.caseStudyBlocks,
     };
   } catch {
     return staticProject ?? null;

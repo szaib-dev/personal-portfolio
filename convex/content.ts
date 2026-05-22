@@ -116,6 +116,7 @@ export const upsertProject = mutation({
     stack: v.array(v.string()),
     reverse: v.boolean(),
     order: v.number(),
+    caseStudyBlocksJson: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
