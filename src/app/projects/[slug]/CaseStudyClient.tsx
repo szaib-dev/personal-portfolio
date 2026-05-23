@@ -224,7 +224,7 @@ function Block({
                 <div
                   key={item.index}
                   data-project-image
-                  className="aspect-[9/19.5] w-[14rem] flex-shrink-0 overflow-hidden max-[1100px]:w-[12.5rem] max-[700px]:w-[10.5rem]"
+                  className="aspect-[9/19.5] w-[14rem] flex-shrink-0 overflow-hidden transition-transform duration-300 ease-out hover:scale-105 max-[1100px]:w-[12.5rem] max-[700px]:w-[10.5rem]"
                 >
                   {item.url ? (
                     <Image src={item.url as string} alt={item.img.alt} fill className="object-cover" sizes="14rem" loading="lazy" />
