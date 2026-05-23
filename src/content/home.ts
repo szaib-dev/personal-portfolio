@@ -103,14 +103,16 @@ export const referenceCards: ReferenceCard[] = [
 export const aboutContent: AboutContent = {
   heading: ["I’m Shahzaib Mirza,", "a PK-based Developer"],
   columnTwo: [
-    "I’m a seasoned developer with a",
-    "strong passion for creating intuitive",
-    "& user-friendly digital experiences.",
+    "I'm a full-stack web developer",
+    "who builds scalable architecture,",
+    "sharp interfaces, & AI features.",
+
   ],
   columnThree: [
-    "I love collaborating with founders,",
-    "helping them solve UX challenges",
-    "and build solutions.",
+    "I work with founders and businesses",
+    "to build fast, reliable web systems",
+    "that grow with them.",
+
   ],
   bottomText: ["Let me help with a great visual", "solution for your business."],
   primaryImage: "",
