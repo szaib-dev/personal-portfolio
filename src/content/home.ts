@@ -63,37 +63,37 @@ export const values = ["Useful", "Considered", "Beautiful", "Well made"];
 
 export const referenceCards: ReferenceCard[] = [
   {
-    name: "Areeba Khan",
+    name: "Chris Walker",
     role: "Founder at Northlane Studio",
     body:
       "Shahzaib took our rough vision and turned it into a polished site that felt premium, clear, and ready for clients from day one.",
   },
   {
-    name: "Usman Tariq",
+    name: "Zack Reynolds",
     role: "Product Manager at FinSolve",
     body:
       "Working with Shahzaib was incredibly smooth. He made smart frontend decisions, kept the backend clean, and shipped features without drama.",
   },
   {
-    name: "Zara Hameed",
+    name: "Andrew Mitchell",
     role: "Operations Lead at Meditech",
     body:
       "He understood the product quickly, simplified the experience, and built a system that stayed dependable as more users came in.",
   },
   {
-    name: "Bilal Saeed",
+    name: "Jason Cole",
     role: "Co-founder at LaunchGrid",
     body:
       "Shahzaib blends design sensitivity with engineering discipline. The product looked better, loaded faster, and became easier for our team to maintain.",
   },
   {
-    name: "Mariam Ali",
+    name: "Marcus Dean",
     role: "Marketing Lead at Novacrest",
     body:
       "He did not just make the site look good. He gave us a smoother structure, stronger responsiveness, and a web presence that finally matched our brand.",
   },
   {
-    name: "Hassan Raza",
+    name: "Ryan Torres",
     role: "CTO at Taskmint",
     body:
       "He was comfortable across the stack, thoughtful about architecture, and reliable about turning ambiguous requirements into shippable product work.",

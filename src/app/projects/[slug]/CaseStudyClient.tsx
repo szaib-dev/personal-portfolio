@@ -98,9 +98,12 @@ function Block({
                     <p className="mb-2 text-[0.9rem] font-semibold tracking-[-0.01em] text-[#111111]">{card.label}</p>
                     {card.body && <p className="text-[0.86rem] leading-[1.75] text-[#666666]">{card.body}</p>}
                     {card.bullets && card.bullets.length > 0 && (
-                      <div className="mt-1 grid grid-cols-2 gap-x-4">
+                      <div className="mt-2 flex flex-col gap-1.5">
                         {card.bullets.map((b) => (
-                          <p key={b} className="text-[0.84rem] leading-[2.1] text-[#666666]">· {b}</p>
+                          <div key={b} className="flex gap-2.5 text-[0.84rem] leading-[1.6] text-[#666666]">
+                            <span className="mt-[0.55rem] h-1.5 w-1.5 shrink-0 rounded-full bg-[#cccccc]" />
+                            <span>{b}</span>
+                          </div>
                         ))}
                       </div>
                     )}
@@ -153,8 +156,8 @@ function Block({
                 <div className="mt-10 grid grid-cols-2 gap-8 border-t border-dashed border-black/15 pt-8 max-[700px]:grid-cols-1">
                   <div>
                     <div className="mb-5 flex items-center gap-2.5">
-                      <FiCheckCircle aria-hidden="true" className="text-[1.1rem]" style={{ color: accent }} />
-                      <h3 className="text-[1.1rem] font-semibold tracking-[-0.04em]" style={{ color: accent }}>Goals</h3>
+                      <FiCheckCircle aria-hidden="true" className="text-[1.1rem] text-[#22c55e]" />
+                      <h3 className="text-[1.1rem] font-semibold tracking-[-0.04em] text-[#22c55e]">Goals</h3>
                     </div>
                     <ul className="space-y-4 text-[0.88rem] font-medium leading-[1.55] text-[#343434]">
                       {block.goals.map((goal) => (
@@ -167,7 +170,7 @@ function Block({
                   </div>
                   <div>
                     <div className="mb-5 flex items-center gap-2.5">
-                      <FiAlertTriangle aria-hidden="true" className="text-[1.1rem]" style={{ color: accent }} />
+                      <FiAlertTriangle aria-hidden="true" className="text-[1.1rem] text-[#e03030]" />
                       <h3 className="text-[1.1rem] font-semibold tracking-[-0.04em] text-[#e03030]">Frustration</h3>
                     </div>
                     <ul className="space-y-4 text-[0.88rem] font-medium leading-[1.55] text-[#343434]">
@@ -193,11 +196,11 @@ function Block({
                   <h3 className="text-[1.6rem] font-semibold leading-none tracking-[-0.05em] text-[#080808]">{block.name}</h3>
                   <p className="mt-2 text-[0.88rem] font-medium leading-[1.45] text-[#555555]">{block.role}</p>
                 </div>
-                <dl className="mt-6 grid gap-4 text-[0.85rem] leading-[1.45] max-[820px]:justify-items-center">
+                <dl className="mt-6 grid gap-3 text-[0.85rem] leading-[1.45] max-[820px]:justify-items-center">
                   {block.details.map((detail) => (
-                    <div key={detail.label} className="grid grid-cols-[6rem_1fr] gap-3 max-[560px]:grid-cols-1 max-[560px]:gap-0.5">
-                      <dt className="text-[#aaaaaa]">{detail.label}:</dt>
-                      <dd className="font-semibold text-[#2c2c2c]">{detail.value}</dd>
+                    <div key={detail.label} className="flex gap-3 max-[560px]:flex-col max-[560px]:gap-0.5">
+                      <dt className="w-[5.5rem] shrink-0 text-[#999999]">{detail.label}</dt>
+                      <dd className="font-semibold text-[#1a1a1a]">{detail.value}</dd>
                     </div>
                   ))}
                 </dl>
@@ -812,7 +815,8 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
             solution for your business.
           </p>
 
-          <div className="mt-16 flex items-center justify-between border-t border-black/[0.07] pt-9">
+          {/* Desktop footer */}
+          <div className="mt-16 flex items-center justify-between border-t border-black/[0.07] pt-9 max-[560px]:hidden">
             <Link
               href="/"
               className="group inline-flex items-center gap-2 text-[0.92rem] text-[#888888] transition-colors hover:text-[#111111]"
@@ -823,18 +827,6 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
               />
               Back to portfolio
             </Link>
-
-            {/* Back to top button — mobile only, icon only */}
-            <button
-              type="button"
-              aria-label="Back to top"
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="hidden h-7 w-7 items-center justify-center text-[#888888] transition-colors hover:text-[#111111] max-[560px]:flex"
-            >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                <path d="M7 2 L12 8 M7 2 L2 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
 
             <div className="flex flex-wrap gap-6">
               {otherProjects.map((p) => (
@@ -852,7 +844,63 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
               ))}
             </div>
           </div>
+
+          {/* Mobile footer — 3 icon buttons */}
+          <MobileFooterNav otherProjects={otherProjects} />
         </footer>
+      </div>
+    </div>
+  );
+}
+
+function MobileFooterNav({ otherProjects }: { otherProjects: ProjectEntry[] }) {
+  const [currentIdx, setCurrentIdx] = useState(0);
+
+  const nextProject = () => {
+    setCurrentIdx((prev) => (prev + 1) % otherProjects.length);
+  };
+
+  return (
+    <div className="mt-8 hidden border-t border-black/[0.07] pt-6 max-[560px]:block">
+      <div className="flex items-center justify-between">
+        {/* Back — goes to homepage */}
+        <Link
+          href="/"
+          className="flex h-9 w-9 items-center justify-center text-[#888888] transition-colors hover:text-[#111111]"
+          aria-label="Back to portfolio"
+        >
+          <FiArrowLeft className="text-[1.1rem]" />
+        </Link>
+
+        {/* Top — scroll to top */}
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="flex h-9 w-9 items-center justify-center text-[#888888] transition-colors hover:text-[#111111]"
+          aria-label="Scroll to top"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M7 2 L12 8 M7 2 L2 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+
+        {/* Right — cycles through projects */}
+        {otherProjects.length > 0 ? (
+          <Link
+            href={`/projects/${otherProjects[currentIdx].slug}`}
+            onClick={(e) => {
+              if (otherProjects.length > 1) {
+                e.preventDefault();
+                nextProject();
+                window.location.href = `/projects/${otherProjects[(currentIdx + 1) % otherProjects.length].slug}`;
+              }
+            }}
+            className="flex h-9 w-9 items-center justify-center text-[#888888] transition-colors hover:text-[#111111]"
+            aria-label={`Next project: ${otherProjects[currentIdx].title}`}
+          >
+            <FiArrowRight className="text-[1.1rem]" />
+          </Link>
+        ) : null}
       </div>
     </div>
   );

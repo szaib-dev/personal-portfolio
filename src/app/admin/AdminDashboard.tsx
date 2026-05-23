@@ -315,36 +315,6 @@ export default function AdminDashboard({
       {/* Main Content */}
       <main className="mx-auto max-w-[960px] px-6 py-8 max-[560px]:px-4 max-[560px]:py-5">
         {/* Section Header with Collapse All */}
-        {currentProject && (
-          <div className="mb-5 rounded-[8px] border border-[#eaeaea] px-5 py-4 max-[560px]:px-4">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <p className="text-[0.82rem] font-semibold text-[#222222]">
-                  Project icon color
-                </p>
-                <p className="mt-1 text-[0.76rem] leading-[1.45] text-[#888888]">
-                  Controls this project&apos;s accent icons and project label color.
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <input
-                  type="color"
-                  aria-label={`${currentProject.title} icon color`}
-                  value={getProjectAccent(currentProject.slug, currentProject.accent, settings)}
-                  onChange={(event) => handleAccentChange(currentProject.slug, event.target.value)}
-                  className="h-9 w-12 cursor-pointer rounded-[5px] border border-[#dddddd] bg-white p-1"
-                />
-                <input
-                  type="text"
-                  value={getProjectAccent(currentProject.slug, currentProject.accent, settings)}
-                  onChange={(event) => handleAccentChange(currentProject.slug, event.target.value)}
-                  className="h-9 w-[7rem] rounded-[5px] border border-[#dddddd] px-3 font-mono text-[0.78rem] text-[#333333] outline-none transition-colors focus:border-[#111111]"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
         <div className="mb-5 flex items-center justify-between">
           <p className="text-[0.82rem] font-medium text-[#888888]">
             {currentGroup.sections.length} sections · {getTotalSlots(currentGroup)} slots

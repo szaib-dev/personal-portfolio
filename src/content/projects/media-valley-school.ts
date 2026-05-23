@@ -5,14 +5,14 @@ export const mediaValleySchoolProject: ProjectEntry = {
   kicker: "Media Valley School",
   title: "Media Valley School",
   summary:
-    "A full build of a premium online community and school platform for designers, developers, and creators. The hardest challenge was the animation layer — every interaction had to match a detailed design brief exactly, delivered with zero compromise.",
+    "A full build of a premium online community and school platform for designers, developers, and creators. The hardest challenge was the animation layer. Every interaction had to match a detailed design brief exactly, delivered with zero compromise.",
   metaLeft: "Complete Build (Community Platform)",
   metaRight: "Full-Stack Web Developer",
   image: "",
   width: 1086,
   height: 633,
   reverse: false,
-  accent: "#CCFF00",
+  accent: "#222222",
   year: "2026",
   role: "Full-Stack Web Developer",
   client: "Jason (Netherlands)",
@@ -79,12 +79,12 @@ export const mediaValleySchoolProject: ProjectEntry = {
         "The typical visitor to Media Valley School is a freelance designer or developer who is already working but not yet earning what they know they are capable of. They are drawn to community-led learning and peer accountability over traditional courses. They need to feel like joining is a smart business move, not just another subscription.",
       quote: "I've watched enough free YouTube videos. I need to be around people who are actually making money from their skills and willing to show me how.",
       name: "Jordan",
-      role: "Freelance Designer / Developer",
+      role: "Freelance Designer and Developer",
       photo: "/my-personal-2.jpg",
       details: [
         { label: "Age", value: "26" },
-        { label: "Company", value: "Self-employed / freelancing" },
-        { label: "Location", value: "United States / Europe" },
+        { label: "Company", value: "Self-employed, freelancing" },
+        { label: "Location", value: "United States and Europe" },
       ],
       goals: [
         "Find a community of serious creators who share real results",
@@ -136,7 +136,7 @@ export const mediaValleySchoolProject: ProjectEntry = {
       samples: [
         { name: "Display", family: "Geist", weight: "Bold", sample: "Design your freedom." },
         { name: "Body", family: "Geist", weight: "Regular", sample: "Join the elite community of designers, developers, and creators building wealth and mastering their craft." },
-        { name: "Label", family: "Geist", weight: "Medium", sample: "MEDIA VALLEY SCHOOL — SEASON 2 LIVE" },
+        { name: "Label", family: "Geist", weight: "Medium", sample: "MEDIA VALLEY SCHOOL, SEASON 2 LIVE" },
       ],
     },
     {

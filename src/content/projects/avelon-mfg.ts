@@ -6,7 +6,7 @@ export const avelonMfgProject: ProjectEntry = {
   title: "Avelon MFG",
   summary:
     "A complete rebuild of a wholesale distribution website that was losing customers due to slow load times and a confusing experience. The new site cut load time by 70% and increased trade account conversions by 80%.",
-  metaLeft: "Website Redesign / Complete Rebuild",
+  metaLeft: "Website Redesign, Complete Rebuild",
   metaRight: "Full-Stack Web Developer",
   image: "",
   width: 1086,

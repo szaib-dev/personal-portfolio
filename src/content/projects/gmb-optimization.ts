@@ -84,7 +84,7 @@ export const gmbOptimizationProject: ProjectEntry = {
       details: [
         { label: "Age", value: "42" },
         { label: "Company", value: "Local service business" },
-        { label: "Location", value: "United States / Australia" },
+        { label: "Location", value: "Australia" },
       ],
       goals: [
         "Find a marketing partner who can show real proof of results",

@@ -47,7 +47,7 @@ export const visualPoetryProject: ProjectEntry = {
           {
             icon: "role",
             label: "My role:",
-            body: "Design system and front-end direction — brand, layout, motion, and responsive behavior.",
+            body: "Design system and front-end direction. Brand, layout, motion, and responsive behavior.",
           },
           {
             icon: "responsibilities",

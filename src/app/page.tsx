@@ -482,23 +482,18 @@ export default function Home() {
                 }`}
               >
                 <div className={`${isReversed ? "order-2 max-[1220px]:order-none" : ""} max-w-[26rem]`}>
-                <p
-                  className="text-[0.92rem] font-semibold tracking-[-0.02em]"
+                <Link href={`/projects/${project.slug}`}
+                  className="text-[0.92rem] font-semibold tracking-[-0.02em] transition-opacity hover:opacity-70"
                   style={{ color: accent }}
                 >
                   {project.kicker}
-                </p>
-                <h2 className="mt-[0.55rem] text-[clamp(2.8rem,3.9vw,4rem)] font-medium leading-[0.95] tracking-[-0.06em]">
+                </Link>
+                <Link href={`/projects/${project.slug}`} className="mt-[0.55rem] block text-[clamp(2.8rem,3.9vw,4rem)] font-medium leading-[0.95] tracking-[-0.06em] transition-opacity hover:opacity-70">
                   {project.title}
-                </h2>
+                </Link>
                 <p data-text-rise className="mt-[1.45rem] text-[1.12rem] leading-[1.68] text-[#454545]">
                   {project.summary}
                 </p>
-
-                <div className="mt-7 grid grid-cols-2 gap-4 border-t border-dashed border-black/20 pt-5 text-[#1d1d1d]">
-                  <span className="text-base">{project.metaLeft}</span>
-                  <span className="text-base">{project.metaRight}</span>
-                </div>
               </div>
 
                 <Link

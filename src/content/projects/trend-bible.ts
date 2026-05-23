@@ -7,7 +7,7 @@ export const trendBibleProject: ProjectEntry = {
     summary:
       "A bold subscription-first editorial platform concept built to package market signals into a high-impact landing page with oversized type, strong hierarchy, and a confident conversion flow.",
     metaLeft: "Editorial platform",
-    metaRight: "UI / Frontend concept",
+    metaRight: "UI and Frontend concept",
     image: "",
     width: 1086,
     height: 633,
@@ -47,7 +47,7 @@ export const trendBibleProject: ProjectEntry = {
           {
             icon: "role",
             label: "My role:",
-            body: "Full stack concept build — UI direction, content structure, and front-end implementation.",
+            body: "Full stack concept build. UI direction, content structure, and front-end implementation.",
           },
           {
             icon: "responsibilities",
