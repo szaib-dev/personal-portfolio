@@ -159,7 +159,7 @@ export default function Home() {
         ease: "power2.in",
         delay: 0.18,
         onComplete: () => {
-          setIntroText("5+ years of experience");
+          setIntroText("Welcome!");
         },
       })
       .fromTo(

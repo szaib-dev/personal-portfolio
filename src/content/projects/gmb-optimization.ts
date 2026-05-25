@@ -59,7 +59,6 @@ export const gmbOptimizationProject: ProjectEntry = {
             "Multi-page service architecture covering 8 distinct service offerings",
             "Case study results section with real client metrics",
             "Process and methodology pages built to build trust before the sale",
-            "WhatsApp live chat integration and contact flow",
           ],
         },
       ],
