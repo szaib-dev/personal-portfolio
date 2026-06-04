@@ -298,7 +298,7 @@ function Block({
                     <button
                       type="button"
                       aria-label={`Open ${item.img.alt}`}
-                      className="group relative block aspect-[16/10] w-full cursor-zoom-in overflow-hidden text-left"
+                      className="group relative block aspect-[16/10] w-full cursor-pointer overflow-hidden text-left"
                       onClick={() => setLightboxIndex(currentLightboxIndex)}
                     >
                       <Image
@@ -318,6 +318,22 @@ function Block({
               );
             })}
           </div>
+
+          {lightboxItems.length > 0 && (
+            <div aria-hidden="true" className="pointer-events-none fixed -left-[200vw] top-0 h-[82vh] w-[92vw] overflow-hidden opacity-0">
+              {lightboxItems.map((item) => (
+                <Image
+                  key={item.index}
+                  src={item.url}
+                  alt=""
+                  fill
+                  className="object-contain"
+                  sizes="92vw"
+                  loading="eager"
+                />
+              ))}
+            </div>
+          )}
 
           {activeLightboxItem && (
             <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/90 px-5 py-8">
@@ -348,7 +364,7 @@ function Block({
                   fill
                   className="object-contain"
                   sizes="92vw"
-                  loading="lazy"
+                  loading="eager"
                 />
               </div>
 
