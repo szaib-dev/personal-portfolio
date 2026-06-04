@@ -7,9 +7,9 @@ import { minutetasteProject } from "./minutetaste";
 export const projectEntries = [
   avelonMfgProject,
   gmbOptimizationProject,
-  mediaValleySchoolProject,
   dronerolesProject,
   minutetasteProject,
+  mediaValleySchoolProject,
 ];
 
 export function getProjectBySlug(slug: string) {

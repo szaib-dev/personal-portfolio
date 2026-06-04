@@ -83,7 +83,7 @@ export const minutetasteProject: ProjectEntry = {
       body:
         "The typical MinuteTaste customer is a local regular who knows the restaurant and wants a faster way to reserve a table or order pickup without calling in. They are comfortable with a simple web flow on their phone, they pay via bank transfer or TNG because that is how things work locally, and they want confirmation that their order is real and being handled.",
       quote:
-        "I just want to pick my food, pay, and show up. I don't need an app, I just need it to work.",
+        "If I reserve a table or order pickup, I need a clear confirmation that the restaurant has received it and my payment proof is safely attached.",
       name: "Mei Lin",
       role: "Regular customer, office worker",
       photo: "",
