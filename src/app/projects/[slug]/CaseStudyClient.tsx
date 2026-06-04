@@ -22,6 +22,7 @@ import {
   FiUsers,
   FiCheckCircle,
   FiAlertTriangle,
+  FiX,
 } from "react-icons/fi";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
@@ -71,8 +72,9 @@ function Block({
   projectSlug?: string;
   imagesLoading?: boolean;
 }) {
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
-  // Unified two-column grid — 260px left label, right content
+  // Unified two-column grid - 260px left label, right content
   const ROW = "grid grid-cols-[260px_1fr] gap-x-20 border-t border-black/[0.07] py-12 max-[900px]:grid-cols-1 max-[900px]:gap-y-5 max-[900px]:py-8";
   const LABEL = "pt-0.5 text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#888888]";
 
@@ -267,22 +269,102 @@ function Block({
       })).filter((item) => imagesLoading || item.url || !block.hideMissing);
 
       if (galleryItems.length === 0) return null;
+      const lightboxItems = galleryItems.filter(
+        (item): item is typeof item & { url: string } => Boolean(item.url)
+      );
+      const activeLightboxItem = lightboxIndex === null ? null : lightboxItems[lightboxIndex];
+      const showPrevious = () => {
+        setLightboxIndex((current) => {
+          if (current === null || lightboxItems.length === 0) return current;
+          return current === 0 ? lightboxItems.length - 1 : current - 1;
+        });
+      };
+      const showNext = () => {
+        setLightboxIndex((current) => {
+          if (current === null || lightboxItems.length === 0) return current;
+          return current === lightboxItems.length - 1 ? 0 : current + 1;
+        });
+      };
 
       return (
-        <div data-reveal className={`grid gap-4 border-t border-black/[0.07] py-12 ${cols}`}>
-          {galleryItems.map((item) => (
-            <div key={item.index} data-project-image className="overflow-hidden rounded-[3px] bg-[#f4f4f4] shadow-[0_14px_34px_rgba(0,0,0,0.08)]">
-              {item.url ? (
-                <div className="relative aspect-[16/10] w-full">
-                  <Image src={item.url as string} alt={item.img.alt} fill className="object-cover" sizes="(max-width: 560px) 100vw, (max-width: 900px) 50vw, 33vw" loading="lazy" />
+        <>
+          <div data-reveal className={`grid gap-4 border-t border-black/[0.07] py-12 ${cols}`}>
+            {galleryItems.map((item) => {
+              const currentLightboxIndex = lightboxItems.findIndex((lightboxItem) => lightboxItem.index === item.index);
+
+              return (
+                <div key={item.index} data-project-image className="overflow-hidden rounded-[4px] bg-[#f4f4f4] shadow-[0_18px_44px_rgba(0,0,0,0.14)] ring-1 ring-black/[0.04]">
+                  {item.url ? (
+                    <button
+                      type="button"
+                      aria-label={`Open ${item.img.alt}`}
+                      className="group relative block aspect-[16/10] w-full cursor-zoom-in overflow-hidden text-left"
+                      onClick={() => setLightboxIndex(currentLightboxIndex)}
+                    >
+                      <Image
+                        src={item.url as string}
+                        alt={item.img.alt}
+                        fill
+                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.025]"
+                        sizes="(max-width: 560px) 100vw, (max-width: 900px) 50vw, 33vw"
+                        loading="lazy"
+                      />
+                    </button>
+                  ) : (
+                    <ImageSkeleton className="aspect-[16/10] w-full" />
+                  )}
+                  {item.img.caption && <p className="px-3 pb-3 pt-2 text-[0.72rem] leading-[1.4] text-[#b0b0b0]">{item.img.caption}</p>}
                 </div>
-              ) : (
-                <ImageSkeleton className="aspect-[16/10] w-full" />
+              );
+            })}
+          </div>
+
+          {activeLightboxItem && (
+            <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/90 px-5 py-8">
+              <button
+                type="button"
+                aria-label="Close image"
+                className="absolute right-5 top-5 grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-white/10 text-white backdrop-blur transition hover:bg-white/20"
+                onClick={() => setLightboxIndex(null)}
+              >
+                <FiX className="text-[1.25rem]" />
+              </button>
+
+              {lightboxItems.length > 1 && (
+                <button
+                  type="button"
+                  aria-label="Previous image"
+                  className="absolute left-5 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-white/10 text-white backdrop-blur transition hover:bg-white/20 max-[640px]:left-3"
+                  onClick={showPrevious}
+                >
+                  <FiArrowLeft className="text-[1.35rem]" />
+                </button>
               )}
-              {item.img.caption && <p className="px-3 pb-3 pt-2 text-[0.72rem] leading-[1.4] text-[#b0b0b0]">{item.img.caption}</p>}
+
+              <div className="relative h-[82vh] w-full max-w-[92vw]">
+                <Image
+                  src={activeLightboxItem.url}
+                  alt={activeLightboxItem.img.alt}
+                  fill
+                  className="object-contain"
+                  sizes="92vw"
+                  loading="lazy"
+                />
+              </div>
+
+              {lightboxItems.length > 1 && (
+                <button
+                  type="button"
+                  aria-label="Next image"
+                  className="absolute right-5 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-white/10 text-white backdrop-blur transition hover:bg-white/20 max-[640px]:right-3"
+                  onClick={showNext}
+                >
+                  <FiArrowRight className="text-[1.35rem]" />
+                </button>
+              )}
             </div>
-          ))}
-        </div>
+          )}
+        </>
       );
     }
 
