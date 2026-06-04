@@ -784,7 +784,12 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
                   </svg>
                 ),
               },
-            ].map((item) => (
+            ]
+              .filter((item) => {
+                const hideResearch = project.slug === "droneroles" || project.slug === "minutetaste";
+                return !(hideResearch && item.label === "Research");
+              })
+              .map((item) => (
               <a
                 key={item.label}
                 href={`#${item.label.toLowerCase()}`}
