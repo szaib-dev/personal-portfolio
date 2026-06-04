@@ -60,6 +60,7 @@ function Block({
   id,
   getImageUrl,
   personaPhotoUrl,
+  projectSlug,
   imagesLoading = false,
 }: {
   block: CaseStudyBlock;
@@ -67,6 +68,7 @@ function Block({
   id?: string;
   getImageUrl?: (index: number, type: "gallery" | "mobile") => string | null;
   personaPhotoUrl?: string | null;
+  projectSlug?: string;
   imagesLoading?: boolean;
 }) {
 
@@ -212,6 +214,7 @@ function Block({
 
     case "gallery": {
       if (block.columns === 5) {
+        const isDroneRoles = projectSlug === "droneroles";
         const mobileItems = block.images.map((img, i) => ({
           img,
           url: getImageUrl ? getImageUrl(i, "mobile") : null,
@@ -222,15 +225,26 @@ function Block({
 
         return (
           <div data-reveal className="border-t border-black/[0.07] py-12 overflow-hidden">
-            <div className="flex items-end justify-center gap-3 max-[700px]:flex-wrap">
+            <div className={`flex items-end justify-center max-[700px]:flex-wrap ${isDroneRoles ? "gap-2" : "gap-3"}`}>
               {mobileItems.map((item) => (
                 <div
                   key={item.index}
                   data-project-image
-                  className="aspect-[9/19.5] w-[14rem] flex-shrink-0 overflow-hidden transition-transform duration-300 ease-out hover:scale-105 max-[1100px]:w-[12.5rem] max-[700px]:w-[10.5rem]"
+                  className={`relative aspect-[9/19.5] flex-shrink-0 overflow-hidden transition-transform duration-300 ease-out hover:scale-105 ${
+                    isDroneRoles
+                      ? "w-[13rem] bg-transparent max-[1100px]:w-[11.5rem] max-[700px]:w-[10rem]"
+                      : "w-[14rem] max-[1100px]:w-[12.5rem] max-[700px]:w-[10.5rem]"
+                  }`}
                 >
                   {item.url ? (
-                    <Image src={item.url as string} alt={item.img.alt} fill className="object-cover" sizes="14rem" loading="lazy" />
+                    <Image
+                      src={item.url as string}
+                      alt={item.img.alt}
+                      fill
+                      className={isDroneRoles ? "object-contain" : "object-cover"}
+                      sizes={isDroneRoles ? "13rem" : "14rem"}
+                      loading="lazy"
+                    />
                   ) : (
                     <ImageSkeleton className="h-full w-full" />
                   )}
@@ -257,10 +271,11 @@ function Block({
       return (
         <div data-reveal className={`grid gap-4 border-t border-black/[0.07] py-12 ${cols}`}>
           {galleryItems.map((item) => (
-            <div key={item.index} data-project-image className="overflow-hidden rounded-[3px] bg-[#f4f4f4]">
+            <div key={item.index} data-project-image className="overflow-hidden rounded-[3px] bg-[#f4f4f4] shadow-[0_14px_34px_rgba(0,0,0,0.08)]">
               {item.url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={item.url as string} alt={item.img.alt} className="block h-auto w-full" loading="lazy" />
+                <div className="relative aspect-[16/10] w-full">
+                  <Image src={item.url as string} alt={item.img.alt} fill className="object-cover" sizes="(max-width: 560px) 100vw, (max-width: 900px) 50vw, 33vw" loading="lazy" />
+                </div>
               ) : (
                 <ImageSkeleton className="aspect-[16/10] w-full" />
               )}
@@ -801,6 +816,7 @@ function CaseStudyContent({ project, otherProjects, convexImages }: Props & { co
                   id={blockId}
                   getImageUrl={imageUrlGetter}
                   personaPhotoUrl={convexImages?.personaImageUrl}
+                  projectSlug={project.slug}
                   imagesLoading={imagesLoading}
                 />
               );
