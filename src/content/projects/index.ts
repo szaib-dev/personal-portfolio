@@ -2,12 +2,14 @@ import { avelonMfgProject } from "./avelon-mfg";
 import { dronerolesProject } from "./droneroles";
 import { gmbOptimizationProject } from "./gmb-optimization";
 import { mediaValleySchoolProject } from "./media-valley-school";
+import { minutetasteProject } from "./minutetaste";
 
 export const projectEntries = [
   avelonMfgProject,
   gmbOptimizationProject,
   mediaValleySchoolProject,
   dronerolesProject,
+  minutetasteProject,
 ];
 
 export function getProjectBySlug(slug: string) {
